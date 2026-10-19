@@ -1,0 +1,514 @@
+[
+  {
+    "source": "/en/86-garments",
+    "destination": "/collections/garments"
+  },
+  {
+    "source": "/en/45-gents",
+    "destination": "/collections/gents"
+  },
+  {
+    "source": "/en/51-shorts",
+    "destination": "/collections/gents-shorts"
+  },
+  {
+    "source": "/en/57-loom-don-shorts",
+    "destination": "/products/loom-don-shorts"
+  },
+  {
+    "source": "/en/58-jersy-king",
+    "destination": "/products/jersy-king-shorts"
+  },
+  {
+    "source": "/en/60-superfine-shorts",
+    "destination": "/products/super-fine-shorts"
+  },
+  {
+    "source": "/en/69-boxers",
+    "destination": "/products/gents-boxer"
+  },
+  {
+    "source": "/en/70-printed",
+    "destination": "/products/gents-boxer"
+  },
+  {
+    "source": "/en/102-printed-shorts",
+    "destination": "/products/printed-shorts"
+  },
+  {
+    "source": "/en/118-prime-fit-gents-shorts",
+    "destination": "/products/prime-fit-gents-shorts"
+  },
+  {
+    "source": "/en/119-alien-gents-shorts",
+    "destination": "/products/alien-gents-shorts"
+  },
+  {
+    "source": "/en/53-tracks",
+    "destination": "/collections/gents-tracks"
+  },
+  {
+    "source": "/en/65-loom-don-track-with-rib",
+    "destination": "/products/loom-don-track-with-rib"
+  },
+  {
+    "source": "/en/66-loom-don-track-without-rib",
+    "destination": "/products/loom-don-track-with-out-rib"
+  },
+  {
+    "source": "/en/67-fine-comfort-track",
+    "destination": "/products/fine-comfort-track"
+  },
+  {
+    "source": "/en/68-sports-pant",
+    "destination": "/products/sports-slim-track-without-rib"
+  },
+  {
+    "source": "/en/101-urban-track-",
+    "destination": "/products/urban-track"
+  },
+  {
+    "source": "/en/120-prime-fit-gents-track",
+    "destination": "/products/prime-fit-gents-track"
+  },
+  {
+    "source": "/en/121-prime-fit-gents-jogger",
+    "destination": "/products/prime-fit-gents-jogger"
+  },
+  {
+    "source": "/en/88-34th",
+    "destination": "/collections/gents-3-4th"
+  },
+  {
+    "source": "/en/96-loom-don-34-th-with-rib",
+    "destination": "/products/loom-don-34-th-with-rib"
+  },
+  {
+    "source": "/en/98-fine-comfort-34-th",
+    "destination": "/products/fine-comfort-34-th"
+  },
+  {
+    "source": "/en/99-loom-don-34th-without-rib",
+    "destination": "/products/loom-don-34th-without-rib"
+  },
+  {
+    "source": "/en/100-urban-34th",
+    "destination": "/products/urban-34-th"
+  },
+  {
+    "source": "/en/122-t-shirt",
+    "destination": "/collections/gents-t-shirt"
+  },
+  {
+    "source": "/en/123-adventure-gents-t-shirt",
+    "destination": "/collections/gents-t-shirt"
+  },
+  {
+    "source": "/en/124-elegant-t-shirt",
+    "destination": "/collections/gents-t-shirt"
+  },
+  {
+    "source": "/en/46-kids",
+    "destination": "/collections/kids"
+  },
+  {
+    "source": "/en/92-shorts",
+    "destination": "/collections/kids-shorts"
+  },
+  {
+    "source": "/en/104-loom-kids",
+    "destination": "/collections/kids-shorts"
+  },
+  {
+    "source": "/en/109-jersey-kids-shorts",
+    "destination": "/products/jersy-kids-shorts"
+  },
+  {
+    "source": "/en/110-honey-kids-shorts",
+    "destination": "/products/honey-kids-shorts"
+  },
+  {
+    "source": "/en/111-jersey-boys-shorts",
+    "destination": "/products/jersey-boys-shorts"
+  },
+  {
+    "source": "/en/112-honey-boys-shorts",
+    "destination": "/products/honey-boys-shorts"
+  },
+  {
+    "source": "/en/113-urban-boys-shorts",
+    "destination": "/products/urban-boys-shorts"
+  },
+  {
+    "source": "/en/93-tracks",
+    "destination": "/collections/kids-tracks"
+  },
+  {
+    "source": "/en/105-new-york-kids-track",
+    "destination": "/products/new-york-kids-track"
+  },
+  {
+    "source": "/en/106-new-york-boys-track",
+    "destination": "/products/new-york-boys-track"
+  },
+  {
+    "source": "/en/114-new-york-kids-jogger",
+    "destination": "/products/new-york-kids-jogger"
+  },
+  {
+    "source": "/en/115-new-york-boys-jogger",
+    "destination": "/products/new-york-boys-jogger"
+  },
+  {
+    "source": "/en/103--34-th",
+    "destination": "/collections/kids-3-4th"
+  },
+  {
+    "source": "/en/107-new-york-kids-34th",
+    "destination": "/collections/kids-3-4th"
+  },
+  {
+    "source": "/en/108-new-york-boys-34th",
+    "destination": "/products/new-york-boys-34th"
+  },
+  {
+    "source": "/en/116-new-york-kids-34th-jogger",
+    "destination": "/collections/kids-3-4th"
+  },
+  {
+    "source": "/en/117-new-york-boys-34th-jogger",
+    "destination": "/products/new-york-boys-34th-jogger"
+  },
+  {
+    "source": "/en/73-fabric-unstitched",
+    "destination": "/collections/fabric-unstitched"
+  },
+  {
+    "source": "/en/75-lungi",
+    "destination": "/collections/lungi"
+  },
+  {
+    "source": "/en/80-printed-lungi",
+    "destination": "/collections/printed-lungi"
+  },
+  {
+    "source": "/en/83-checked-lungi",
+    "destination": "/collections/checked-lungi"
+  },
+  {
+    "source": "/en/77-kavi",
+    "destination": "/collections/kavi"
+  },
+  {
+    "source": "/en/84-kavi-dhothy",
+    "destination": "/collections/kavi-dhothy"
+  },
+  {
+    "source": "/en/78-towels",
+    "destination": "/collections/towels"
+  },
+  {
+    "source": "/en/79-kerchief",
+    "destination": "/collections/kerchief"
+  },
+  {
+    "source": "/en/home/-61loom-kids.html",
+    "destination": "/products/loom-kids"
+  },
+  {
+    "source": "/en/home/fine-comfort-track.html",
+    "destination": "/products/fine-comfort-track"
+  },
+  {
+    "source": "/en/home/loom-don-track-with-out-rib.html",
+    "destination": "/products/loom-don-track-with-out-rib"
+  },
+  {
+    "source": "/en/home/printed-shorts.html",
+    "destination": "/products/printed-shorts"
+  },
+  {
+    "source": "/en/home/sports-slim-track-without-rib.html",
+    "destination": "/products/sports-slim-track-without-rib"
+  },
+  {
+    "source": "/en/home/super-fine-shorts.html",
+    "destination": "/products/super-fine-shorts"
+  },
+  {
+    "source": "/en/home/hand-kerchief-160.html",
+    "destination": "/products/hand-kerchief-160"
+  },
+  {
+    "source": "/en/home/benz-kavi.html",
+    "destination": "/products/benz-kavi"
+  },
+  {
+    "source": "/en/home/jai-classic-lungi.html",
+    "destination": "/products/jai-classic-lungi"
+  },
+  {
+    "source": "/en/home/gents-boxer.html",
+    "destination": "/products/gents-boxer"
+  },
+  {
+    "source": "/en/garments/loom-don-track-with-rib.html",
+    "destination": "/products/loom-don-track-with-rib"
+  },
+  {
+    "source": "/en/home/loom-don-shorts.html",
+    "destination": "/products/loom-don-shorts"
+  },
+  {
+    "source": "/en/home/jersy-king-shorts.html",
+    "destination": "/products/jersy-king-shorts"
+  },
+  {
+    "source": "/en/home/loom-don-34-th-with-rib.html",
+    "destination": "/products/loom-don-34-th-with-rib"
+  },
+  {
+    "source": "/en/home/fine-comfort-34-th.html",
+    "destination": "/products/fine-comfort-34-th"
+  },
+  {
+    "source": "/en/home/loom-don-34th-without-rib.html",
+    "destination": "/products/loom-don-34th-without-rib"
+  },
+  {
+    "source": "/en/home/urban-34-th.html",
+    "destination": "/products/urban-34-th"
+  },
+  {
+    "source": "/en/home/urban-track.html",
+    "destination": "/products/urban-track"
+  },
+  {
+    "source": "/en/new-york-kids-track/new-york-kids-track.html",
+    "destination": "/products/new-york-kids-track"
+  },
+  {
+    "source": "/en/home/new-york-boys-track.html",
+    "destination": "/products/new-york-boys-track"
+  },
+  {
+    "source": "/en/new-york-kids-34th/new-york-kids-34th-.html",
+    "destination": "/products/new-york-kids-34th"
+  },
+  {
+    "source": "/en/new-york-boys-34th/new-york-boys-34th.html",
+    "destination": "/products/new-york-boys-34th"
+  },
+  {
+    "source": "/en/jersey-kids-shorts/jersy-kids-shorts.html",
+    "destination": "/products/jersy-kids-shorts"
+  },
+  {
+    "source": "/en/honey-kids-shorts/honey-kids-shorts.html",
+    "destination": "/products/honey-kids-shorts"
+  },
+  {
+    "source": "/en/urban-boys-shorts/urban-boys-shorts.html",
+    "destination": "/products/urban-boys-shorts"
+  },
+  {
+    "source": "/en/jersey-boys-shorts/jersey-boys-shorts.html",
+    "destination": "/products/jersey-boys-shorts"
+  },
+  {
+    "source": "/en/honey-boys-shorts/honey-boys-shorts.html",
+    "destination": "/products/honey-boys-shorts"
+  },
+  {
+    "source": "/en/new-york-kids-jogger/new-york-kids-jogger.html",
+    "destination": "/products/new-york-kids-jogger"
+  },
+  {
+    "source": "/en/new-york-boys-jogger/new-york-boys-jogger.html",
+    "destination": "/products/new-york-boys-jogger"
+  },
+  {
+    "source": "/en/new-york-kids-34th/new-kids-34th-jogger.html",
+    "destination": "/products/new-kids-34th-jogger"
+  },
+  {
+    "source": "/en/new-york-boys-34th-jogger/new-york-boys-34th-jogger.html",
+    "destination": "/products/new-york-boys-34th-jogger"
+  },
+  {
+    "source": "/en/home/prime-fit-gents-shorts.html",
+    "destination": "/products/prime-fit-gents-shorts"
+  },
+  {
+    "source": "/en/home/alien-gents-shorts.html",
+    "destination": "/products/alien-gents-shorts"
+  },
+  {
+    "source": "/en/home/prime-fit-gents-track.html",
+    "destination": "/products/prime-fit-gents-track"
+  },
+  {
+    "source": "/en/home/prime-fit-gents-jogger.html",
+    "destination": "/products/prime-fit-gents-jogger"
+  },
+  {
+    "source": "/en/home/city-king-lungi.html",
+    "destination": "/products/city-king-lungi"
+  },
+  {
+    "source": "/en/home/royal-lungi.html",
+    "destination": "/products/royal-lungi"
+  },
+  {
+    "source": "/en/home/oscar-lungi.html",
+    "destination": "/products/oscar-lungi"
+  },
+  {
+    "source": "/en/home/1st-class-lungi.html",
+    "destination": "/products/1st-class-lungi"
+  },
+  {
+    "source": "/en/home/polo-lungi.html",
+    "destination": "/products/polo-lungi"
+  },
+  {
+    "source": "/en/home/golden-eagle-lungi.html",
+    "destination": "/products/golden-eagle-lungi"
+  },
+  {
+    "source": "/en/home/mayil-brand-lungi.html",
+    "destination": "/products/mayil-brand-lungi"
+  },
+  {
+    "source": "/en/home/tatoo-lungi.html",
+    "destination": "/products/tatoo-lungi"
+  },
+  {
+    "source": "/en/home/don-lungi.html",
+    "destination": "/products/don-lungi"
+  },
+  {
+    "source": "/en/home/vel-brand-lungi.html",
+    "destination": "/products/vel-brand-lungi"
+  },
+  {
+    "source": "/en/home/black-forest-kavi.html",
+    "destination": "/products/black-forest-kavi"
+  },
+  {
+    "source": "/en/home/colour-cube-kavi.html",
+    "destination": "/products/colour-cube-kavi"
+  },
+  {
+    "source": "/en/home/colour-fantasy-kavi.html",
+    "destination": "/products/colour-fantasy-kavi"
+  },
+  {
+    "source": "/en/home/colour-spark-kavi.html",
+    "destination": "/products/colour-spark-kavi"
+  },
+  {
+    "source": "/en/home/crown-spark-kavi.html",
+    "destination": "/products/crown-spark-kavi"
+  },
+  {
+    "source": "/en/home/crysta-kavi.html",
+    "destination": "/products/crysta-kavi"
+  },
+  {
+    "source": "/en/home/kaala-kavi.html",
+    "destination": "/products/kaala-kavi"
+  },
+  {
+    "source": "/en/home/kohinoor-kavi.html",
+    "destination": "/products/kohinoor-kavi"
+  },
+  {
+    "source": "/en/home/lotus-kavi.html",
+    "destination": "/products/lotus-kavi"
+  },
+  {
+    "source": "/en/home/majestic-kavi.html",
+    "destination": "/products/majestic-kavi"
+  },
+  {
+    "source": "/en/home/rose-kavi.html",
+    "destination": "/products/rose-kavi"
+  },
+  {
+    "source": "/en/home/super-fast-kavi.html",
+    "destination": "/products/super-fast-kavi"
+  },
+  {
+    "source": "/en/home/target-kavi.html",
+    "destination": "/products/target-kavi"
+  },
+  {
+    "source": "/en/home/-prince-towel.html",
+    "destination": "/products/prince-towel"
+  },
+  {
+    "source": "/en/home/-prince-white-towel.html",
+    "destination": "/products/prince-white-towel"
+  },
+  {
+    "source": "/en/home/vip-colour-towel.html",
+    "destination": "/products/vip-colour-towel"
+  },
+  {
+    "source": "/en/home/-vip-white-1-towel.html",
+    "destination": "/products/vip-white-1-towel"
+  },
+  {
+    "source": "/en/home/-vip-white-2-towel.html",
+    "destination": "/products/vip-white-2-towel"
+  },
+  {
+    "source": "/en/home/-white-jagard-towel.html",
+    "destination": "/products/white-jagard-towel"
+  },
+  {
+    "source": "/en/home/charle-check.html",
+    "destination": "/products/charle-check"
+  },
+  {
+    "source": "/en/home/charlee-check-white.html",
+    "destination": "/products/charlee-check-white"
+  },
+  {
+    "source": "/en/home/chess-raja.html",
+    "destination": "/products/chess-raja"
+  },
+  {
+    "source": "/en/home/handkerchief-160.html",
+    "destination": "/products/handkerchief-160"
+  },
+  {
+    "source": "/en/home/white-handkerchief-1030.html",
+    "destination": "/products/white-handkerchief-1030"
+  },
+  {
+    "source": "/en/home/handkerchief-3450.html",
+    "destination": "/products/handkerchief-3450"
+  },
+  {
+    "source": "/en/home/handkerchief-4400.html",
+    "destination": "/products/handkerchief-4400"
+  },
+  {
+    "source": "/en/home/handkerchief-4450.html",
+    "destination": "/products/handkerchief-4450"
+  },
+  {
+    "source": "/en/home/handkerchief-160-light.html",
+    "destination": "/products/handkerchief-160-light"
+  },
+  {
+    "source": "/en/home/handkerchief-44001.html",
+    "destination": "/products/handkerchief-44001"
+  },
+  {
+    "source": "/en/87-ladies",
+    "destination": "/shop"
+  }
+]
