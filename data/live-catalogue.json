@@ -1,0 +1,3568 @@
+{
+  "source": "https://lesparo.com/en/",
+  "crawledAt": "2026-10-19T07:20:19.217Z",
+  "categories": [
+    {
+      "legacyId": 86,
+      "name": "Garments",
+      "legacyUrl": "https://lesparo.com/en/86-garments",
+      "parentLegacyId": null,
+      "depth": 1,
+      "productLegacyIds": [
+        40,
+        37,
+        39,
+        28,
+        89,
+        36,
+        92,
+        101,
+        34,
+        102,
+        103,
+        104,
+        105,
+        35,
+        38,
+        120,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        132,
+        133,
+        134,
+        137,
+        138,
+        141,
+        142
+      ]
+    },
+    {
+      "legacyId": 45,
+      "name": "Gents",
+      "legacyUrl": "https://lesparo.com/en/45-gents",
+      "parentLegacyId": 86,
+      "depth": 2,
+      "productLegacyIds": [
+        40,
+        39,
+        38,
+        37,
+        36,
+        35,
+        34,
+        89,
+        92,
+        101,
+        102,
+        103,
+        104,
+        105,
+        137,
+        138,
+        141,
+        142
+      ]
+    },
+    {
+      "legacyId": 51,
+      "name": "Shorts",
+      "legacyUrl": "https://lesparo.com/en/51-shorts",
+      "parentLegacyId": 45,
+      "depth": 3,
+      "productLegacyIds": [
+        35,
+        40,
+        89,
+        92,
+        38,
+        137,
+        138
+      ]
+    },
+    {
+      "legacyId": 57,
+      "name": "Loom Don Shorts",
+      "legacyUrl": "https://lesparo.com/en/57-loom-don-shorts",
+      "parentLegacyId": 51,
+      "depth": 4,
+      "productLegacyIds": [
+        89
+      ]
+    },
+    {
+      "legacyId": 58,
+      "name": "Jersy King",
+      "legacyUrl": "https://lesparo.com/en/58-jersy-king",
+      "parentLegacyId": 51,
+      "depth": 4,
+      "productLegacyIds": [
+        92
+      ]
+    },
+    {
+      "legacyId": 60,
+      "name": "Superfine Shorts",
+      "legacyUrl": "https://lesparo.com/en/60-superfine-shorts",
+      "parentLegacyId": 51,
+      "depth": 4,
+      "productLegacyIds": [
+        40
+      ]
+    },
+    {
+      "legacyId": 69,
+      "name": "Boxers",
+      "legacyUrl": "https://lesparo.com/en/69-boxers",
+      "parentLegacyId": 51,
+      "depth": 4,
+      "productLegacyIds": [
+        35
+      ]
+    },
+    {
+      "legacyId": 70,
+      "name": "Printed",
+      "legacyUrl": "https://lesparo.com/en/70-printed",
+      "parentLegacyId": 69,
+      "depth": 5,
+      "productLegacyIds": [
+        35
+      ]
+    },
+    {
+      "legacyId": 102,
+      "name": "Printed Shorts",
+      "legacyUrl": "https://lesparo.com/en/102-printed-shorts",
+      "parentLegacyId": 51,
+      "depth": 4,
+      "productLegacyIds": [
+        38
+      ]
+    },
+    {
+      "legacyId": 118,
+      "name": "Prime Fit Gents Shorts",
+      "legacyUrl": "https://lesparo.com/en/118-prime-fit-gents-shorts",
+      "parentLegacyId": 51,
+      "depth": 4,
+      "productLegacyIds": [
+        137
+      ]
+    },
+    {
+      "legacyId": 119,
+      "name": "Alien Gents Shorts",
+      "legacyUrl": "https://lesparo.com/en/119-alien-gents-shorts",
+      "parentLegacyId": 51,
+      "depth": 4,
+      "productLegacyIds": [
+        138
+      ]
+    },
+    {
+      "legacyId": 53,
+      "name": "Tracks",
+      "legacyUrl": "https://lesparo.com/en/53-tracks",
+      "parentLegacyId": 45,
+      "depth": 3,
+      "productLegacyIds": [
+        39,
+        37,
+        36,
+        34,
+        105,
+        141,
+        142
+      ]
+    },
+    {
+      "legacyId": 65,
+      "name": "Loom Don Track With Rib",
+      "legacyUrl": "https://lesparo.com/en/65-loom-don-track-with-rib",
+      "parentLegacyId": 53,
+      "depth": 4,
+      "productLegacyIds": [
+        37
+      ]
+    },
+    {
+      "legacyId": 66,
+      "name": "Loom Don Track Without Rib",
+      "legacyUrl": "https://lesparo.com/en/66-loom-don-track-without-rib",
+      "parentLegacyId": 53,
+      "depth": 4,
+      "productLegacyIds": [
+        36
+      ]
+    },
+    {
+      "legacyId": 67,
+      "name": "Fine Comfort Track",
+      "legacyUrl": "https://lesparo.com/en/67-fine-comfort-track",
+      "parentLegacyId": 53,
+      "depth": 4,
+      "productLegacyIds": [
+        34
+      ]
+    },
+    {
+      "legacyId": 68,
+      "name": "Sports Pant",
+      "legacyUrl": "https://lesparo.com/en/68-sports-pant",
+      "parentLegacyId": 53,
+      "depth": 4,
+      "productLegacyIds": [
+        39
+      ]
+    },
+    {
+      "legacyId": 101,
+      "name": "Urban Track",
+      "legacyUrl": "https://lesparo.com/en/101-urban-track-",
+      "parentLegacyId": 53,
+      "depth": 4,
+      "productLegacyIds": [
+        105
+      ]
+    },
+    {
+      "legacyId": 120,
+      "name": "Prime Fit Gents Track",
+      "legacyUrl": "https://lesparo.com/en/120-prime-fit-gents-track",
+      "parentLegacyId": 53,
+      "depth": 4,
+      "productLegacyIds": [
+        141
+      ]
+    },
+    {
+      "legacyId": 121,
+      "name": "Prime Fit Gents Jogger",
+      "legacyUrl": "https://lesparo.com/en/121-prime-fit-gents-jogger",
+      "parentLegacyId": 53,
+      "depth": 4,
+      "productLegacyIds": [
+        142
+      ]
+    },
+    {
+      "legacyId": 88,
+      "name": "3/4th",
+      "legacyUrl": "https://lesparo.com/en/88-34th",
+      "parentLegacyId": 45,
+      "depth": 3,
+      "productLegacyIds": [
+        101,
+        102,
+        103,
+        104
+      ]
+    },
+    {
+      "legacyId": 96,
+      "name": "Loom Don 3/4 th With Rib",
+      "legacyUrl": "https://lesparo.com/en/96-loom-don-34-th-with-rib",
+      "parentLegacyId": 88,
+      "depth": 4,
+      "productLegacyIds": [
+        101
+      ]
+    },
+    {
+      "legacyId": 98,
+      "name": "Fine Comfort 3/4 th",
+      "legacyUrl": "https://lesparo.com/en/98-fine-comfort-34-th",
+      "parentLegacyId": 88,
+      "depth": 4,
+      "productLegacyIds": [
+        102
+      ]
+    },
+    {
+      "legacyId": 99,
+      "name": "Loom Don 3/4th Without RIb",
+      "legacyUrl": "https://lesparo.com/en/99-loom-don-34th-without-rib",
+      "parentLegacyId": 88,
+      "depth": 4,
+      "productLegacyIds": [
+        103
+      ]
+    },
+    {
+      "legacyId": 100,
+      "name": "Urban 3/4th",
+      "legacyUrl": "https://lesparo.com/en/100-urban-34th",
+      "parentLegacyId": 88,
+      "depth": 4,
+      "productLegacyIds": [
+        104
+      ]
+    },
+    {
+      "legacyId": 122,
+      "name": "T-SHIRT",
+      "legacyUrl": "https://lesparo.com/en/122-t-shirt",
+      "parentLegacyId": 45,
+      "depth": 3,
+      "productLegacyIds": []
+    },
+    {
+      "legacyId": 123,
+      "name": "Adventure Gents T-shirt",
+      "legacyUrl": "https://lesparo.com/en/123-adventure-gents-t-shirt",
+      "parentLegacyId": 122,
+      "depth": 4,
+      "productLegacyIds": []
+    },
+    {
+      "legacyId": 124,
+      "name": "Elegant T-shirt",
+      "legacyUrl": "https://lesparo.com/en/124-elegant-t-shirt",
+      "parentLegacyId": 122,
+      "depth": 4,
+      "productLegacyIds": []
+    },
+    {
+      "legacyId": 46,
+      "name": "Kids",
+      "legacyUrl": "https://lesparo.com/en/46-kids",
+      "parentLegacyId": 86,
+      "depth": 2,
+      "productLegacyIds": [
+        28,
+        120,
+        133,
+        122,
+        123,
+        124,
+        128,
+        125,
+        126,
+        127,
+        129,
+        130,
+        132,
+        134
+      ]
+    },
+    {
+      "legacyId": 92,
+      "name": "Shorts",
+      "legacyUrl": "https://lesparo.com/en/92-shorts",
+      "parentLegacyId": 46,
+      "depth": 3,
+      "productLegacyIds": [
+        28,
+        125,
+        126,
+        127,
+        128,
+        129
+      ]
+    },
+    {
+      "legacyId": 104,
+      "name": "Loom Kids",
+      "legacyUrl": "https://lesparo.com/en/104-loom-kids",
+      "parentLegacyId": 92,
+      "depth": 4,
+      "productLegacyIds": []
+    },
+    {
+      "legacyId": 109,
+      "name": "Jersey Kids Shorts",
+      "legacyUrl": "https://lesparo.com/en/109-jersey-kids-shorts",
+      "parentLegacyId": 92,
+      "depth": 4,
+      "productLegacyIds": [
+        125
+      ]
+    },
+    {
+      "legacyId": 110,
+      "name": "Honey Kids Shorts",
+      "legacyUrl": "https://lesparo.com/en/110-honey-kids-shorts",
+      "parentLegacyId": 92,
+      "depth": 4,
+      "productLegacyIds": [
+        126
+      ]
+    },
+    {
+      "legacyId": 111,
+      "name": "Jersey Boys Shorts",
+      "legacyUrl": "https://lesparo.com/en/111-jersey-boys-shorts",
+      "parentLegacyId": 92,
+      "depth": 4,
+      "productLegacyIds": [
+        128
+      ]
+    },
+    {
+      "legacyId": 112,
+      "name": "Honey Boys Shorts",
+      "legacyUrl": "https://lesparo.com/en/112-honey-boys-shorts",
+      "parentLegacyId": 92,
+      "depth": 4,
+      "productLegacyIds": [
+        129
+      ]
+    },
+    {
+      "legacyId": 113,
+      "name": "Urban Boys Shorts",
+      "legacyUrl": "https://lesparo.com/en/113-urban-boys-shorts",
+      "parentLegacyId": 92,
+      "depth": 4,
+      "productLegacyIds": [
+        127
+      ]
+    },
+    {
+      "legacyId": 93,
+      "name": "Tracks",
+      "legacyUrl": "https://lesparo.com/en/93-tracks",
+      "parentLegacyId": 46,
+      "depth": 3,
+      "productLegacyIds": [
+        120,
+        122,
+        130,
+        132
+      ]
+    },
+    {
+      "legacyId": 105,
+      "name": "New York Kids Track",
+      "legacyUrl": "https://lesparo.com/en/105-new-york-kids-track",
+      "parentLegacyId": 93,
+      "depth": 4,
+      "productLegacyIds": [
+        120
+      ]
+    },
+    {
+      "legacyId": 106,
+      "name": "New York Boys Track",
+      "legacyUrl": "https://lesparo.com/en/106-new-york-boys-track",
+      "parentLegacyId": 93,
+      "depth": 4,
+      "productLegacyIds": [
+        122
+      ]
+    },
+    {
+      "legacyId": 114,
+      "name": "New York Kids Jogger",
+      "legacyUrl": "https://lesparo.com/en/114-new-york-kids-jogger",
+      "parentLegacyId": 93,
+      "depth": 4,
+      "productLegacyIds": [
+        130
+      ]
+    },
+    {
+      "legacyId": 115,
+      "name": "New York Boys Jogger",
+      "legacyUrl": "https://lesparo.com/en/115-new-york-boys-jogger",
+      "parentLegacyId": 93,
+      "depth": 4,
+      "productLegacyIds": [
+        132
+      ]
+    },
+    {
+      "legacyId": 103,
+      "name": "3/4 th",
+      "legacyUrl": "https://lesparo.com/en/103--34-th",
+      "parentLegacyId": 46,
+      "depth": 3,
+      "productLegacyIds": [
+        123,
+        124,
+        133,
+        134
+      ]
+    },
+    {
+      "legacyId": 107,
+      "name": "New York Kids 3/4th",
+      "legacyUrl": "https://lesparo.com/en/107-new-york-kids-34th",
+      "parentLegacyId": 103,
+      "depth": 4,
+      "productLegacyIds": [
+        123,
+        133
+      ]
+    },
+    {
+      "legacyId": 108,
+      "name": "New York Boys 3/4th",
+      "legacyUrl": "https://lesparo.com/en/108-new-york-boys-34th",
+      "parentLegacyId": 103,
+      "depth": 4,
+      "productLegacyIds": [
+        124
+      ]
+    },
+    {
+      "legacyId": 116,
+      "name": "New York Kids 3/4th Jogger",
+      "legacyUrl": "https://lesparo.com/en/116-new-york-kids-34th-jogger",
+      "parentLegacyId": 103,
+      "depth": 4,
+      "productLegacyIds": []
+    },
+    {
+      "legacyId": 117,
+      "name": "New York Boys 3/4th Jogger",
+      "legacyUrl": "https://lesparo.com/en/117-new-york-boys-34th-jogger",
+      "parentLegacyId": 103,
+      "depth": 4,
+      "productLegacyIds": [
+        134
+      ]
+    },
+    {
+      "legacyId": 73,
+      "name": "Fabric Unstitched",
+      "legacyUrl": "https://lesparo.com/en/73-fabric-unstitched",
+      "parentLegacyId": null,
+      "depth": 1,
+      "productLegacyIds": [
+        41,
+        42,
+        43,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        108,
+        109,
+        110,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118
+      ]
+    },
+    {
+      "legacyId": 75,
+      "name": "Lungi",
+      "legacyUrl": "https://lesparo.com/en/75-lungi",
+      "parentLegacyId": 73,
+      "depth": 2,
+      "productLegacyIds": [
+        43,
+        50,
+        45,
+        51,
+        46,
+        108,
+        47,
+        48,
+        49,
+        52,
+        53,
+        54,
+        109,
+        110
+      ]
+    },
+    {
+      "legacyId": 80,
+      "name": "Printed Lungi",
+      "legacyUrl": "https://lesparo.com/en/80-printed-lungi",
+      "parentLegacyId": 75,
+      "depth": 3,
+      "productLegacyIds": [
+        43,
+        45,
+        46,
+        47,
+        48,
+        49,
+        52,
+        53
+      ]
+    },
+    {
+      "legacyId": 83,
+      "name": "Checked Lungi",
+      "legacyUrl": "https://lesparo.com/en/83-checked-lungi",
+      "parentLegacyId": 75,
+      "depth": 3,
+      "productLegacyIds": [
+        50,
+        51,
+        54,
+        108,
+        109,
+        110
+      ]
+    },
+    {
+      "legacyId": 77,
+      "name": "Kavi",
+      "legacyUrl": "https://lesparo.com/en/77-kavi",
+      "parentLegacyId": 73,
+      "depth": 2,
+      "productLegacyIds": [
+        42,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68
+      ]
+    },
+    {
+      "legacyId": 84,
+      "name": "Kavi Dhothy",
+      "legacyUrl": "https://lesparo.com/en/84-kavi-dhothy",
+      "parentLegacyId": 77,
+      "depth": 3,
+      "productLegacyIds": [
+        42,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68
+      ]
+    },
+    {
+      "legacyId": 78,
+      "name": "Towels",
+      "legacyUrl": "https://lesparo.com/en/78-towels",
+      "parentLegacyId": 73,
+      "depth": 2,
+      "productLegacyIds": [
+        81,
+        82,
+        83,
+        84,
+        85,
+        86
+      ]
+    },
+    {
+      "legacyId": 79,
+      "name": "Kerchief",
+      "legacyUrl": "https://lesparo.com/en/79-kerchief",
+      "parentLegacyId": 73,
+      "depth": 2,
+      "productLegacyIds": [
+        41,
+        112,
+        113,
+        114,
+        115,
+        116,
+        117,
+        118
+      ]
+    }
+  ],
+  "deadCategories": [
+    {
+      "legacyId": 87,
+      "name": "Ladies",
+      "legacyUrl": "https://lesparo.com/en/87-ladies"
+    }
+  ],
+  "products": [
+    {
+      "legacyId": 28,
+      "name": "Loom Kids",
+      "slug": "loom-kids",
+      "legacyUrl": "https://lesparo.com/en/home/-61loom-kids.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Cotton"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/547-large_default/loom-kids.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/548-large_default/loom-kids.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/549-large_default/loom-kids.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/550-large_default/loom-kids.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-01-02 16:53:35",
+      "dateUpdated": "2021-12-27 10:29:47"
+    },
+    {
+      "legacyId": 34,
+      "name": "FINE COMFORT TRACK",
+      "slug": "fine-comfort-track",
+      "legacyUrl": "https://lesparo.com/en/home/fine-comfort-track.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:12pt;line-height:18.4px;font-family:Calibri, sans-serif;\">      </span><span style=\"font-size:11pt;line-height:16.8667px;font-family:Calibri, sans-serif;\">*<b>CARE INSTRUCTION:</b>Use Normal Wash And Regular Detergent ( With Color  Safe - Bleach  If Desired) <strong>NO MACHINE WASH</strong><br />      * <b>FIT TYPE:</b> comfort fit<br />      * <b>MATERIA COMPOSSITION: </b>Bio wash fabric 100% cotton<br />      * <strong>FABRIC TYPE:</strong> Combed Cotton <br />      * Convenient double side zipper pocket ,<br />      *  Waist Band Comfortable  Elastic &amp;  </span><span style=\"font-size:12pt;line-height:18.4px;font-family:Calibri, sans-serif;\">drawstring</span><span style=\"font-size:11pt;line-height:16.8667px;font-family:Calibri, sans-serif;\"> <br />      * <b>AVAILABLE COLORS:</b> five colors available<br />      * <b>PACKING:</b> Set of five pc’s pouch <br /></span><span style=\"font-size:12pt;line-height:18.4px;font-family:Calibri, sans-serif;\">     * <b>AVAILABLE SIZE</b> = M,L,XL,2XL</span></p>",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Cotton"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/464-large_default/fine-comfort-track.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/465-large_default/fine-comfort-track.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/466-large_default/fine-comfort-track.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/467-large_default/fine-comfort-track.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/468-large_default/fine-comfort-track.jpg",
+          "position": 5,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/469-large_default/fine-comfort-track.jpg",
+          "position": 6,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-01-08 15:40:17",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 36,
+      "name": "LOOM DON TRACK WITH OUT RIB",
+      "slug": "loom-don-track-with-out-rib",
+      "legacyUrl": "https://lesparo.com/en/home/loom-don-track-with-out-rib.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">      *<b>CARE INSTRUCTION:</b>Use Normal Wash And Regular Detergent ( With Color  Safe - Bleach  If Desired)  <strong>NO MACHINE WASH</strong><br />      * <b>FIT TYPE:</b> Regular type<br />      * <b>MATERIA COMPOSSITION:</b> Hosiery loop knitting<br />      * Convenient left side zipper pocket ,Rights side open type,<br />      *  Waist Band Comfortable Rib Elastic &amp;  </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">drawstring</span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\"> <br />      * Bottom comfortable cub its placed<br />      * <b>AVAILABLE COLORS:</b> Six colors available<br />      * <b>PACKING:</b> Set of six pc’s pouch <br /></span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     * <b>AVAILABLE SIZE</b> = L,XL,2XL</span></p>",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/56-large_default/loom-don-track-with-out-rib.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/57-large_default/loom-don-track-with-out-rib.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/58-large_default/loom-don-track-with-out-rib.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/59-large_default/loom-don-track-with-out-rib.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/60-large_default/loom-don-track-with-out-rib.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-01-08 15:42:39",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 38,
+      "name": "PRINTED SHORTS",
+      "slug": "printed-shorts",
+      "legacyUrl": "https://lesparo.com/en/home/printed-shorts.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     </span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">*<b>CARE INSTRUCTION:</b>Use Normal Wash And Regular Detergent ( With Color  Safe - Bleach  If Desired) <strong>NO MACHINE WASH</strong><br />      * <b>FIT TYPE:</b> Regular type<br />      * <b>MATERIA COMPOSSITION: </b>100% cotton<br />      * <strong>FABRIC TYPE:</strong> Printed Hosiery <br />      * Convenient double side pocket  available,<br />      *  Waist Band Comfortable  Elastic &amp;  </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">drawstring</span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\"> <br />      * Bottom comfortable cub its placed<br />      * <b>AVAILABLE COLORS:</b> Six colors available<br />      * <b>PACKING:</b> Set of three pc’s pouch <br /></span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     * <b>AVAILABLE SIZE</b> =M,L,XL,2XL</span></p>\n<p class=\"MsoNormal\"><span style=\"font-size:12pt;line-height:115%;\"> <!-- [if !supportLineBreakNewLine]--><br /> <!--[endif]--></span></p>",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Printed Hosiery"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/66-large_default/printed-shorts.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/67-large_default/printed-shorts.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/68-large_default/printed-shorts.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/69-large_default/printed-shorts.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-01-08 15:47:00",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 39,
+      "name": "SPORTS SLIM TRACK WITHOUT RIB",
+      "slug": "sports-slim-track-without-rib",
+      "legacyUrl": "https://lesparo.com/en/home/sports-slim-track-without-rib.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/70-large_default/sports-slim-track-without-rib.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/71-large_default/sports-slim-track-without-rib.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/72-large_default/sports-slim-track-without-rib.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/73-large_default/sports-slim-track-without-rib.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/74-large_default/sports-slim-track-without-rib.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/75-large_default/sports-slim-track-without-rib.jpg",
+          "position": 6,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-01-08 15:48:35",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 40,
+      "name": "SUPER FINE SHORTS",
+      "slug": "super-fine-shorts",
+      "legacyUrl": "https://lesparo.com/en/home/super-fine-shorts.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">      *</span><b><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">CARE INSTRUCTION :</span></b><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\"> Normal Wash And Regular Detergent with cold water ( With Color – Safe Bleach  If Desired) <strong>NO MACHINE WASH</strong><br />      * <b>FIT TYPE:</b> Regular Type,<br />      * <b>MATERIA COMPOSSITION:</b> Hosiery Combed Cotton,<br />      * Convenient Double side zipper pocket<br />      * Waist Band Comfortable Elastic &amp;  </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">drawstring<br /></span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">      * Feel Free Fabric silicon softener its added <br />      * Five Colors’ Available<br />      * <b>PACKING:</b> Stream Iron &amp; 5 set of back<br />      * <b>AVAILABLE SIZE</b> = M , L , XL,  2XL</span></p>",
+      "descriptionShortHtml": "<p><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">      </span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\"><br /> <br /> <!-- [if !supportLineBreakNewLine]--><br /> <!--[endif]--></span></p>",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Cotton"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/76-large_default/super-fine-shorts.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/77-large_default/super-fine-shorts.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/78-large_default/super-fine-shorts.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/79-large_default/super-fine-shorts.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/80-large_default/super-fine-shorts.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/81-large_default/super-fine-shorts.jpg",
+          "position": 6,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/82-large_default/super-fine-shorts.jpg",
+          "position": 7,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-01-08 15:50:07",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 41,
+      "name": "HAND KERCHIEF 160",
+      "slug": "hand-kerchief-160",
+      "legacyUrl": "https://lesparo.com/en/home/hand-kerchief-160.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/522-large_default/hand-kerchief-160.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/523-large_default/hand-kerchief-160.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/524-large_default/hand-kerchief-160.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-01-11 16:20:28",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 42,
+      "name": "BENZ KAVI",
+      "slug": "benz-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/benz-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/182-large_default/benz-kavi.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/183-large_default/benz-kavi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/184-large_default/benz-kavi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/185-large_default/benz-kavi.jpg",
+          "position": 4,
+          "cover": true,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-01-11 16:24:46",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 43,
+      "name": "JAI CLASSIC LUNGI",
+      "slug": "jai-classic-lungi",
+      "legacyUrl": "https://lesparo.com/en/home/jai-classic-lungi.html",
+      "reference": "",
+      "descriptionHtml": "<p><br /></p>",
+      "descriptionShortHtml": "<p><br /></p>",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/103-large_default/jai-classic-lungi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/162-large_default/jai-classic-lungi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/163-large_default/jai-classic-lungi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-01-11 16:26:54",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 35,
+      "name": "GENTS BOXER",
+      "slug": "gents-boxer",
+      "legacyUrl": "https://lesparo.com/en/home/gents-boxer.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     </span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">*<b>CARE INSTRUCTION:</b> Use Normal Wash And Regular Detergent ( With Color – Safe Bleach  If Desired) <br />      * <b>FIT TYPE:</b> Regular fit<br />      * <b>MATERIA COMPOSSITION:</b> 100% Cotton<br />      * Convenient  One Back Pocket,<br />      * Waist Band Comfortable  Elastic<br />      * Multi colors available <br />      * <b>PACKING:</b> Set of 3 pc’s   <br /> </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     * <b>Size</b> =M, L,XL,2XL</span></p>",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/53-large_default/gents-boxer.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/54-large_default/gents-boxer.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/55-large_default/gents-boxer.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-01-08 15:41:47",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 37,
+      "name": "LOOM DON TRACK WITH RIB",
+      "slug": "loom-don-track-with-rib",
+      "legacyUrl": "https://lesparo.com/en/garments/loom-don-track-with-rib.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">      </span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">*<b>CARE INSTRUCTION:</b>Use Normal Wash And Regular Detergent ( With Color  Safe - Bleach  If Desired)  <br />       * <b>FIT TYPE:</b> Regular type<br />       * <b>MATERIA COMPOSSITION: </b>100% cotton<br />      * <strong>FABRIC TYPE:</strong> Hosiery loop knitting<br />       * Convenient left side zipper pocket ,Rights side open type,<br />       *  Waist Band Comfortable Rib Elastic &amp;  </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">drawstring</span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">  <br />       * Bottom comfortable cub its placed<br />       * <b>AVAILABLE COLORS:</b> Six colors available<br />       * <b>PACKING:</b> Set of six pc’s pouch  <br /> </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     * <b>AVAILABLE SIZE</b> = L,XL,2XL</span></p>",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/462-large_default/loom-don-track-with-rib.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/458-large_default/loom-don-track-with-rib.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/459-large_default/loom-don-track-with-rib.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/460-large_default/loom-don-track-with-rib.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/461-large_default/loom-don-track-with-rib.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/463-large_default/loom-don-track-with-rib.jpg",
+          "position": 6,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-01-08 15:44:06",
+      "dateUpdated": "2021-12-24 18:12:11"
+    },
+    {
+      "legacyId": 89,
+      "name": "LOOM DON SHORTS",
+      "slug": "loom-don-shorts",
+      "legacyUrl": "https://lesparo.com/en/home/loom-don-shorts.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, sans-serif;\">       </span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, sans-serif;\">*<strong>CARE INSTRUCTION:</strong> Use Normal Wash And Regular Detergent ( With Color – Safe Bleach  If Desired)  <strong>NO MACHINE WASH</strong></span></p>\n<p><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     * <strong>FIT TYPE:</strong> Regular type<br />     * <strong>MATERIA COMPOSSITION:</strong> Hosiery loop knitting<br />     * Convenient Left Side Sipper Pocket ,Rights Side Open Type<br />     * Waist Band Comfortable Rib Elastic &amp;  </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">drawstring</span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\"><br />     * Six colors available<br />     *<strong> PACKING</strong>: Set of six pc’s<br /></span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">    * <strong>AVAILABLE SIZE</strong> =M, L,XL,2XL<br /></span></p>\n<p><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\"> <!-- [if !supportLineBreakNewLine]--><br /> <!--[endif]--></span></p>",
+      "descriptionShortHtml": "<p><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, sans-serif;\">   </span></p>\n<p><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\"> <!-- [if !supportLineBreakNewLine]--><br /> <!--[endif]--></span></p>",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        },
+        {
+          "name": "Pattern",
+          "value": "Solid"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/441-large_default/loom-don-shorts.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/442-large_default/loom-don-shorts.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/443-large_default/loom-don-shorts.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/444-large_default/loom-don-shorts.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/445-large_default/loom-don-shorts.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/446-large_default/loom-don-shorts.jpg",
+          "position": 6,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-06-16 09:00:02",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 92,
+      "name": "JERSY KING SHORTS",
+      "slug": "jersy-king-shorts",
+      "legacyUrl": "https://lesparo.com/en/home/jersy-king-shorts.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">      *</span><b><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">CARE INSTRUCTION </span></b><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">: Normal Wash And Regular Detergent ( With Color – Safe Bleach  If Desired) <strong>NO MACHINE WASH</strong><br />       * <b>FIT TYPE:</b> Regular Type,<br />       * <b>MATERIA COMPOSSITION:</b> Hosiery Jersey Fabric, <br />       * Convenient left side zipper pocket ,rights side open type,<br />       * Waist Band Comfortable Elastic &amp;  </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">drawstring<br /> </span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">      * Feel Free Fabric Type<br />       * Five Colors Available <br />       * <b>PACKING:</b> Stream Iron &amp; 5 set of back <br />       * <b>AVAILABLE SIZE</b>= M , L , XL,  2XL <br /> <!-- [if !supportLineBreakNewLine]--><br /> <!--[endif]--></span></p>",
+      "descriptionShortHtml": "<p><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">      </span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\"><br /> <!-- [if !supportLineBreakNewLine]--><br /> <!--[endif]--></span></p>",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/453-large_default/jersy-king-shorts.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/454-large_default/jersy-king-shorts.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/455-large_default/jersy-king-shorts.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/456-large_default/jersy-king-shorts.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/457-large_default/jersy-king-shorts.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-06-16 09:52:37",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 101,
+      "name": "Loom Don 3/4 th With Rib",
+      "slug": "loom-don-34-th-with-rib",
+      "legacyUrl": "https://lesparo.com/en/home/loom-don-34-th-with-rib.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:12pt;line-height:18.4px;font-family:Calibri, sans-serif;\">      </span><span style=\"font-family:Calibri, sans-serif;font-size:11pt;\">*</span><b style=\"font-family:Calibri, sans-serif;font-size:11pt;\">CARE INSTRUCTION:</b><span style=\"font-family:Calibri, sans-serif;font-size:11pt;\">Use Normal Wash And Regular Detergent ( With Color  Safe - Bleach  If Desired) </span></p>\n<p><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">      * <b>FIT TYPE:</b> Regular type<br />      * <b>MATERIA COMPOSSITION:</b> Hosiery loop knitting<br />      * Convenient left side zipper pocket ,Rights side open type,<br />      *  Waist Band Comfortable Rib Elastic &amp;  </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">drawstring</span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\"> <br />      * Bottom comfortable cub its placed<br />      * <b>AVAILABLE COLORS:</b> Six colors available<br />      * <b>PACKING:</b> Set of six pc’s pouch <br /></span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     * <b>AVAILABLE SIZE</b> = L,XL,2XL</span></p>",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/477-large_default/loom-don-34-th-with-rib.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/478-large_default/loom-don-34-th-with-rib.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/479-large_default/loom-don-34-th-with-rib.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/480-large_default/loom-don-34-th-with-rib.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/481-large_default/loom-don-34-th-with-rib.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-06-17 10:04:39",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 102,
+      "name": "Fine Comfort 3/4 th",
+      "slug": "fine-comfort-34-th",
+      "legacyUrl": "https://lesparo.com/en/home/fine-comfort-34-th.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:11pt;line-height:16.8667px;font-family:Calibri, sans-serif;\">      *<b>CARE INSTRUCTION:</b>Use Normal Wash And Regular Detergent ( With Color  Safe - Bleach  If Desired) <br />      * <b>FIT TYPE:</b> comfort fit<br />      * <b>MATERIA COMPOSSITION: </b>Bio wash fabric 100% cotton<br />      * <strong>FABRIC TYPE:</strong> Combed Cotton <br />      * Convenient double side zipper pocket ,<br />      *  Waist Band Comfortable  Elastic &amp;  </span><span style=\"font-size:12pt;line-height:18.4px;font-family:Calibri, sans-serif;\">drawstring</span><span style=\"font-size:11pt;line-height:16.8667px;font-family:Calibri, sans-serif;\"> <br />      * <b>AVAILABLE COLORS:</b> five colors available<br />      * <b>PACKING:</b> Set of five pc’s pouch <br /></span><span style=\"font-size:12pt;line-height:18.4px;font-family:Calibri, sans-serif;\">     * <b>AVAILABLE SIZE</b> = M,L,XL,2XL</span></p>",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/482-large_default/fine-comfort-34-th.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/483-large_default/fine-comfort-34-th.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/484-large_default/fine-comfort-34-th.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/485-large_default/fine-comfort-34-th.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/486-large_default/fine-comfort-34-th.jpg",
+          "position": 5,
+          "cover": true,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-06-17 10:26:53",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 103,
+      "name": "Loom Don 3/4th Without rib",
+      "slug": "loom-don-34th-without-rib",
+      "legacyUrl": "https://lesparo.com/en/home/loom-don-34th-without-rib.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:11pt;line-height:16.8667px;font-family:Calibri, sans-serif;\">    </span><span style=\"font-size:12pt;line-height:18.4px;font-family:Calibri, sans-serif;\">  </span><span style=\"font-family:Calibri, sans-serif;font-size:11pt;\">*</span><b style=\"font-family:Calibri, sans-serif;font-size:11pt;\">CARE INSTRUCTION:</b><span style=\"font-family:Calibri, sans-serif;font-size:11pt;\">Use Normal Wash And Regular Detergent ( With Color  Safe - Bleach  If Desired) <strong>NO MACHINE WASH</strong> </span></p>\n<p><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">      * <b>FIT TYPE:</b> Regular type<br />      * <b>MATERIA COMPOSSITION:</b> Hosiery loop knitting<br />      * Convenient left side zipper pocket ,Rights side open type,<br />      *  Waist Band Comfortable Rib Elastic &amp;  </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">drawstring</span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\"> <br />      * <b>AVAILABLE COLORS:</b> Six colors available<br />      * <b>PACKING:</b> Set of six pc’s pouch <br /></span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     * <b>AVAILABLE SIZE</b> = L,XL,2XL</span></p>",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/487-large_default/loom-don-34th-without-rib.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/488-large_default/loom-don-34th-without-rib.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/489-large_default/loom-don-34th-without-rib.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/490-large_default/loom-don-34th-without-rib.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/491-large_default/loom-don-34th-without-rib.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/492-large_default/loom-don-34th-without-rib.jpg",
+          "position": 6,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-06-17 10:30:14",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 104,
+      "name": "Urban 3/4 th",
+      "slug": "urban-34-th",
+      "legacyUrl": "https://lesparo.com/en/home/urban-34-th.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/493-large_default/urban-34-th.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/494-large_default/urban-34-th.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/495-large_default/urban-34-th.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/496-large_default/urban-34-th.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/497-large_default/urban-34-th.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/498-large_default/urban-34-th.jpg",
+          "position": 6,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/499-large_default/urban-34-th.jpg",
+          "position": 7,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-06-17 10:35:53",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 105,
+      "name": "Urban Track",
+      "slug": "urban-track",
+      "legacyUrl": "https://lesparo.com/en/home/urban-track.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:12pt;line-height:18.4px;font-family:Calibri, sans-serif;\">      </span><span style=\"font-family:Calibri, sans-serif;font-size:11pt;\">*</span><b style=\"font-family:Calibri, sans-serif;font-size:11pt;\">CARE INSTRUCTION:</b><span style=\"font-family:Calibri, sans-serif;font-size:11pt;\">Use Normal Wash And Regular Detergent ( With Color  Safe - Bleach  If Desired)<strong> NO MACHINE WASH</strong></span></p>\n<p><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">      * <b>FIT TYPE:</b> Regular type<br />      * <b>MATERIA COMPOSSITION:</b> Hosiery loop knitting<br />      * Convenient left side zipper pocket ,Rights side open type, center zipper available<br />      *  Waist Band Comfortable  Elastic &amp;  </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">drawstring</span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\"><br />      * <b>AVAILABLE COLORS:</b> Five colors available<br />      * <b>PACKING:</b> Set of five pc’s pouch <br /></span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     * <b>AVAILABLE SIZE</b> =M,L,XL,2XL</span></p>",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/500-large_default/urban-track.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/501-large_default/urban-track.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/502-large_default/urban-track.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/503-large_default/urban-track.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/504-large_default/urban-track.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-06-17 10:45:20",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 120,
+      "name": "New York Kids Track",
+      "slug": "new-york-kids-track",
+      "legacyUrl": "https://lesparo.com/en/new-york-kids-track/new-york-kids-track.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/553-large_default/new-york-kids-track.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-12-24 18:21:15",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 122,
+      "name": "New York Boys Track",
+      "slug": "new-york-boys-track",
+      "legacyUrl": "https://lesparo.com/en/home/new-york-boys-track.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/556-large_default/new-york-boys-track.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/557-large_default/new-york-boys-track.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-12-24 18:28:36",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 123,
+      "name": "New York Kids 3/4th",
+      "slug": "new-york-kids-34th-",
+      "legacyUrl": "https://lesparo.com/en/new-york-kids-34th/new-york-kids-34th-.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/558-large_default/new-york-kids-34th-.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/559-large_default/new-york-kids-34th-.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/560-large_default/new-york-kids-34th-.jpg",
+          "position": 3,
+          "cover": true,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-12-24 18:39:21",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 124,
+      "name": "New York Boys 3/4th",
+      "slug": "new-york-boys-34th",
+      "legacyUrl": "https://lesparo.com/en/new-york-boys-34th/new-york-boys-34th.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/563-large_default/new-york-boys-34th.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/564-large_default/new-york-boys-34th.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-12-24 18:49:26",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 125,
+      "name": "Jersy Kids Shorts",
+      "slug": "jersy-kids-shorts",
+      "legacyUrl": "https://lesparo.com/en/jersey-kids-shorts/jersy-kids-shorts.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Jersey Fabric"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/568-large_default/jersy-kids-shorts.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/569-large_default/jersy-kids-shorts.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/579-large_default/jersy-kids-shorts.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/580-large_default/jersy-kids-shorts.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-12-24 18:54:46",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 126,
+      "name": "Honey Kids Shorts",
+      "slug": "honey-kids-shorts",
+      "legacyUrl": "https://lesparo.com/en/honey-kids-shorts/honey-kids-shorts.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Jersey Fabric"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/570-large_default/honey-kids-shorts.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/571-large_default/honey-kids-shorts.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/572-large_default/honey-kids-shorts.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/573-large_default/honey-kids-shorts.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/576-large_default/honey-kids-shorts.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-12-24 19:06:28",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 127,
+      "name": "Urban Boys Shorts",
+      "slug": "urban-boys-shorts",
+      "legacyUrl": "https://lesparo.com/en/urban-boys-shorts/urban-boys-shorts.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/581-large_default/urban-boys-shorts.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/582-large_default/urban-boys-shorts.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/583-large_default/urban-boys-shorts.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-12-24 19:45:16",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 128,
+      "name": "Jersey Boys Shorts",
+      "slug": "jersey-boys-shorts",
+      "legacyUrl": "https://lesparo.com/en/jersey-boys-shorts/jersey-boys-shorts.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Jersey Fabric"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/584-large_default/jersey-boys-shorts.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/585-large_default/jersey-boys-shorts.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/586-large_default/jersey-boys-shorts.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/587-large_default/jersey-boys-shorts.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-12-24 19:47:27",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 129,
+      "name": "Honey Boys Shorts",
+      "slug": "honey-boys-shorts",
+      "legacyUrl": "https://lesparo.com/en/honey-boys-shorts/honey-boys-shorts.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Jersey Fabric"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/588-large_default/honey-boys-shorts.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/589-large_default/honey-boys-shorts.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-12-24 19:49:13",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 130,
+      "name": "New York Kids Jogger",
+      "slug": "new-york-kids-jogger",
+      "legacyUrl": "https://lesparo.com/en/new-york-kids-jogger/new-york-kids-jogger.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/590-large_default/new-york-kids-jogger.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/591-large_default/new-york-kids-jogger.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-12-27 09:31:04",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 132,
+      "name": "New York Boys Jogger",
+      "slug": "new-york-boys-jogger",
+      "legacyUrl": "https://lesparo.com/en/new-york-boys-jogger/new-york-boys-jogger.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/592-large_default/new-york-boys-jogger.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/593-large_default/new-york-boys-jogger.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/594-large_default/new-york-boys-jogger.jpg",
+          "position": 3,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/595-large_default/new-york-boys-jogger.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-12-27 10:01:34",
+      "dateUpdated": "2022-05-28 12:46:31"
+    },
+    {
+      "legacyId": 133,
+      "name": "New Kids 3/4th Jogger",
+      "slug": "new-kids-34th-jogger",
+      "legacyUrl": "https://lesparo.com/en/new-york-kids-34th/new-kids-34th-jogger.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/596-large_default/new-kids-34th-jogger.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/597-large_default/new-kids-34th-jogger.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-12-27 10:13:45",
+      "dateUpdated": "2022-05-28 12:46:31"
+    },
+    {
+      "legacyId": 134,
+      "name": "New York Boys 3/4th Jogger",
+      "slug": "new-york-boys-34th-jogger",
+      "legacyUrl": "https://lesparo.com/en/new-york-boys-34th-jogger/new-york-boys-34th-jogger.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [
+        {
+          "name": "Fabric",
+          "value": "Hosiery Loop Knitting"
+        }
+      ],
+      "images": [
+        {
+          "url": "https://lesparo.com/598-large_default/new-york-boys-34th-jogger.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/599-large_default/new-york-boys-34th-jogger.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-12-27 10:25:12",
+      "dateUpdated": "2022-05-28 12:46:31"
+    },
+    {
+      "legacyId": 137,
+      "name": "Prime Fit Gents Shorts",
+      "slug": "prime-fit-gents-shorts",
+      "legacyUrl": "https://lesparo.com/en/home/prime-fit-gents-shorts.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     </span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">*<b>CARE INSTRUCTION:</b>Use Normal Wash And Regular Detergent ( With Color  Safe - Bleach  If Desired) <br />      * <b>FIT TYPE:</b> Regular type<br />      * <b>MATERIA COMPOSSITION: </b>100% polyester<br />      * <strong>FABRIC TYPE:</strong> single jersey  lycra fabric<br />      * Convenient left side zipper pocket ,Rights side open type,<br />      *  Waist Band Comfortable Rib Elastic &amp;  </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">drawstring</span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\"> <br />      * <b>AVAILABLE COLORS:</b> five colors available<br />      * <b>PACKING:</b> Set of five pc’s pouch <br /></span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     * <b>AVAILABLE SIZE</b> = M,L,XL,2XL</span></p>",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/601-large_default/prime-fit-gents-shorts.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/602-large_default/prime-fit-gents-shorts.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/603-large_default/prime-fit-gents-shorts.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/605-large_default/prime-fit-gents-shorts.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/604-large_default/prime-fit-gents-shorts.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/606-large_default/prime-fit-gents-shorts.jpg",
+          "position": 6,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2022-09-02 10:07:57",
+      "dateUpdated": "2024-09-25 11:44:16"
+    },
+    {
+      "legacyId": 138,
+      "name": "Alien Gents Shorts",
+      "slug": "alien-gents-shorts",
+      "legacyUrl": "https://lesparo.com/en/home/alien-gents-shorts.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">      </span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">*<b>CARE INSTRUCTION:</b>Use Normal Wash And Regular Detergent ( With Color  Safe - Bleach  If Desired) <br />      * <b>FIT TYPE:</b> Regular type<br />      * <b>MATERIA COMPOSSITION: </b>100% polyester<br />      * <strong>FABRIC TYPE:</strong> single jersey  lycra fabric<br />      * Convenient left side zipper pocket ,Rights side open type,<br />      *  Waist Band Comfortable Rib Elastic &amp;  </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">drawstring</span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\"> <br />      * <b>AVAILABLE COLORS:</b> five colors available<br />      * <b>PACKING:</b> Set of five pc’s pouch <br /></span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     * <b>AVAILABLE SIZE</b> = M,L,XL,2XL</span></p>",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/613-large_default/alien-gents-shorts.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/607-large_default/alien-gents-shorts.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/608-large_default/alien-gents-shorts.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/609-large_default/alien-gents-shorts.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/612-large_default/alien-gents-shorts.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/610-large_default/alien-gents-shorts.jpg",
+          "position": 6,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/611-large_default/alien-gents-shorts.jpg",
+          "position": 7,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2022-09-02 10:15:08",
+      "dateUpdated": "2024-09-25 11:44:16"
+    },
+    {
+      "legacyId": 141,
+      "name": "Prime Fit Gents Track",
+      "slug": "prime-fit-gents-track",
+      "legacyUrl": "https://lesparo.com/en/home/prime-fit-gents-track.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\">      *<b>CARE INSTRUCTION:</b>Use Normal Wash And Regular Detergent ( With Color  Safe - Bleach  If Desired) <br />      * <b>FIT TYPE:</b> Regular type<br />      * <b>MATERIA COMPOSSITION: </b>100% polyester<br />      * <strong>FABRIC TYPE:</strong> single jersey  lycra fabric<br />      * Convenient left side zipper pocket ,Rights side open type,<br />      *  Waist Band Comfortable Rib Elastic &amp;  </span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">drawstring</span><span style=\"font-size:11pt;line-height:115%;font-family:Calibri, 'sans-serif';\"> <br />      * <b>AVAILABLE COLORS:</b> five colors available<br />      * <b>PACKING:</b> Set of 10 pc’s Box Packing <br /></span><span style=\"font-size:12pt;line-height:115%;font-family:Calibri, 'sans-serif';\">     * <b>AVAILABLE SIZE</b> = M,L,XL,2XL</span></p>",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/619-large_default/prime-fit-gents-track.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/620-large_default/prime-fit-gents-track.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/625-large_default/prime-fit-gents-track.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/622-large_default/prime-fit-gents-track.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/623-large_default/prime-fit-gents-track.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/624-large_default/prime-fit-gents-track.jpg",
+          "position": 6,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/621-large_default/prime-fit-gents-track.jpg",
+          "position": 7,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2022-09-02 18:46:20",
+      "dateUpdated": "2024-09-25 11:44:17"
+    },
+    {
+      "legacyId": 142,
+      "name": "Prime Fit Gents Jogger",
+      "slug": "prime-fit-gents-jogger",
+      "legacyUrl": "https://lesparo.com/en/home/prime-fit-gents-jogger.html",
+      "reference": "",
+      "descriptionHtml": "<p><span style=\"font-family:Calibri, 'sans-serif';color:#333333;background-color:#ffffff;font-size:11pt;line-height:16.8667px;\">      *<span style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:bolder;\">CARE INSTRUCTION:</span>Use Normal Wash And Regular Detergent ( With Color  Safe - Bleach  If Desired) <br style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;\" />      * <span style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:bolder;\">FIT TYPE:</span> Regular type<br style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;\" />      * <span style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:bolder;\">MATERIA COMPOSSITION: </span>100% polyester<br style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;\" />      * <span style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:bolder;\">FABRIC TYPE:</span> single jersey  lycra fabric<br style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;\" />      * Convenient left side zipper pocket ,Rights side open type,<br style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;\" />      *  Waist Band Comfortable Rib Elastic &amp;  </span><span style=\"font-family:Calibri, 'sans-serif';color:#333333;background-color:#ffffff;font-size:12pt;line-height:18.4px;\">drawstring</span><span style=\"font-family:Calibri, 'sans-serif';color:#333333;background-color:#ffffff;font-size:11pt;line-height:16.8667px;\"> <br style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;\" />      * <span style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:bolder;\">AVAILABLE COLORS:</span> five colors available<br style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;\" />      * <span style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:bolder;\">PACKING:</span> Set of 10 pc’s Box Packing <br style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;\" /></span><span style=\"font-family:Calibri, 'sans-serif';color:#333333;background-color:#ffffff;font-size:12pt;line-height:18.4px;\">     * <span style=\"font-family:Jost, 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-weight:bolder;\">AVAILABLE SIZE</span> = M,L,XL,2X</span></p>",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/632-large_default/prime-fit-gents-jogger.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/631-large_default/prime-fit-gents-jogger.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/627-large_default/prime-fit-gents-jogger.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/628-large_default/prime-fit-gents-jogger.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/629-large_default/prime-fit-gents-jogger.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/630-large_default/prime-fit-gents-jogger.jpg",
+          "position": 6,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/626-large_default/prime-fit-gents-jogger.jpg",
+          "position": 7,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2022-09-02 19:07:59",
+      "dateUpdated": "2024-09-25 11:44:17"
+    },
+    {
+      "legacyId": 45,
+      "name": "CITY KING LUNGI",
+      "slug": "city-king-lungi",
+      "legacyUrl": "https://lesparo.com/en/home/city-king-lungi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/152-large_default/city-king-lungi.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/153-large_default/city-king-lungi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/154-large_default/city-king-lungi.jpg",
+          "position": 3,
+          "cover": true,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 15:25:50",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 46,
+      "name": "ROYAL LUNGI",
+      "slug": "royal-lungi",
+      "legacyUrl": "https://lesparo.com/en/home/royal-lungi.html",
+      "reference": "",
+      "descriptionHtml": "<p><br /></p>",
+      "descriptionShortHtml": "<p><br /></p>",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/171-large_default/royal-lungi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/172-large_default/royal-lungi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/173-large_default/royal-lungi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/174-large_default/royal-lungi.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 15:40:38",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 47,
+      "name": "Oscar LUNGI",
+      "slug": "oscar-lungi",
+      "legacyUrl": "https://lesparo.com/en/home/oscar-lungi.html",
+      "reference": "",
+      "descriptionHtml": "<p><br /></p>",
+      "descriptionShortHtml": "<p><br /></p>",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/164-large_default/oscar-lungi.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/165-large_default/oscar-lungi.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/166-large_default/oscar-lungi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 15:41:32",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 48,
+      "name": "1ST CLASS LUNGI",
+      "slug": "1st-class-lungi",
+      "legacyUrl": "https://lesparo.com/en/home/1st-class-lungi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/149-large_default/1st-class-lungi.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/150-large_default/1st-class-lungi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/151-large_default/1st-class-lungi.jpg",
+          "position": 3,
+          "cover": true,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 15:41:54",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 49,
+      "name": "POLO LUNGI",
+      "slug": "polo-lungi",
+      "legacyUrl": "https://lesparo.com/en/home/polo-lungi.html",
+      "reference": "",
+      "descriptionHtml": "<p><br /></p>",
+      "descriptionShortHtml": "<p><br /></p>",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/167-large_default/polo-lungi.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/168-large_default/polo-lungi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/169-large_default/polo-lungi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/170-large_default/polo-lungi.jpg",
+          "position": 4,
+          "cover": true,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 15:43:37",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 50,
+      "name": "GOLDEN EAGLE LUNGI",
+      "slug": "golden-eagle-lungi",
+      "legacyUrl": "https://lesparo.com/en/home/golden-eagle-lungi.html",
+      "reference": "",
+      "descriptionHtml": "<p><br /></p>",
+      "descriptionShortHtml": "<p><br /></p>",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/159-large_default/golden-eagle-lungi.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/160-large_default/golden-eagle-lungi.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/161-large_default/golden-eagle-lungi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 15:44:10",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 51,
+      "name": "MAYIL BRAND LUNGI",
+      "slug": "mayil-brand-lungi",
+      "legacyUrl": "https://lesparo.com/en/home/mayil-brand-lungi.html",
+      "reference": "",
+      "descriptionHtml": "<p><br /></p>",
+      "descriptionShortHtml": "<p><br /></p>",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/145-large_default/mayil-brand-lungi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/146-large_default/mayil-brand-lungi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/148-large_default/mayil-brand-lungi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 15:44:32",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 52,
+      "name": "TATOO LUNGI",
+      "slug": "tatoo-lungi",
+      "legacyUrl": "https://lesparo.com/en/home/tatoo-lungi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/175-large_default/tatoo-lungi.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/176-large_default/tatoo-lungi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/177-large_default/tatoo-lungi.jpg",
+          "position": 3,
+          "cover": true,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 15:44:58",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 53,
+      "name": "DON LUNGI",
+      "slug": "don-lungi",
+      "legacyUrl": "https://lesparo.com/en/home/don-lungi.html",
+      "reference": "",
+      "descriptionHtml": "<p><br /></p>",
+      "descriptionShortHtml": "<p><br /></p>",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/155-large_default/don-lungi.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/156-large_default/don-lungi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/157-large_default/don-lungi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/158-large_default/don-lungi.jpg",
+          "position": 4,
+          "cover": true,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 15:45:35",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 54,
+      "name": "VEL BRAND LUNGI",
+      "slug": "vel-brand-lungi",
+      "legacyUrl": "https://lesparo.com/en/home/vel-brand-lungi.html",
+      "reference": "",
+      "descriptionHtml": "<p><br /></p>",
+      "descriptionShortHtml": "<p><br /></p>",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/178-large_default/vel-brand-lungi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/179-large_default/vel-brand-lungi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/180-large_default/vel-brand-lungi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/181-large_default/vel-brand-lungi.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 15:46:25",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 56,
+      "name": "BLACK FOREST KAVI",
+      "slug": "black-forest-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/black-forest-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/190-large_default/black-forest-kavi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/191-large_default/black-forest-kavi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/192-large_default/black-forest-kavi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/193-large_default/black-forest-kavi.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 18:11:22",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 57,
+      "name": "COLOUR CUBE KAVI",
+      "slug": "colour-cube-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/colour-cube-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/198-large_default/colour-cube-kavi.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/199-large_default/colour-cube-kavi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/200-large_default/colour-cube-kavi.jpg",
+          "position": 3,
+          "cover": true,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 18:13:30",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 58,
+      "name": "COLOUR FANTASY KAVI",
+      "slug": "colour-fantasy-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/colour-fantasy-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/204-large_default/colour-fantasy-kavi.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/205-large_default/colour-fantasy-kavi.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/206-large_default/colour-fantasy-kavi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/207-large_default/colour-fantasy-kavi.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 18:15:09",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 59,
+      "name": "COLOUR SPARK KAVI",
+      "slug": "colour-spark-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/colour-spark-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/211-large_default/colour-spark-kavi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/216-large_default/colour-spark-kavi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/217-large_default/colour-spark-kavi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 18:16:46",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 60,
+      "name": "CROWN SPARK KAVI",
+      "slug": "crown-spark-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/crown-spark-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/213-large_default/crown-spark-kavi.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/214-large_default/crown-spark-kavi.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/215-large_default/crown-spark-kavi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 18:22:51",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 61,
+      "name": "CRYSTA KAVI",
+      "slug": "crysta-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/crysta-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/221-large_default/crysta-kavi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/222-large_default/crysta-kavi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/223-large_default/crysta-kavi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 18:27:34",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 62,
+      "name": "KAALA KAVI",
+      "slug": "kaala-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/kaala-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/227-large_default/kaala-kavi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/228-large_default/kaala-kavi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/232-large_default/kaala-kavi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 18:29:31",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 63,
+      "name": "KOHINOOR KAVI",
+      "slug": "kohinoor-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/kohinoor-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/233-large_default/kohinoor-kavi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/234-large_default/kohinoor-kavi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 18:30:54",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 64,
+      "name": "LOTUS KAVI",
+      "slug": "lotus-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/lotus-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/237-large_default/lotus-kavi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/238-large_default/lotus-kavi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/239-large_default/lotus-kavi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 18:32:09",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 65,
+      "name": "MAJESTIC KAVI",
+      "slug": "majestic-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/majestic-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/243-large_default/majestic-kavi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/244-large_default/majestic-kavi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/245-large_default/majestic-kavi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 18:33:32",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 66,
+      "name": "ROSE KAVI",
+      "slug": "rose-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/rose-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/249-large_default/rose-kavi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/250-large_default/rose-kavi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/251-large_default/rose-kavi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 18:34:50",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 67,
+      "name": "SUPER FAST KAVI",
+      "slug": "super-fast-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/super-fast-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/255-large_default/super-fast-kavi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/256-large_default/super-fast-kavi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/257-large_default/super-fast-kavi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 18:35:45",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 68,
+      "name": "TARGET KAVI",
+      "slug": "target-kavi",
+      "legacyUrl": "https://lesparo.com/en/home/target-kavi.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/261-large_default/target-kavi.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/262-large_default/target-kavi.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/263-large_default/target-kavi.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-24 18:36:38",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 81,
+      "name": "PRINCE TOWEL",
+      "slug": "-prince-towel",
+      "legacyUrl": "https://lesparo.com/en/home/-prince-towel.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/394-large_default/-prince-towel.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/395-large_default/-prince-towel.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/396-large_default/-prince-towel.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/397-large_default/-prince-towel.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-25 16:47:30",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 82,
+      "name": "PRINCE WHITE TOWEL",
+      "slug": "-prince-white-towel",
+      "legacyUrl": "https://lesparo.com/en/home/-prince-white-towel.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/402-large_default/-prince-white-towel.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/403-large_default/-prince-white-towel.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/404-large_default/-prince-white-towel.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/405-large_default/-prince-white-towel.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-25 16:50:45",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 83,
+      "name": "VIP COLOUR TOWEL",
+      "slug": "vip-colour-towel",
+      "legacyUrl": "https://lesparo.com/en/home/vip-colour-towel.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/410-large_default/vip-colour-towel.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/411-large_default/vip-colour-towel.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/412-large_default/vip-colour-towel.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-25 16:54:03",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 84,
+      "name": "VIP WHITE 1  TOWEL",
+      "slug": "-vip-white-1-towel",
+      "legacyUrl": "https://lesparo.com/en/home/-vip-white-1-towel.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/416-large_default/-vip-white-1-towel.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/417-large_default/-vip-white-1-towel.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/418-large_default/-vip-white-1-towel.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/419-large_default/-vip-white-1-towel.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-25 16:56:26",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 85,
+      "name": "VIP WHITE 2  TOWEL",
+      "slug": "-vip-white-2-towel",
+      "legacyUrl": "https://lesparo.com/en/home/-vip-white-2-towel.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/425-large_default/-vip-white-2-towel.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/426-large_default/-vip-white-2-towel.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/427-large_default/-vip-white-2-towel.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-25 16:59:02",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 86,
+      "name": "WHITE JAGARD   TOWEL",
+      "slug": "-white-jagard-towel",
+      "legacyUrl": "https://lesparo.com/en/home/-white-jagard-towel.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/435-large_default/-white-jagard-towel.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/436-large_default/-white-jagard-towel.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/437-large_default/-white-jagard-towel.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/438-large_default/-white-jagard-towel.jpg",
+          "position": 4,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/439-large_default/-white-jagard-towel.jpg",
+          "position": 5,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-03-25 17:02:00",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 108,
+      "name": "Charlee Check",
+      "slug": "charle-check",
+      "legacyUrl": "https://lesparo.com/en/home/charle-check.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/512-large_default/charle-check.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/513-large_default/charle-check.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/514-large_default/charle-check.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/515-large_default/charle-check.jpg",
+          "position": 4,
+          "cover": true,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-06-29 17:53:25",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 109,
+      "name": "Charlee Check White",
+      "slug": "charlee-check-white",
+      "legacyUrl": "https://lesparo.com/en/home/charlee-check-white.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/516-large_default/charlee-check-white.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/517-large_default/charlee-check-white.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/518-large_default/charlee-check-white.jpg",
+          "position": 3,
+          "cover": true,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-06-29 17:56:22",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 110,
+      "name": "Chess Raja",
+      "slug": "chess-raja",
+      "legacyUrl": "https://lesparo.com/en/home/chess-raja.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/519-large_default/chess-raja.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/520-large_default/chess-raja.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/521-large_default/chess-raja.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-06-29 17:58:13",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 112,
+      "name": "Handkerchief  160",
+      "slug": "handkerchief-160",
+      "legacyUrl": "https://lesparo.com/en/home/handkerchief-160.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/525-large_default/handkerchief-160.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/526-large_default/handkerchief-160.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/527-large_default/handkerchief-160.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-07-01 15:41:19",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 113,
+      "name": "White Handkerchief 1030",
+      "slug": "white-handkerchief-1030",
+      "legacyUrl": "https://lesparo.com/en/home/white-handkerchief-1030.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/528-large_default/white-handkerchief-1030.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/529-large_default/white-handkerchief-1030.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/530-large_default/white-handkerchief-1030.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-07-01 15:43:10",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 114,
+      "name": "Handkerchief 3450",
+      "slug": "handkerchief-3450",
+      "legacyUrl": "https://lesparo.com/en/home/handkerchief-3450.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/531-large_default/handkerchief-3450.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/532-large_default/handkerchief-3450.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/533-large_default/handkerchief-3450.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-07-01 15:44:57",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 115,
+      "name": "Handkerchief 4400",
+      "slug": "handkerchief-4400",
+      "legacyUrl": "https://lesparo.com/en/home/handkerchief-4400.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/534-large_default/handkerchief-4400.jpg",
+          "position": 1,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/535-large_default/handkerchief-4400.jpg",
+          "position": 2,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/536-large_default/handkerchief-4400.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-07-01 15:47:19",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 116,
+      "name": "Handkerchief 4450",
+      "slug": "handkerchief-4450",
+      "legacyUrl": "https://lesparo.com/en/home/handkerchief-4450.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/537-large_default/handkerchief-4450.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/538-large_default/handkerchief-4450.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/539-large_default/handkerchief-4450.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-07-01 15:50:13",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 117,
+      "name": "Handkerchief 160 Light",
+      "slug": "handkerchief-160-light",
+      "legacyUrl": "https://lesparo.com/en/home/handkerchief-160-light.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/540-large_default/handkerchief-160-light.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/541-large_default/handkerchief-160-light.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/542-large_default/handkerchief-160-light.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-07-01 15:51:21",
+      "dateUpdated": "2021-12-27 10:07:32"
+    },
+    {
+      "legacyId": 118,
+      "name": "Handkerchief 4400(1)",
+      "slug": "handkerchief-44001",
+      "legacyUrl": "https://lesparo.com/en/home/handkerchief-44001.html",
+      "reference": "",
+      "descriptionHtml": "",
+      "descriptionShortHtml": "",
+      "features": [],
+      "images": [
+        {
+          "url": "https://lesparo.com/543-large_default/handkerchief-44001.jpg",
+          "position": 1,
+          "cover": true,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/544-large_default/handkerchief-44001.jpg",
+          "position": 2,
+          "cover": false,
+          "legend": ""
+        },
+        {
+          "url": "https://lesparo.com/545-large_default/handkerchief-44001.jpg",
+          "position": 3,
+          "cover": false,
+          "legend": ""
+        }
+      ],
+      "dateAdded": "2021-07-01 15:59:43",
+      "dateUpdated": "2021-12-27 10:07:32"
+    }
+  ]
+}
