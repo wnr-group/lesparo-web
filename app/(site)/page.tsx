@@ -2,7 +2,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { CountUp } from "@/components/site/count-up";
-import { HeroRing } from "@/components/site/hero-ring";
+import { HeroEarthrise } from "@/components/site/hero-earthrise";
 import type { RingItem } from "@/components/site/product-ring";
 import { CardDeck, type DeckItem } from "@/components/site/card-deck";
 import { PinnedTrack } from "@/components/site/pinned-track";
@@ -94,7 +94,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ---------------------------------------------------------------- hero */}
-      <HeroRing
+      <HeroEarthrise
         eyebrow={content.hero.eyebrow}
         heading={content.hero.heading}
         subheading={content.hero.subheading}

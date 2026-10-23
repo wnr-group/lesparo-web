@@ -10,13 +10,41 @@ const PENDING = "[data-reveal]:not([data-revealed])";
  * picks up elements added later by client navigation. Until this runs nothing is hidden,
  * so content stays visible without JavaScript; elements already on screen at start-up are
  * shown immediately instead of blinking out and back in.
+ *
+ * With cacheComponents the layout hydrates before the page beneath it, so an element can be
+ * on screen while React has not yet claimed it. Writing data-revealed then would make its
+ * hydration fail (an attribute the server never rendered), so such elements wait until React
+ * has attached its fiber key, which is how the DOM shows a node is hydrated.
  */
 export function RevealObserver() {
   useEffect(() => {
     const root = document.documentElement;
     if (!("IntersectionObserver" in window) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    const reveal = (el: Element) => ((el as HTMLElement).dataset.revealed = "");
+    // The body is hydrated by now; if React's key is not found (internals changed), skip the wait.
+    const fiberKey = Object.keys(document.body).find((k) => k.startsWith("__reactFiber$"));
+    const waiting = new Set<Element>();
+    let retry = 0;
+    let passes = 0;
+    const flush = () => {
+      retry = 0;
+      passes++;
+      // Snapshot first: anything still unhydrated is re-added, and must wait for the next pass.
+      const batch = [...waiting];
+      waiting.clear();
+      batch.forEach((el) => reveal(el));
+      if (!waiting.size) passes = 0;
+    };
+    const reveal = (el: Element) => {
+      waiting.delete(el);
+      // Give up waiting after ~5s so nothing can stay hidden.
+      if (fiberKey && passes < 100 && el.isConnected && !(fiberKey in el)) {
+        waiting.add(el);
+        retry ||= window.setTimeout(flush, 50);
+        return;
+      }
+      (el as HTMLElement).dataset.revealed = "";
+    };
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
@@ -51,6 +79,7 @@ export function RevealObserver() {
     mo.observe(document.body, { childList: true, subtree: true });
 
     return () => {
+      window.clearTimeout(retry);
       io.disconnect();
       mo.disconnect();
       delete root.dataset.revealOn;

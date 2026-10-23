@@ -14,7 +14,14 @@ type Cta = { label: string; href: string };
 export function HeroRing({ eyebrow, heading, subheading, primaryCta, secondaryCta, items }: { eyebrow: string; heading: string; subheading: string; primaryCta: Cta; secondaryCta: Cta; items: RingItem[] }) {
   const words = heading.split(/\s+/);
   return (
-    <section className="relative overflow-hidden bg-[radial-gradient(120%_70%_at_50%_100%,var(--color-indigo-soft),#fff_65%)]">
+    <section className="relative isolate overflow-hidden bg-[radial-gradient(120%_70%_at_50%_100%,var(--color-indigo-soft),#fff_65%)]">
+      {/* Living gradient: soft brand-colour blobs drifting and blending behind everything. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-[-12%] top-[-18%] size-[36rem] rounded-full bg-indigo/40 blur-[90px] motion-safe:animate-[blob-a_22s_ease-in-out_infinite]" />
+        <div className="absolute right-[-10%] top-[-8%] size-[30rem] rounded-full bg-sun/55 blur-[90px] motion-safe:animate-[blob-b_26s_ease-in-out_infinite]" />
+        <div className="absolute bottom-[-14%] left-[8%] size-[34rem] rounded-full bg-[#a9a4ff]/55 blur-[100px] motion-safe:animate-[blob-c_30s_ease-in-out_infinite]" />
+        <div className="absolute bottom-[4%] right-[6%] size-[26rem] rounded-full bg-[#7fb2ff]/45 blur-[90px] motion-safe:animate-[blob-a_28s_-9s_ease-in-out_infinite_reverse]" />
+      </div>
       <Container className="pt-12 text-center lg:pt-14">
         <p className="eyebrow motion-safe:animate-rise">{eyebrow}</p>
         <h1 className="word-flip mx-auto mt-5 max-w-5xl font-display text-[clamp(2.6rem,1.3rem+4.4vw,5.75rem)] font-extrabold leading-[1] tracking-[-0.04em] text-ink">

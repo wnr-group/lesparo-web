@@ -5,7 +5,8 @@ import { useEffect, useRef, type ReactNode } from "react";
 /**
  * Horizontal storytelling strip. On large screens (motion allowed) the section pins below the
  * header and vertical scrolling moves the strip sideways, with a progress bar; the page scroll
- * itself is never captured, the section is simply taller. Everywhere else it is a native
+ * itself is never captured, the section is simply taller. While pinned, the panel nearest the
+ * middle is in focus and the others dim back (a film-reel focus). Everywhere else it is a native
  * swipeable row with scroll snapping, so every panel stays reachable by touch and keyboard.
  */
 export function PinnedTrack({ children, label }: { children: ReactNode; label: string }) {
@@ -30,12 +31,26 @@ export function PinnedTrack({ children, label }: { children: ReactNode; label: s
       const progress = distance ? Math.min(1, Math.max(0, (pinTop - o.getBoundingClientRect().top) / distance)) : 0;
       t.style.transform = `translate3d(${(-progress * distance).toFixed(1)}px,0,0)`;
       b.style.transform = `scaleX(${progress.toFixed(4)})`;
+      // Reel focus: the panel nearest the focus line (a little right of centre) is sharp; the
+      // rest dim and ease back by their distance from it.
+      const vw = v.clientWidth;
+      for (const panel of panels()) {
+        const r = panel.getBoundingClientRect();
+        const off = Math.min(1, (Math.abs(r.left + r.width / 2 - vw * 0.58) / vw) * 1.5);
+        panel.style.opacity = String(1 - off * 0.6);
+        panel.style.scale = String(1 - off * 0.06);
+      }
     };
+    const panels = () => Array.from(t.children).filter((c): c is HTMLElement => c instanceof HTMLElement && !c.hasAttribute("aria-hidden"));
     const measure = () => {
       if (!mq.matches) {
         o.removeAttribute("data-pinned");
         o.style.height = "";
         t.style.transform = "";
+        for (const panel of panels()) {
+          panel.style.opacity = "";
+          panel.style.scale = "";
+        }
         return;
       }
       o.setAttribute("data-pinned", "");
