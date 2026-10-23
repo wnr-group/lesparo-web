@@ -2,7 +2,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { CountUp } from "@/components/site/count-up";
-import { HeroRing } from "@/components/site/hero-ring";
+import { HeroEarthrise } from "@/components/site/hero-earthrise";
 import type { RingItem } from "@/components/site/product-ring";
 import { CardDeck, type DeckItem } from "@/components/site/card-deck";
 import { PinnedTrack } from "@/components/site/pinned-track";
@@ -10,7 +10,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { Container, SectionHeading } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
 import { getCategoryTree, getHomepageContent, getProductsBySlugs, listProducts, type CategoryNode } from "@/lib/catalogue/queries";
-import { publicMediaUrl } from "@/lib/supabase/server";
+import { publicMediaUrl } from "@/lib/storage";
 
 const MILESTONES = [
   { year: "1979", text: "Mr. Yuvaraj founds R. Yuvaraj in Erode — lungis, dhoties and mull cloth for Kerala." },
@@ -94,7 +94,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ---------------------------------------------------------------- hero */}
-      <HeroRing
+      <HeroEarthrise
         eyebrow={content.hero.eyebrow}
         heading={content.hero.heading}
         subheading={content.hero.subheading}

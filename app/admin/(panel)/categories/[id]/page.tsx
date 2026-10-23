@@ -4,7 +4,8 @@ import { CategoryEditor } from "@/components/admin/category-editor";
 import { PageHeader, Panel } from "@/components/admin/ui";
 import { Alert } from "@/components/ui/primitives";
 import { getStaffSession } from "@/lib/auth/staff";
-import { createClient, publicMediaUrl } from "@/lib/supabase/server";
+import { requestDb } from "@/lib/db";
+import { publicMediaUrl } from "@/lib/storage";
 import { categoryOptions } from "../../products/shared";
 import { saveCategory } from "../actions";
 
@@ -16,8 +17,8 @@ export default async function CategoryPage(props: PageProps<"/admin/categories/[
   const session = await getStaffSession();
   if (!session?.isAdmin) return <Alert tone="warning" title="Administrator access is required to manage categories." />;
 
-  const db = await createClient();
-  const { data: c } = isNew ? { data: null } : await db.from("categories").select("*").eq("id", id).maybeSingle();
+  const db = await requestDb();
+  const c = isNew ? null : await db.category.findUnique({ where: { id } });
   if (!isNew && !c) notFound();
   const parents = (await categoryOptions()).filter((p) => p.id !== id);
 

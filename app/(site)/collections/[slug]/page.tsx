@@ -16,7 +16,7 @@ export async function generateMetadata(props: PageProps<"/collections/[slug]">):
   if (!found) return { title: "Collection not found" };
   const path = found.trail.map((c) => c.name).join(" / ");
   return {
-    title: found.trail.length > 1 ? `${found.category.name} — ${found.trail[found.trail.length - 2].name}` : found.category.name,
+    title: found.trail.length > 1 ? `${found.category.name} – ${found.trail[found.trail.length - 2].name}` : found.category.name,
     description: found.category.description ?? `LESPARO ${path}: browse the range and send a wholesale enquiry.`,
     alternates: { canonical: `/collections/${slug}` },
   };

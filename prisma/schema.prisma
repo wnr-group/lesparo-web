@@ -1,0 +1,263 @@
+// LESPARO schema: catalogue, staff users, wholesale enquiries, site content, integration
+// outbox. Quote-first: no orders/payments until retail checkout is confirmed.
+//
+// Datasource: SQLite (a single local file, see DATABASE_URL) - no Supabase/Postgres needed.
+// Columns keep the snake_case names of the original Postgres schema. JSON-shaped values
+// (specs, sizes, site content) use Prisma's Json type, which SQLite stores as text.
+// Enumerated values are plain strings, validated in lib/validation/*.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ---------------------------------------------------------------------------
+// Staff
+// ---------------------------------------------------------------------------
+
+model StaffUser {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  name          String   @default("")
+  password_hash String
+  role          String   @default("admin") // "admin" | "sales"
+  created_at    DateTime @default(now())
+
+  @@map("staff_users")
+}
+
+// ---------------------------------------------------------------------------
+// Catalogue
+// ---------------------------------------------------------------------------
+
+model Category {
+  id               String     @id @default(uuid())
+  parent_id        String?
+  parent           Category?  @relation("CategoryTree", fields: [parent_id], references: [id], onDelete: Restrict)
+  children         Category[] @relation("CategoryTree")
+  name             String
+  slug             String     @unique
+  description      String?
+  cover_image_path String?
+  display_order    Int        @default(0)
+  is_published     Boolean    @default(false)
+  is_featured      Boolean    @default(false)
+  legacy_id        Int?       @unique
+  legacy_url       String?
+  created_at       DateTime   @default(now())
+  updated_at       DateTime   @updatedAt
+  products         Product[]
+
+  @@index([parent_id, display_order])
+  @@map("categories")
+}
+
+model Product {
+  id              String         @id @default(uuid())
+  name            String
+  slug            String         @unique
+  sku             String?        @unique
+  category_id     String?
+  category        Category?      @relation(fields: [category_id], references: [id], onDelete: Restrict)
+  description     String?
+  /// Ordered label/value pairs, e.g. [{"label":"Fit type","value":"Regular"}].
+  specs           Json           @default("[]")
+  fabric          String?
+  /// string[]
+  sizes           Json           @default("[]")
+  packing         String?
+  quote_enabled   Boolean        @default(true)
+  retail_enabled  Boolean        @default(false)
+  price           Float?
+  currency        String         @default("INR")
+  is_published    Boolean        @default(false)
+  is_featured     Boolean        @default(false)
+  archived_at     DateTime?
+  seo_title       String?
+  seo_description String?
+  legacy_id       Int?           @unique
+  legacy_url      String?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+  images          ProductImage[]
+  enquiry_items   EnquiryItem[]
+
+  @@index([category_id])
+  @@index([is_published, created_at])
+  @@map("products")
+}
+
+model ProductImage {
+  id            String   @id @default(uuid())
+  product_id    String
+  product       Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  storage_path  String
+  alt_text      String   @default("")
+  width         Int?
+  height        Int?
+  display_order Int      @default(0)
+  is_primary    Boolean  @default(false)
+  created_at    DateTime @default(now())
+
+  @@index([product_id, display_order])
+  @@map("product_images")
+}
+
+// ---------------------------------------------------------------------------
+// Site content (homepage etc.). Shape is validated by lib/validation/content.ts.
+// ---------------------------------------------------------------------------
+
+model SiteContent {
+  key        String   @id
+  data       Json
+  updated_at DateTime @updatedAt
+  updated_by String?
+
+  @@map("site_content")
+}
+
+// ---------------------------------------------------------------------------
+// Wholesale enquiries
+// ---------------------------------------------------------------------------
+
+model WholesaleEnquiry {
+  id                    String                 @id @default(uuid())
+  enquiry_number        String                 @unique
+  idempotency_key       String                 @unique
+  customer_name         String
+  company_name          String?
+  email                 String
+  phone                 String
+  country               String?
+  message               String
+  target_budget         String?
+  /// new | under_review | info_required | quotation_prepared | quotation_sent | accepted | rejected | closed
+  status                String                 @default("new")
+  assigned_to           String?
+  quotation_amount      Float?
+  quotation_currency    String?
+  quotation_valid_until String?
+  quotation_details     String?
+  follow_up_at          DateTime?
+  follow_up_outcome     String?
+  crm_record_id         String?
+  /// not_configured | pending | synced | failed
+  crm_sync_status       String                 @default("not_configured")
+  consent_at            DateTime
+  source                String                 @default("website")
+  created_at            DateTime               @default(now())
+  updated_at            DateTime               @updatedAt
+  items                 EnquiryItem[]
+  attachments           EnquiryAttachment[]
+  notes                 EnquiryNote[]
+  status_history        EnquiryStatusHistory[]
+
+  @@index([status, created_at])
+  @@index([created_at])
+  @@map("wholesale_enquiries")
+}
+
+model EnquiryItem {
+  id                    String           @id @default(uuid())
+  enquiry_id            String
+  enquiry               WholesaleEnquiry @relation(fields: [enquiry_id], references: [id], onDelete: Cascade)
+  product_id            String?
+  product               Product?         @relation(fields: [product_id], references: [id], onDelete: SetNull)
+  product_name_snapshot String
+  quantity              Int?
+  specifications        String?
+  display_order         Int              @default(0)
+
+  @@index([enquiry_id, display_order])
+  @@map("enquiry_items")
+}
+
+model EnquiryAttachment {
+  id                String           @id @default(uuid())
+  enquiry_id        String
+  enquiry           WholesaleEnquiry @relation(fields: [enquiry_id], references: [id], onDelete: Cascade)
+  storage_path      String           @unique
+  original_filename String
+  content_type      String
+  file_size         Int
+  created_at        DateTime         @default(now())
+
+  @@index([enquiry_id])
+  @@map("enquiry_attachments")
+}
+
+model EnquiryNote {
+  id         String           @id @default(uuid())
+  enquiry_id String
+  enquiry    WholesaleEnquiry @relation(fields: [enquiry_id], references: [id], onDelete: Cascade)
+  author_id  String?
+  note       String
+  created_at DateTime         @default(now())
+
+  @@index([enquiry_id, created_at])
+  @@map("enquiry_notes")
+}
+
+model EnquiryStatusHistory {
+  id          Int              @id @default(autoincrement())
+  enquiry_id  String
+  enquiry     WholesaleEnquiry @relation(fields: [enquiry_id], references: [id], onDelete: Cascade)
+  from_status String?
+  to_status   String
+  changed_by  String?
+  changed_at  DateTime         @default(now())
+
+  @@index([enquiry_id, changed_at])
+  @@map("enquiry_status_history")
+}
+
+// ---------------------------------------------------------------------------
+// Integration outbox (CRM, email, ...). Rows are written by server code only.
+// ---------------------------------------------------------------------------
+
+model IntegrationJob {
+  id              String   @id @default(uuid())
+  provider        String
+  operation       String
+  entity_type     String
+  entity_id       String
+  idempotency_key String   @unique
+  /// pending | running | succeeded | failed | blocked
+  status          String   @default("pending")
+  attempts        Int      @default(0)
+  max_attempts    Int      @default(5)
+  next_attempt_at DateTime @default(now())
+  last_error      String?
+  external_id     String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@index([status, next_attempt_at])
+  @@index([entity_type, entity_id])
+  @@map("integration_jobs")
+}
+
+// ---------------------------------------------------------------------------
+// Small server-only tables
+// ---------------------------------------------------------------------------
+
+/// Fixed-window rate limiting for public endpoints, keyed by hashed client id.
+model RateLimit {
+  key          String
+  window_start DateTime
+  hits         Int      @default(0)
+
+  @@id([key, window_start])
+  @@map("rate_limits")
+}
+
+/// Named counters (enquiry numbers).
+model Counter {
+  name  String @id
+  value Int    @default(0)
+
+  @@map("counters")
+}

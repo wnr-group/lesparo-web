@@ -3,21 +3,24 @@ import { EnquiryStatusBadge, formatDate, PageHeader, Panel } from "@/components/
 import { buttonClass } from "@/components/ui/button";
 import { Alert } from "@/components/ui/primitives";
 import { integrationStatus } from "@/lib/integrations/registry";
-import { createClient } from "@/lib/supabase/server";
+import { requestDb } from "@/lib/db";
 import type { EnquiryStatus } from "@/lib/validation/enquiry";
 
 export default async function DashboardPage() {
-  const db = await createClient();
-  const count = (q: PromiseLike<{ count: number | null }>) => q.then((r) => r.count ?? 0);
+  const db = await requestDb();
 
   const [published, drafts, categories, newEnquiries, awaiting, failedJobs, recent] = await Promise.all([
-    count(db.from("products").select("id", { count: "exact", head: true }).eq("is_published", true).is("archived_at", null)),
-    count(db.from("products").select("id", { count: "exact", head: true }).eq("is_published", false).is("archived_at", null)),
-    count(db.from("categories").select("id", { count: "exact", head: true }).eq("is_published", true)),
-    count(db.from("wholesale_enquiries").select("id", { count: "exact", head: true }).eq("status", "new")),
-    count(db.from("wholesale_enquiries").select("id", { count: "exact", head: true }).in("status", ["under_review", "info_required", "quotation_prepared"])),
-    count(db.from("integration_jobs").select("id", { count: "exact", head: true }).in("status", ["failed", "blocked"])),
-    db.from("wholesale_enquiries").select("id, enquiry_number, customer_name, company_name, status, created_at").order("created_at", { ascending: false }).limit(6),
+    db.product.count({ where: { is_published: true, archived_at: null } }),
+    db.product.count({ where: { is_published: false, archived_at: null } }),
+    db.category.count({ where: { is_published: true } }),
+    db.wholesaleEnquiry.count({ where: { status: "new" } }),
+    db.wholesaleEnquiry.count({ where: { status: { in: ["under_review", "info_required", "quotation_prepared"] } } }),
+    db.integrationJob.count({ where: { status: { in: ["failed", "blocked"] } } }),
+    db.wholesaleEnquiry.findMany({
+      select: { id: true, enquiry_number: true, customer_name: true, company_name: true, status: true, created_at: true },
+      orderBy: { created_at: "desc" },
+      take: 6,
+    }),
   ]);
   const integrations = integrationStatus();
 
@@ -58,9 +61,9 @@ export default async function DashboardPage() {
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[2fr_1fr]">
         <Panel title="Recent enquiries" actions={<Link href="/admin/enquiries" className="text-xs text-muted hover:text-ink">View all</Link>}>
-          {recent.data?.length ? (
+          {recent.length ? (
             <ul className="-my-3 divide-y divide-line">
-              {recent.data.map((e) => (
+              {recent.map((e) => (
                 <li key={e.id}>
                   <Link href={`/admin/enquiries/${e.id}`} className="flex flex-wrap items-center justify-between gap-2 py-3 hover:text-indigo">
                     <span>

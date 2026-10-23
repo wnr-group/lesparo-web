@@ -10,10 +10,10 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: { default: "LESPARO — Abija Exports, Erode", template: "%s · LESPARO" },
+  title: { default: "LESPARO | Abija Exports, Erode", template: "%s | LESPARO" },
   description:
     "LESPARO by Abija Exports, Erode: gents and kids shorts, tracks and 3/4ths, lungis, kavi dhothies, towels and kerchiefs. Wholesale enquiries welcome.",
-  openGraph: { siteName: "LESPARO — Abija Exports", type: "website", locale: "en_IN" },
+  openGraph: { siteName: "LESPARO | Abija Exports", type: "website", locale: "en_IN" },
 };
 
 export const viewport: Viewport = { themeColor: "#ffffff" };

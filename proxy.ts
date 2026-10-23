@@ -1,42 +1,22 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { SESSION_COOKIE, verifySession } from "@/lib/auth/session";
 
 /**
- * Refreshes the Supabase session cookie for admin routes and sends signed-out visitors
- * to the sign-in page. This is a convenience only: every admin page and server action
- * re-checks staff roles on the server (lib/auth/staff.ts).
+ * Sends visitors without a valid session cookie to the sign-in page. This is
+ * a convenience only: every admin page and server action re-checks staff roles on the
+ * server (lib/auth/staff.ts).
  */
 export async function proxy(request: NextRequest) {
-  let response = NextResponse.next({ request });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll: () => request.cookies.getAll(),
-        setAll: (toSet) => {
-          toSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          response = NextResponse.next({ request });
-          toSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
-        },
-      },
-    },
-  );
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const signedIn = !!(await verifySession(request.cookies.get(SESSION_COOKIE)?.value));
   const isLogin = request.nextUrl.pathname === "/admin/login";
-  if (!user && !isLogin) {
+
+  if (!signedIn && !isLogin) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
     url.search = "";
     return NextResponse.redirect(url);
   }
-
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {

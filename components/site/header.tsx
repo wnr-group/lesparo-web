@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import { getCategoryTree } from "@/lib/catalogue/queries";
 import { SiteNav, type NavGroup } from "./site-nav";
 
@@ -28,7 +29,10 @@ export async function Header() {
           {/* Registered LESPARO mark, unaltered. */}
           <Image src="/lesparo-logo.png" alt="LESPARO" width={678} height={446} priority className="h-11 w-auto lg:h-12" />
         </Link>
-        <SiteNav groups={groups} />
+        {/* usePathname() is request data: a boundary lets pages re-render after admin edits. */}
+        <Suspense>
+          <SiteNav groups={groups} />
+        </Suspense>
       </div>
     </header>
   );

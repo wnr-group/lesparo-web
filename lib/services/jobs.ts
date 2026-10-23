@@ -1,8 +1,8 @@
 import "server-only";
+import { prisma } from "@/lib/db";
 import { serverEnv } from "@/lib/env";
 import type { CrmEnquiry } from "@/lib/integrations/crm/types";
 import { getCrm, getEmail } from "@/lib/integrations/registry";
-import { createServiceClient } from "@/lib/supabase/server";
 import { blockedReason, executeJob, type JobOperation, type JobRecord } from "./job-runner";
 
 export function currentDeps() {
@@ -25,13 +25,8 @@ export function jobsForNewEnquiry() {
 }
 
 async function loadCrmEnquiry(enquiryId: string): Promise<CrmEnquiry> {
-  const db = createServiceClient();
-  const { data, error } = await db
-    .from("wholesale_enquiries")
-    .select("id, enquiry_number, customer_name, company_name, email, phone, country, message, target_budget, created_at, enquiry_items(product_name_snapshot, quantity, specifications, display_order)")
-    .eq("id", enquiryId)
-    .single();
-  if (error || !data) throw new Error(`Enquiry ${enquiryId} not found`);
+  const data = await prisma.wholesaleEnquiry.findUnique({ where: { id: enquiryId }, include: { items: { orderBy: { display_order: "asc" } } } });
+  if (!data) throw new Error(`Enquiry ${enquiryId} not found`);
   return {
     websiteEnquiryId: data.id,
     enquiryNumber: data.enquiry_number,
@@ -39,11 +34,9 @@ async function loadCrmEnquiry(enquiryId: string): Promise<CrmEnquiry> {
     company: data.company_name ? { name: data.company_name } : null,
     message: data.message,
     targetBudget: data.target_budget,
-    items: [...data.enquiry_items]
-      .sort((a, b) => a.display_order - b.display_order)
-      .map((i) => ({ productName: i.product_name_snapshot, quantity: i.quantity, specifications: i.specifications })),
+    items: data.items.map((i) => ({ productName: i.product_name_snapshot, quantity: i.quantity, specifications: i.specifications })),
     source: "website",
-    submittedAt: data.created_at,
+    submittedAt: data.created_at.toISOString(),
   };
 }
 
@@ -52,16 +45,15 @@ async function loadCrmEnquiry(enquiryId: string): Promise<CrmEnquiry> {
  * move the same row from pending/failed to running.
  */
 export async function processJob(jobId: string): Promise<void> {
-  const db = createServiceClient();
-  const { data: claimed } = await db
-    .from("integration_jobs")
-    .update({ status: "running" })
-    .eq("id", jobId)
-    .in("status", ["pending", "failed"])
-    .lte("next_attempt_at", new Date().toISOString())
-    .select("id, operation, idempotency_key, attempts, max_attempts, entity_id")
-    .maybeSingle();
-  if (!claimed) return;
+  const { count } = await prisma.integrationJob.updateMany({
+    where: { id: jobId, status: { in: ["pending", "failed"] }, next_attempt_at: { lte: new Date() } },
+    data: { status: "running" },
+  });
+  if (!count) return;
+  const claimed = await prisma.integrationJob.findUniqueOrThrow({
+    where: { id: jobId },
+    select: { id: true, operation: true, idempotency_key: true, attempts: true, max_attempts: true, entity_id: true },
+  });
 
   const outcome = await executeJob(claimed as JobRecord, {
     ...currentDeps(),
@@ -70,55 +62,50 @@ export async function processJob(jobId: string): Promise<void> {
   });
 
   const attempts = claimed.attempts + (outcome.status === "blocked" && outcome.error.includes("not configured") ? 0 : 1);
-  await db
-    .from("integration_jobs")
-    .update({
+  await prisma.integrationJob.update({
+    where: { id: jobId },
+    data: {
       status: outcome.status,
       attempts,
       last_error: outcome.status === "succeeded" ? null : outcome.error,
       external_id: outcome.status === "succeeded" ? outcome.externalId : null,
-      next_attempt_at: outcome.status === "failed" ? outcome.nextAttemptAt.toISOString() : new Date().toISOString(),
-    })
-    .eq("id", jobId);
+      next_attempt_at: outcome.status === "failed" ? outcome.nextAttemptAt : new Date(),
+    },
+  });
 
   if (claimed.operation === "crm.create_enquiry") {
     const syncStatus = outcome.status === "succeeded" ? "synced" : outcome.status === "failed" ? "pending" : outcome.error.includes("not configured") ? "not_configured" : "failed";
-    await db
-      .from("wholesale_enquiries")
-      .update({ crm_sync_status: syncStatus, ...(outcome.status === "succeeded" ? { crm_record_id: outcome.externalId } : {}) })
-      .eq("id", claimed.entity_id);
+    await prisma.wholesaleEnquiry.update({
+      where: { id: claimed.entity_id },
+      data: { crm_sync_status: syncStatus, ...(outcome.status === "succeeded" ? { crm_record_id: outcome.externalId } : {}) },
+    });
   }
 
   if (outcome.status !== "succeeded") console.warn(`[jobs] ${claimed.operation} ${jobId}: ${outcome.status} — ${outcome.error}`);
 }
 
 export async function processEntityJobs(entityId: string) {
-  const db = createServiceClient();
-  const { data } = await db.from("integration_jobs").select("id").eq("entity_id", entityId).in("status", ["pending", "failed"]);
-  for (const job of data ?? []) await processJob(job.id);
+  const jobs = await prisma.integrationJob.findMany({ where: { entity_id: entityId, status: { in: ["pending", "failed"] } }, select: { id: true } });
+  for (const job of jobs) await processJob(job.id);
 }
 
 /** Processes all due jobs. Run on a schedule (see docs/deployment.md). */
 export async function processDueJobs(limit = 50) {
-  const db = createServiceClient();
-  const { data } = await db
-    .from("integration_jobs")
-    .select("id")
-    .in("status", ["pending", "failed"])
-    .lte("next_attempt_at", new Date().toISOString())
-    .order("next_attempt_at")
-    .limit(limit);
-  for (const job of data ?? []) await processJob(job.id);
-  return data?.length ?? 0;
+  const jobs = await prisma.integrationJob.findMany({
+    where: { status: { in: ["pending", "failed"] }, next_attempt_at: { lte: new Date() } },
+    orderBy: { next_attempt_at: "asc" },
+    take: limit,
+    select: { id: true },
+  });
+  for (const job of jobs) await processJob(job.id);
+  return jobs.length;
 }
 
 /** Staff-triggered retry of a blocked/failed job (re-checks configuration). */
 export async function retryJob(jobId: string) {
-  const db = createServiceClient();
-  await db
-    .from("integration_jobs")
-    .update({ status: "pending", attempts: 0, next_attempt_at: new Date().toISOString() })
-    .eq("id", jobId)
-    .in("status", ["blocked", "failed"]);
+  await prisma.integrationJob.updateMany({
+    where: { id: jobId, status: { in: ["blocked", "failed"] } },
+    data: { status: "pending", attempts: 0, next_attempt_at: new Date() },
+  });
   await processJob(jobId);
 }

@@ -10,9 +10,10 @@ export type RingItem = { id: string; href: string; name: string; label: string |
  * 3D product ring: cards stand on a cylinder that turns slowly and can be dragged (with
  * momentum). Cards facing the viewer are bright; those turning away fade into depth. A drag never
  * triggers the card link; a plain click does. Animation pauses off screen and in background tabs;
- * reduced motion keeps the ring still but draggable.
+ * reduced motion keeps the ring still but draggable. `frontOnly` fades the far half out
+ * completely and shows only the facing card's caption (a cleaner ring on busy backgrounds).
  */
-export function ProductRing({ items }: { items: RingItem[] }) {
+export function ProductRing({ items, frontOnly = false }: { items: RingItem[]; frontOnly?: boolean }) {
   const stage = useRef<HTMLDivElement>(null);
   const ring = useRef<HTMLDivElement>(null);
   const count = items.length;
@@ -47,7 +48,9 @@ export function ProductRing({ items }: { items: RingItem[] }) {
       cards.forEach((card, i) => {
         const rel = ((((i * step + angle) % 360) + 540) % 360) - 180; // -180..180, 0 = facing the viewer
         const facing = Math.cos((rel * Math.PI) / 180); // 1 front, -1 back
-        card.style.opacity = String(0.25 + 0.75 * Math.max(0, facing) ** 1.5);
+        card.style.opacity = String(frontOnly ? Math.min(1, Math.max(0, (facing - 0.1) / 0.5)) : 0.25 + 0.75 * Math.max(0, facing) ** 1.5);
+        // Front-only rings also keep just the facing card's caption, so one product name reads at a time.
+        if (frontOnly) (card.lastElementChild as HTMLElement).style.opacity = String(Math.min(1, Math.max(0, (facing - 0.88) / 0.1)));
         card.style.filter = `brightness(${(0.75 + 0.25 * Math.max(0, facing)).toFixed(3)})`;
         card.style.zIndex = String(Math.round(facing * 100) + 100);
       });
@@ -131,7 +134,7 @@ export function ProductRing({ items }: { items: RingItem[] }) {
       st.removeEventListener("pointerleave", onLeave);
       st.removeEventListener("click", onClick, true);
     };
-  }, [count, step]);
+  }, [count, step, frontOnly]);
 
   if (!count) return null;
   return (

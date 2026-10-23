@@ -4,7 +4,8 @@ import { ActionForm, FieldError } from "@/components/admin/forms";
 import { formatDate, PageHeader, Panel } from "@/components/admin/ui";
 import { Alert } from "@/components/ui/primitives";
 import { getStaffSession } from "@/lib/auth/staff";
-import { createClient, publicMediaUrl } from "@/lib/supabase/server";
+import { requestDb } from "@/lib/db";
+import { publicMediaUrl } from "@/lib/storage";
 import { DEFAULT_HOMEPAGE, homepageSchema } from "@/lib/validation/content";
 import { saveHomepage } from "./actions";
 
@@ -27,16 +28,16 @@ function Text({ name, label, value, max, area }: { name: string; label: string; 
 export default async function ContentPage() {
   const session = await getStaffSession();
   if (!session?.isAdmin) return <Alert tone="warning" title="Administrator access is required to edit site content." />;
-  const db = await createClient();
-  const [{ data: row }, { data: cats }, { data: products }] = await Promise.all([
-    db.from("site_content").select("data, updated_at").eq("key", "homepage").maybeSingle(),
-    db.from("categories").select("slug, name, parent_id").eq("is_published", true).order("display_order"),
-    db.from("products").select("slug, name").eq("is_published", true).is("archived_at", null).order("name"),
+  const db = await requestDb();
+  const [row, cats, products] = await Promise.all([
+    db.siteContent.findUnique({ where: { key: "homepage" }, select: { data: true, updated_at: true } }),
+    db.category.findMany({ where: { is_published: true }, select: { slug: true, name: true, parent_id: true }, orderBy: { display_order: "asc" } }),
+    db.product.findMany({ where: { is_published: true, archived_at: null }, select: { slug: true, name: true }, orderBy: { name: "asc" } }),
   ]);
   const parsed = homepageSchema.safeParse(row?.data);
   const c = parsed.success ? parsed.data : DEFAULT_HOMEPAGE;
   const heroUrl = publicMediaUrl(c.hero.imagePath);
-  const subcats = (cats ?? []).filter((x) => x.parent_id);
+  const subcats = cats.filter((x) => x.parent_id);
 
   return (
     <>
@@ -105,7 +106,7 @@ export default async function ContentPage() {
           <FieldError name="featuredProductSlugs" />
           <details className="mt-3 text-xs text-muted">
             <summary className="cursor-pointer">All published product slugs</summary>
-            <p className="mt-2 font-mono leading-relaxed">{products?.map((p) => p.slug).join(", ")}</p>
+            <p className="mt-2 font-mono leading-relaxed">{products.map((p) => p.slug).join(", ")}</p>
           </details>
         </Panel>
 
