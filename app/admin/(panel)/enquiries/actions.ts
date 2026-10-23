@@ -3,9 +3,9 @@
 import { refresh } from "next/cache";
 import { z } from "zod";
 import { AuthorizationError, requireStaff } from "@/lib/auth/staff";
+import { prisma } from "@/lib/db";
 import { fieldErrors } from "@/lib/services/enquiry-form";
 import { retryJob } from "@/lib/services/jobs";
-import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { enquiryNoteSchema, enquiryUpdateSchema } from "@/lib/validation/enquiry";
 
 export type ActionState = { ok?: boolean; error?: string; fields?: Record<string, string> };
@@ -20,24 +20,30 @@ function failure(err: unknown): ActionState {
 
 export async function updateEnquiry(id: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
   try {
-    await requireStaff();
+    const session = await requireStaff();
     const parsed = enquiryUpdateSchema.safeParse(emptyToUndefined(fd));
     if (!parsed.success) return { error: "Please check the highlighted fields.", fields: fieldErrors(parsed.error) };
     const v = parsed.data;
-    const db = await createClient();
-    const { error } = await db
-      .from("wholesale_enquiries")
-      .update({
-        status: v.status,
-        quotation_amount: v.quotationAmount ?? null,
-        quotation_currency: v.quotationAmount !== undefined ? (v.quotationCurrency ?? "INR") : null,
-        quotation_valid_until: v.quotationValidUntil ?? null,
-        quotation_details: v.quotationDetails ?? null,
-        follow_up_at: v.followUpAt ? new Date(`${v.followUpAt}+05:30`).toISOString() : null,
-        follow_up_outcome: v.followUpOutcome ?? null,
-      })
-      .eq("id", z.uuid().parse(id));
-    if (error) throw error;
+    const enquiryId = z.uuid().parse(id);
+    // Staff may only change workflow fields, never buyer-submitted data.
+    await prisma.$transaction(async (tx) => {
+      const before = await tx.wholesaleEnquiry.findUniqueOrThrow({ where: { id: enquiryId }, select: { status: true } });
+      await tx.wholesaleEnquiry.update({
+        where: { id: enquiryId },
+        data: {
+          status: v.status,
+          quotation_amount: v.quotationAmount ?? null,
+          quotation_currency: v.quotationAmount !== undefined ? (v.quotationCurrency ?? "INR") : null,
+          quotation_valid_until: v.quotationValidUntil ?? null,
+          quotation_details: v.quotationDetails ?? null,
+          follow_up_at: v.followUpAt ? new Date(`${v.followUpAt}+05:30`) : null,
+          follow_up_outcome: v.followUpOutcome ?? null,
+        },
+      });
+      if (before.status !== v.status) {
+        await tx.enquiryStatusHistory.create({ data: { enquiry_id: enquiryId, from_status: before.status, to_status: v.status, changed_by: session.userId } });
+      }
+    });
     refresh();
     return { ok: true };
   } catch (err) {
@@ -50,9 +56,7 @@ export async function addNote(id: string, _prev: ActionState, fd: FormData): Pro
     const session = await requireStaff();
     const parsed = enquiryNoteSchema.safeParse({ note: fd.get("note") });
     if (!parsed.success) return { error: parsed.error.issues[0].message };
-    const db = await createClient();
-    const { error } = await db.from("enquiry_notes").insert({ enquiry_id: z.uuid().parse(id), author_id: session.userId, note: parsed.data.note });
-    if (error) throw error;
+    await prisma.enquiryNote.create({ data: { enquiry_id: z.uuid().parse(id), author_id: session.userId, note: parsed.data.note } });
     refresh();
     return { ok: true };
   } catch (err) {
@@ -63,12 +67,10 @@ export async function addNote(id: string, _prev: ActionState, fd: FormData): Pro
 export async function retryIntegrationJob(jobId: string): Promise<ActionState> {
   try {
     await requireStaff();
-    // Confirm the job is visible to this staff member (RLS) before acting with the service role.
-    const db = await createClient();
-    const { data } = await db.from("integration_jobs").select("id").eq("id", z.uuid().parse(jobId)).maybeSingle();
-    if (!data) return { error: "Job not found." };
-    await retryJob(jobId);
-    const { data: after } = await createServiceClient().from("integration_jobs").select("status, last_error").eq("id", jobId).single();
+    const id = z.uuid().parse(jobId);
+    if (!(await prisma.integrationJob.findUnique({ where: { id }, select: { id: true } }))) return { error: "Job not found." };
+    await retryJob(id);
+    const after = await prisma.integrationJob.findUnique({ where: { id }, select: { status: true, last_error: true } });
     refresh();
     return after?.status === "succeeded" ? { ok: true } : { error: after?.last_error ?? "The job did not complete." };
   } catch (err) {

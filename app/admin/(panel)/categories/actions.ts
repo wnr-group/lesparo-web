@@ -6,12 +6,20 @@ import { refresh, updateTag } from "next/cache";
 import { z } from "zod";
 import { AuthorizationError, requireAdmin } from "@/lib/auth/staff";
 import { CATALOGUE_TAG } from "@/lib/catalogue/queries";
+import { prisma } from "@/lib/db";
 import { fieldErrors } from "@/lib/services/enquiry-form";
 import { sniffFileType } from "@/lib/services/file-sniff";
-import { createClient } from "@/lib/supabase/server";
+import { saveFile } from "@/lib/storage";
 import { categorySchema } from "@/lib/validation/catalogue";
 
 export type ActionState = { ok?: boolean; error?: string; fields?: Record<string, string> };
+
+/** The category and all of its descendants. */
+async function categorySubtree(root: string): Promise<string[]> {
+  const all = await prisma.category.findMany({ select: { id: true, parent_id: true } });
+  const walk = (id: string): string[] => [id, ...all.filter((c) => c.parent_id === id).flatMap((c) => walk(c.id))];
+  return walk(root);
+}
 
 export async function saveCategory(id: string | null, _prev: ActionState, fd: FormData): Promise<ActionState> {
   let newId: string | null = null;
@@ -20,12 +28,10 @@ export async function saveCategory(id: string | null, _prev: ActionState, fd: Fo
     const parsed = categorySchema.safeParse(Object.fromEntries(fd.entries()));
     if (!parsed.success) return { error: "Please check the highlighted fields.", fields: fieldErrors(parsed.error) };
     const c = parsed.data;
-    const db = await createClient();
 
     if (id && c.parentId) {
       // Prevent cycles: the new parent may not be this category or one of its descendants.
-      const { data: subtree } = await db.rpc("category_subtree", { root: id });
-      if ((subtree as string[] | null)?.includes(c.parentId)) return { error: "A category cannot be placed inside itself.", fields: { parentId: "Choose a different parent." } };
+      if ((await categorySubtree(id)).includes(c.parentId)) return { error: "A category cannot be placed inside itself.", fields: { parentId: "Choose a different parent." } };
     }
 
     let coverPath: string | undefined;
@@ -36,8 +42,7 @@ export async function saveCategory(id: string | null, _prev: ActionState, fd: Fo
       const type = sniffFileType(bytes);
       if (!type || type.mime === "application/pdf") return { error: "Cover must be a JPG, PNG or WebP image.", fields: { cover: "Unsupported file." } };
       coverPath = `categories/${c.slug}/${randomUUID()}.${type.ext}`;
-      const up = await db.storage.from("product-media").upload(coverPath, bytes, { contentType: type.mime });
-      if (up.error) throw up.error;
+      await saveFile("media", coverPath, bytes);
     }
 
     const row = {
@@ -51,18 +56,15 @@ export async function saveCategory(id: string | null, _prev: ActionState, fd: Fo
       ...(coverPath && { cover_image_path: coverPath }),
     };
     if (id) {
-      const { error } = await db.from("categories").update(row).eq("id", z.uuid().parse(id));
-      if (error) throw error;
+      await prisma.category.update({ where: { id: z.uuid().parse(id) }, data: row });
     } else {
-      const { data, error } = await db.from("categories").insert(row).select("id").single();
-      if (error) throw error;
-      newId = data.id;
+      newId = (await prisma.category.create({ data: row, select: { id: true } })).id;
     }
     updateTag(CATALOGUE_TAG);
     refresh();
   } catch (err) {
     if (err instanceof AuthorizationError) return { error: err.message };
-    if ((err as { code?: string }).code === "23505") return { error: "That slug is already used.", fields: { slug: "Already in use." } };
+    if ((err as { code?: string }).code === "P2002") return { error: "That slug is already used.", fields: { slug: "Already in use." } };
     console.error("[admin/categories]", err);
     return { error: "Something went wrong. Please try again." };
   }

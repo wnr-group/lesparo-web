@@ -4,12 +4,11 @@ import { z } from "zod";
 /**
  * Server-only configuration. Public values (NEXT_PUBLIC_*) are read directly where needed;
  * everything secret is validated here and must never be imported by client components.
+ * DATABASE_URL, STORAGE_DIR and AUTH_SECRET are read by lib/db.ts, lib/storage.ts and
+ * lib/auth/session.ts.
  */
 const schema = z.object({
   NEXT_PUBLIC_SITE_URL: z.url(),
-  NEXT_PUBLIC_SUPABASE_URL: z.url(),
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
-  SUPABASE_SECRET_KEY: z.string().min(1),
   RATE_LIMIT_SALT: z.string().min(8),
   CRM_PROVIDER: z.enum(["none", "mock"]).default("none"),
   EMAIL_PROVIDER: z.enum(["none", "mock"]).default("none"),

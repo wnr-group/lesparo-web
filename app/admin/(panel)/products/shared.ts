@@ -1,11 +1,10 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { requestDb } from "@/lib/db";
 
 /** Category options labelled with their path, e.g. "Garments › Gents › Shorts". */
 export async function categoryOptions() {
-  const db = await createClient();
-  const { data } = await db.from("categories").select("id, name, parent_id").order("display_order");
-  const all = data ?? [];
+  const db = await requestDb();
+  const all = await db.category.findMany({ select: { id: true, name: true, parent_id: true }, orderBy: { display_order: "asc" } });
   const label = (id: string): string => {
     const c = all.find((x) => x.id === id)!;
     return c.parent_id ? `${label(c.parent_id)} › ${c.name}` : c.name;

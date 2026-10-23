@@ -2,7 +2,8 @@ import Link from "next/link";
 import { EnquiryStatusBadge, formatDate, PageHeader, Pagination, SyncBadge, Table } from "@/components/admin/ui";
 import { EmptyState } from "@/components/ui/primitives";
 import { sanitiseSearch } from "@/lib/catalogue/queries";
-import { createClient } from "@/lib/supabase/server";
+import type { Prisma } from "@prisma/client";
+import { requestDb } from "@/lib/db";
 import { ENQUIRY_STATUSES, ENQUIRY_STATUS_LABELS, type EnquiryStatus } from "@/lib/validation/enquiry";
 
 const PAGE_SIZE = 25;
@@ -15,24 +16,30 @@ export default async function EnquiriesPage(props: PageProps<"/admin/enquiries">
   const sync = sp.sync === "issues";
   const page = Math.max(1, Number(sp.page) || 1);
 
-  const db = await createClient();
-  let req = db
-    .from("wholesale_enquiries")
-    .select("id, enquiry_number, customer_name, company_name, email, country, status, crm_sync_status, created_at, follow_up_at, enquiry_items(count)", { count: "exact" })
-    .order("created_at", { ascending: false });
-
-  if (status === "active") req = req.in("status", ACTIVE);
-  else if ((ENQUIRY_STATUSES as readonly string[]).includes(status)) req = req.eq("status", status as EnquiryStatus);
-  if (q) req = req.or(`enquiry_number.ilike.%${q}%,customer_name.ilike.%${q}%,company_name.ilike.%${q}%,email.ilike.%${q}%`);
+  const db = await requestDb();
+  const where: Prisma.WholesaleEnquiryWhereInput = {
+    ...(status === "active" ? { status: { in: ACTIVE } } : (ENQUIRY_STATUSES as readonly string[]).includes(status) ? { status } : {}),
+    ...(q && { OR: [{ enquiry_number: { contains: q } }, { customer_name: { contains: q } }, { company_name: { contains: q } }, { email: { contains: q } }] }),
+  };
   if (sync) {
-    const { data: jobs } = await db.from("integration_jobs").select("entity_id").in("status", ["failed", "blocked"]).limit(1000);
-    req = req.in("id", [...new Set((jobs ?? []).map((j) => j.entity_id))].concat("00000000-0000-0000-0000-000000000000"));
+    const jobs = await db.integrationJob.findMany({ where: { status: { in: ["failed", "blocked"] } }, select: { entity_id: true }, take: 1000 });
+    where.id = { in: [...new Set(jobs.map((j) => j.entity_id))] };
   }
 
-  const from = (page - 1) * PAGE_SIZE;
-  const { data, count, error } = await req.range(from, from + PAGE_SIZE - 1);
-  if (error) throw error;
-  const pageCount = Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE));
+  const [data, count] = await Promise.all([
+    db.wholesaleEnquiry.findMany({
+      where,
+      select: {
+        id: true, enquiry_number: true, customer_name: true, company_name: true, email: true, country: true, status: true, crm_sync_status: true, created_at: true, follow_up_at: true,
+        _count: { select: { items: true } },
+      },
+      orderBy: { created_at: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    db.wholesaleEnquiry.count({ where }),
+  ]);
+  const pageCount = Math.max(1, Math.ceil(count / PAGE_SIZE));
   const href = (p: number) => {
     const params = new URLSearchParams();
     if (status) params.set("status", status);
@@ -44,7 +51,7 @@ export default async function EnquiriesPage(props: PageProps<"/admin/enquiries">
 
   return (
     <>
-      <PageHeader title="Wholesale enquiries" description={`${count ?? 0} matching`} />
+      <PageHeader title="Wholesale enquiries" description={`${count} matching`} />
       <form className="mb-4 flex flex-wrap items-end gap-3" action="/admin/enquiries">
         <div>
           <label htmlFor="q" className="mb-1 block text-xs text-muted">
@@ -90,7 +97,7 @@ export default async function EnquiriesPage(props: PageProps<"/admin/enquiries">
                   {e.country ?? ""}
                 </span>
               </td>
-              <td className="px-4 py-3 tabular-nums">{(e.enquiry_items as unknown as { count: number }[])[0]?.count ?? 0}</td>
+              <td className="px-4 py-3 tabular-nums">{e._count.items}</td>
               <td className="px-4 py-3 text-muted">{formatDate(e.created_at, true)}</td>
               <td className="px-4 py-3 text-muted">{formatDate(e.follow_up_at)}</td>
               <td className="px-4 py-3">

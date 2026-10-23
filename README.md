@@ -13,26 +13,28 @@ is **not built yet** — it waits on a business decision (see `docs/audit-and-de
 
 - **Next.js 16** (App Router, Cache Components, Turbopack), React 19, TypeScript (strict)
 - **Tailwind CSS 4** with design tokens in `app/globals.css` ("Modern Textile Atelier")
-- **Supabase**: Postgres + Row Level Security, Auth (staff sign-in), Storage
+- **Prisma 7 + SQLite**: a single local database file (`prisma/dev.db`); no Docker or hosted database needed
+- Staff sign-in: email + password (bcrypt) with a signed session cookie (`jose`)
+- Uploads on local disk in `storage/` (public images in `storage/media/`, private enquiry files in `storage/attachments/`)
 - **Zod** for validation shared by forms and server actions
-- **Vitest** unit tests, plus a role-based RLS/storage check script
+- **Vitest** unit tests
 
 ## Prerequisites
 
 - Node.js 20.9+ (developed on 24), npm 10+
-- Docker Desktop (for local Supabase) and the Supabase CLI (`npx supabase`)
 
 ## Local development
 
 ```bash
-npm install
-npx supabase start                 # starts Postgres, Auth, Storage locally (Docker)
-cp .env.example .env.local         # fill in values printed by `supabase start`
-npm run db:reset                   # applies supabase/migrations/*
-npm run catalogue:import           # imports data/live-catalogue.json + images into Supabase
-npm run staff:grant -- you@example.com admin --password "a-long-local-password"
-npm run dev                        # http://localhost:3000  (admin: /admin)
+npm install                        # also runs `prisma generate`
+cp .env.example .env.local         # set AUTH_SECRET and RATE_LIMIT_SALT (random, 32+ chars)
+npm run db:migrate                 # creates prisma/dev.db from prisma/migrations/*
+npm run db:seed                    # imports the catalogue (+ downloads images) and creates the default admin
+npm run dev                        # http://localhost:3000  (admin: /admin, sign in as admin@lesparo.com)
 ```
+
+The default admin's password is set in `scripts/seed-admin.ts` (override with `ADMIN_EMAIL` /
+`ADMIN_PASSWORD` before seeding). Change it after the first sign-in on any shared install.
 
 ## Scripts
 
@@ -42,11 +44,13 @@ npm run dev                        # http://localhost:3000  (admin: /admin)
 | `npm run type-check` | TypeScript, no emit |
 | `npm run lint` | ESLint |
 | `npm test` | Unit tests (Vitest) |
-| `npm run test:security` | RLS, grants and storage checks against **local** Supabase as anon, sales and admin |
-| `npm run db:reset` | Recreate the local database from migrations |
-| `npm run db:types` | Regenerate `types/database.ts` from the local schema |
+| `npm run db:migrate` | Apply/create Prisma migrations on the SQLite database |
+| `npm run db:seed` | `catalogue:import` + `admin:seed` |
+| `npm run db:reset` | Delete and recreate the database, then seed it |
+| `npm run db:studio` | Browse and edit the database in Prisma Studio |
+| `npm run admin:seed` | Create the default admin account (keeps an existing password) |
 | `npm run catalogue:crawl` | Re-snapshot the live lesparo.com catalogue into `data/live-catalogue.json` |
-| `npm run catalogue:import` | Upsert the snapshot into Supabase (idempotent), copy images, write `data/legacy-redirects.json` |
+| `npm run catalogue:import` | Upsert the snapshot into the database (idempotent), download images to `storage/media/`, write `data/legacy-redirects.json` |
 | `npm run staff:grant -- <email> <admin\|sales> [--password <pw>]` | Create a staff user / grant a role (`--revoke` to remove) |
 | `npm run jobs:run` | Process due CRM/email jobs once |
 
@@ -61,9 +65,10 @@ lib/catalogue/       cached catalogue queries, legacy description parser
 lib/services/        enquiry submission, integration job runner, upload sniffing
 lib/integrations/    provider-independent CRM and email adapters (+ test mocks)
 lib/validation/      Zod schemas shared by client and server
-supabase/migrations/ schema, RLS, storage policies, grants
+prisma/              schema.prisma and SQL migrations
+storage/             uploaded images and enquiry files (git-ignored)
 scripts/             catalogue crawl/import, staff provisioning, job runner
-tests/               unit tests and the security check
+tests/               unit tests
 docs/                database, integrations, deployment, audit & decision register
 ```
 

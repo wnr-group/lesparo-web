@@ -7,7 +7,9 @@ import { formatDate, PageHeader, Panel } from "@/components/admin/ui";
 import { buttonClass } from "@/components/ui/button";
 import { Alert, Badge } from "@/components/ui/primitives";
 import { getStaffSession } from "@/lib/auth/staff";
-import { createClient, publicMediaUrl } from "@/lib/supabase/server";
+import { jsonStrings } from "@/lib/catalogue/queries";
+import { requestDb } from "@/lib/db";
+import { publicMediaUrl } from "@/lib/storage";
 import { saveProduct, setArchived, updateImage, uploadImages } from "../actions";
 import { categoryOptions } from "../shared";
 
@@ -15,15 +17,15 @@ export default async function EditProductPage(props: PageProps<"/admin/products/
   const { id } = await props.params;
   const sp = await props.searchParams;
   if (!z.uuid().safeParse(id).success) notFound();
-  const db = await createClient();
-  const [{ data: p }, session, categories] = await Promise.all([
-    db.from("products").select("*, product_images(*)").eq("id", id).maybeSingle(),
+  const db = await requestDb();
+  const [p, session, categories] = await Promise.all([
+    db.product.findUnique({ where: { id }, include: { images: { orderBy: { display_order: "asc" } } } }),
     getStaffSession(),
     categoryOptions(),
   ]);
   if (!p) notFound();
   const readOnly = !session?.isAdmin;
-  const images = [...p.product_images].sort((a, b) => a.display_order - b.display_order);
+  const images = p.images;
 
   return (
     <>
@@ -67,7 +69,7 @@ export default async function EditProductPage(props: PageProps<"/admin/products/
                 categoryId: p.category_id,
                 description: p.description,
                 fabric: p.fabric,
-                sizes: p.sizes,
+                sizes: jsonStrings(p.sizes),
                 packing: p.packing,
                 specs: p.specs as { label: string; value: string }[],
                 quoteEnabled: p.quote_enabled,

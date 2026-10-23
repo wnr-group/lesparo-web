@@ -6,7 +6,8 @@ import { AuthorizationError, requireAdmin } from "@/lib/auth/staff";
 import { CONTENT_TAG } from "@/lib/catalogue/queries";
 import { fieldErrors } from "@/lib/services/enquiry-form";
 import { sniffFileType } from "@/lib/services/file-sniff";
-import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db";
+import { saveFile } from "@/lib/storage";
 import { homepageSchema } from "@/lib/validation/content";
 
 export type ActionState = { ok?: boolean; error?: string; fields?: Record<string, string> };
@@ -21,8 +22,7 @@ const list = (v: string) =>
 export async function saveHomepage(_prev: ActionState, fd: FormData): Promise<ActionState> {
   try {
     const session = await requireAdmin();
-    const db = await createClient();
-    const { data: current } = await db.from("site_content").select("data").eq("key", "homepage").maybeSingle();
+    const current = await prisma.siteContent.findUnique({ where: { key: "homepage" }, select: { data: true } });
     let imagePath: string | null = (current?.data as { hero?: { imagePath?: string | null } } | null)?.hero?.imagePath ?? null;
 
     if (fd.get("removeHeroImage") === "on") imagePath = null;
@@ -33,8 +33,7 @@ export async function saveHomepage(_prev: ActionState, fd: FormData): Promise<Ac
       const type = sniffFileType(bytes);
       if (!type || type.mime === "application/pdf") return { error: "Hero image must be JPG, PNG or WebP.", fields: { "hero.imagePath": "Unsupported file." } };
       imagePath = `site/hero/${randomUUID()}.${type.ext}`;
-      const up = await db.storage.from("product-media").upload(imagePath, bytes, { contentType: type.mime });
-      if (up.error) throw up.error;
+      await saveFile("media", imagePath, bytes);
     }
 
     const candidate = {
@@ -62,13 +61,16 @@ export async function saveHomepage(_prev: ActionState, fd: FormData): Promise<Ac
 
     const slugs = parsed.data.featuredProductSlugs;
     if (slugs.length) {
-      const { data: found } = await db.from("products").select("slug").in("slug", slugs).eq("is_published", true).is("archived_at", null);
-      const missing = slugs.filter((x) => !found?.some((f) => f.slug === x));
+      const found = await prisma.product.findMany({ where: { slug: { in: slugs }, is_published: true, archived_at: null }, select: { slug: true } });
+      const missing = slugs.filter((x) => !found.some((f) => f.slug === x));
       if (missing.length) return { error: "Some featured products are unknown or unpublished.", fields: { featuredProductSlugs: `Not found or unpublished: ${missing.join(", ")}` } };
     }
 
-    const { error } = await db.from("site_content").upsert({ key: "homepage", data: parsed.data, updated_by: session.userId });
-    if (error) throw error;
+    await prisma.siteContent.upsert({
+      where: { key: "homepage" },
+      create: { key: "homepage", data: parsed.data, updated_by: session.userId },
+      update: { data: parsed.data, updated_by: session.userId },
+    });
     updateTag(CONTENT_TAG);
     refresh();
     return { ok: true };

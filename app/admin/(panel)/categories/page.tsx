@@ -2,17 +2,16 @@ import Link from "next/link";
 import { PageHeader, Table } from "@/components/admin/ui";
 import { buttonClass } from "@/components/ui/button";
 import { Badge } from "@/components/ui/primitives";
-import { createClient } from "@/lib/supabase/server";
+import { requestDb } from "@/lib/db";
 
 export default async function AdminCategoriesPage() {
-  const db = await createClient();
-  const [{ data: cats }, { data: products }] = await Promise.all([
-    db.from("categories").select("id, name, slug, parent_id, display_order, is_published, is_featured").order("display_order"),
-    db.from("products").select("category_id").is("archived_at", null),
+  const db = await requestDb();
+  const [all, products] = await Promise.all([
+    db.category.findMany({ select: { id: true, name: true, slug: true, parent_id: true, display_order: true, is_published: true, is_featured: true }, orderBy: { display_order: "asc" } }),
+    db.product.findMany({ where: { archived_at: null }, select: { category_id: true } }),
   ]);
-  const all = cats ?? [];
   const counts = new Map<string, number>();
-  for (const p of products ?? []) if (p.category_id) counts.set(p.category_id, (counts.get(p.category_id) ?? 0) + 1);
+  for (const p of products) if (p.category_id) counts.set(p.category_id, (counts.get(p.category_id) ?? 0) + 1);
 
   const ordered: { c: (typeof all)[number]; depth: number }[] = [];
   const walk = (parent: string | null, depth: number) =>

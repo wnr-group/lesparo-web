@@ -1,7 +1,9 @@
 import "server-only";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import { createClient } from "@/lib/supabase/server";
+import { requestDb } from "@/lib/db";
+import { SESSION_COOKIE, verifySession } from "./session";
 
 export type StaffRole = "admin" | "sales";
 
@@ -12,19 +14,17 @@ export type StaffSession = {
   isAdmin: boolean;
 };
 
-/** Resolves the current user's staff roles from the database (never from client state). */
+/** Resolves the current user's staff role from the database (never from client state). */
 export const getStaffSession = cache(async (): Promise<StaffSession | null> => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const userId = await verifySession((await cookies()).get(SESSION_COOKIE)?.value);
+  if (!userId) return null;
 
-  const { data: rows, error } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
-  if (error || !rows?.length) return null;
+  const db = await requestDb();
+  const user = await db.staffUser.findUnique({ where: { id: userId }, select: { id: true, email: true, role: true } });
+  if (!user || (user.role !== "admin" && user.role !== "sales")) return null;
 
-  const roles = rows.map((r) => r.role as StaffRole);
-  return { userId: user.id, email: user.email ?? null, roles, isAdmin: roles.includes("admin") };
+  const roles = [user.role as StaffRole];
+  return { userId: user.id, email: user.email, roles, isAdmin: roles.includes("admin") };
 });
 
 /** For pages: redirects to sign-in when the visitor is not staff. */

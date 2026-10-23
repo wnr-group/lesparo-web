@@ -1,8 +1,8 @@
 /**
- * Imports data/live-catalogue.json (from crawl-live-catalogue.ts) into Supabase.
+ * Imports data/live-catalogue.json (from crawl-live-catalogue.ts) into the local database.
  *
  * - Idempotent: categories and products are upserted by their PrestaShop legacy_id.
- * - Images are copied from lesparo.com into the `product-media` bucket.
+ * - Images are downloaded from lesparo.com into storage/media/ (already-downloaded files are kept).
  * - The live site's 4th-level "product line" categories (one product each) are folded into
  *   their parent; their URLs are redirected to the product instead.
  * - Writes data/legacy-redirects.json, consumed by next.config.ts.
@@ -10,12 +10,12 @@
  *   npm run catalogue:import            (uses .env.local)
  *   npm run catalogue:import -- --skip-images
  */
-import { createClient } from "@supabase/supabase-js";
-import { readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { parseLegacyDescription } from "../lib/catalogue/legacy-description";
 import { DEFAULT_HOMEPAGE } from "../lib/validation/content";
 import { slugify } from "../lib/validation/catalogue";
+import { db } from "./db";
 
 type LiveCategory = { legacyId: number; name: string; legacyUrl: string; parentLegacyId: number | null; depth: number; productLegacyIds: number[] };
 type LiveProduct = {
@@ -35,10 +35,7 @@ const MAX_CATEGORY_DEPTH = 3;
 /** Products shown under "New Arrivals" on the live homepage, in order. */
 const LIVE_HOMEPAGE_PRODUCTS = [28, 34, 36, 38, 39, 40, 41, 42, 43, 35];
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const key = process.env.SUPABASE_SECRET_KEY;
-if (!url || !key) throw new Error("NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SECRET_KEY are required.");
-const db = createClient(url, key, { auth: { persistSession: false } });
+const MEDIA_DIR = path.resolve(process.env.STORAGE_DIR ?? path.join(process.cwd(), "storage"), "media");
 const skipImages = process.argv.includes("--skip-images");
 
 function displayName(raw: string): string {
@@ -54,16 +51,17 @@ function pathOf(u: string) {
   return new URL(u).pathname;
 }
 
-async function must<T>(p: PromiseLike<{ data: T; error: { message: string } | null }>, what: string): Promise<T> {
-  const { data, error } = await p;
-  if (error) throw new Error(`${what}: ${error.message}`);
-  return data;
-}
-
-async function mustRow<T>(p: PromiseLike<{ data: T; error: { message: string } | null }>, what: string): Promise<NonNullable<T>> {
-  const data = await must(p, what);
-  if (data === null || data === undefined) throw new Error(`${what}: no row returned`);
-  return data;
+async function download(url: string, storagePath: string): Promise<boolean> {
+  const file = path.join(MEDIA_DIR, storagePath);
+  if (await access(file).then(() => true, () => false)) return true;
+  const res = await fetch(url);
+  if (!res.ok) {
+    console.warn(`  image ${url}: ${res.status}`);
+    return false;
+  }
+  await mkdir(path.dirname(file), { recursive: true });
+  await writeFile(file, Buffer.from(await res.arrayBuffer()));
+  return true;
 }
 
 async function main() {
@@ -92,26 +90,16 @@ async function main() {
     if (usedSlugs.has(slug)) throw new Error(`duplicate category slug ${slug}`);
     usedSlugs.add(slug);
     const productCount = subtreeProducts(cat).size;
-    const row = await mustRow(
-      db
-        .from("categories")
-        .upsert(
-          {
-            legacy_id: cat.legacyId,
-            legacy_url: cat.legacyUrl,
-            name: displayName(cat.name),
-            slug,
-            parent_id: cat.parentLegacyId ? (categoryIds.get(cat.parentLegacyId) ?? null) : null,
-            display_order: snap.categories.indexOf(cat),
-            is_published: productCount > 0,
-            is_featured: cat.depth === 2,
-          },
-          { onConflict: "legacy_id" },
-        )
-        .select("id")
-        .single(),
-      `category ${cat.name}`,
-    );
+    const data = {
+      legacy_url: cat.legacyUrl,
+      name: displayName(cat.name),
+      slug,
+      parent_id: cat.parentLegacyId ? (categoryIds.get(cat.parentLegacyId) ?? null) : null,
+      display_order: snap.categories.indexOf(cat),
+      is_published: productCount > 0,
+      is_featured: cat.depth === 2,
+    };
+    const row = await db.category.upsert({ where: { legacy_id: cat.legacyId }, create: { legacy_id: cat.legacyId, ...data }, update: data, select: { id: true } });
     categoryIds.set(cat.legacyId, row.id);
   }
   console.log(`categories: ${categoryIds.size} upserted`);
@@ -134,51 +122,33 @@ async function main() {
     ];
     const slug = slugify(p.slug) || slugify(p.name);
     const catLegacy = productCategory.get(p.legacyId);
-    const row = await mustRow(
-      db
-        .from("products")
-        .upsert(
-          {
-            legacy_id: p.legacyId,
-            legacy_url: p.legacyUrl,
-            name: displayName(p.name),
-            slug,
-            sku: p.reference || null,
-            category_id: catLegacy ? categoryIds.get(catLegacy) : null,
-            description: null,
-            fabric,
-            specs,
-            sizes: parsed.sizes,
-            packing: parsed.packing,
-            quote_enabled: true,
-            retail_enabled: false,
-            is_published: true,
-            is_featured: LIVE_HOMEPAGE_PRODUCTS.includes(p.legacyId),
-          },
-          { onConflict: "legacy_id" },
-        )
-        .select("id")
-        .single(),
-      `product ${p.name}`,
-    );
+    const data = {
+      legacy_url: p.legacyUrl,
+      name: displayName(p.name),
+      slug,
+      sku: p.reference || null,
+      category_id: catLegacy ? (categoryIds.get(catLegacy) ?? null) : null,
+      description: null,
+      fabric,
+      specs,
+      sizes: parsed.sizes,
+      packing: parsed.packing,
+      quote_enabled: true,
+      retail_enabled: false,
+      is_published: true,
+      is_featured: LIVE_HOMEPAGE_PRODUCTS.includes(p.legacyId),
+    };
+    const row = await db.product.upsert({ where: { legacy_id: p.legacyId }, create: { legacy_id: p.legacyId, ...data }, update: data, select: { id: true } });
     productSlugs.set(p.legacyId, slug);
 
     if (!skipImages) {
-      await must(db.from("product_images").delete().eq("product_id", row.id), "clear images");
+      await db.productImage.deleteMany({ where: { product_id: row.id } });
       const images = [...p.images].sort((a, b) => a.position - b.position);
       for (const [i, img] of images.entries()) {
-        const res = await fetch(img.url);
-        if (!res.ok) {
-          console.warn(`  image ${img.url}: ${res.status}`);
-          continue;
-        }
         const storagePath = `products/${slug}/${String(i + 1).padStart(2, "0")}.jpg`;
-        await must(
-          db.storage.from("product-media").upload(storagePath, Buffer.from(await res.arrayBuffer()), { contentType: "image/jpeg", upsert: true }),
-          `upload ${storagePath}`,
-        );
-        await must(
-          db.from("product_images").insert({
+        if (!(await download(img.url, storagePath))) continue;
+        await db.productImage.create({
+          data: {
             product_id: row.id,
             storage_path: storagePath,
             alt_text: `${displayName(p.name)}${images.length > 1 ? ` — view ${i + 1}` : ""}`,
@@ -186,9 +156,8 @@ async function main() {
             height: 655,
             display_order: i,
             is_primary: i === 0,
-          }),
-          "insert image",
-        );
+          },
+        });
       }
     }
     console.log(`product ${p.legacyId} ${p.name} -> /products/${slug}`);
@@ -198,33 +167,27 @@ async function main() {
   for (const cat of kept) {
     const first = [...subtreeProducts(cat)].map((id) => productSlugs.get(id)).find(Boolean);
     if (!first) continue;
-    await must(
-      db.from("categories").update({ cover_image_path: `products/${first}/01.jpg` }).eq("legacy_id", cat.legacyId).is("cover_image_path", null),
-      "cover",
-    );
+    await db.category.updateMany({ where: { legacy_id: cat.legacyId, cover_image_path: null }, data: { cover_image_path: `products/${first}/01.jpg` } });
   }
 
   // ---- homepage content (only created if missing; admins own it afterwards) -----------
   const topLevel = kept.filter((c) => c.depth === 2).map((c) => slugify(c.name));
-  await must(
-    db.from("site_content").upsert(
-      {
-        key: "homepage",
-        data: {
-          ...DEFAULT_HOMEPAGE,
-          featuredCategorySlugs: [...new Set(topLevel)].slice(0, 8),
-          featuredProductSlugs: LIVE_HOMEPAGE_PRODUCTS.map((id) => productSlugs.get(id)).filter(Boolean),
-        },
+  await db.siteContent.upsert({
+    where: { key: "homepage" },
+    create: {
+      key: "homepage",
+      data: {
+        ...DEFAULT_HOMEPAGE,
+        featuredCategorySlugs: [...new Set(topLevel)].slice(0, 8),
+        featuredProductSlugs: LIVE_HOMEPAGE_PRODUCTS.map((id) => productSlugs.get(id)).filter((s): s is string => !!s),
       },
-      { onConflict: "key", ignoreDuplicates: true },
-    ),
-    "homepage content",
-  );
+    },
+    update: {},
+  });
 
   // ---- redirects ----------------------------------------------------------------------
   const redirects: { source: string; destination: string }[] = [];
-  const categorySlug = async (legacyId: number) =>
-    (await mustRow(db.from("categories").select("slug").eq("legacy_id", legacyId).single(), "slug")).slug;
+  const categorySlug = async (legacyId: number) => (await db.category.findUniqueOrThrow({ where: { legacy_id: legacyId }, select: { slug: true } })).slug;
 
   for (const cat of snap.categories) {
     let destination: string;
@@ -246,7 +209,9 @@ async function main() {
   console.log(`redirects: ${unique.length} written to data/legacy-redirects.json`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main()
+  .catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  })
+  .finally(() => db.$disconnect());

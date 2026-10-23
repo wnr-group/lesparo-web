@@ -1,6 +1,8 @@
 import "server-only";
+import type { Prisma } from "@prisma/client";
 import { cacheLife, cacheTag } from "next/cache";
-import { createPublicClient, publicMediaUrl } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db";
+import { publicMediaUrl } from "@/lib/storage";
 import { DEFAULT_HOMEPAGE, homepageSchema, type HomepageContent } from "@/lib/validation/content";
 import type { Spec } from "./legacy-description";
 
@@ -56,23 +58,20 @@ export type Category = {
 
 export type CategoryNode = Category & { children: CategoryNode[] };
 
-const CARD_COLUMNS =
-  "id, name, slug, fabric, sizes, packing, quote_enabled, retail_enabled, price, currency, created_at, categories(name, slug), product_images(storage_path, alt_text, width, height, display_order)";
+const CARD_INCLUDE = {
+  category: { select: { name: true, slug: true } },
+  images: { orderBy: { display_order: "asc" }, select: { storage_path: true, alt_text: true, width: true, height: true } },
+} satisfies Prisma.ProductInclude;
 
-type CardRow = {
-  id: string;
-  name: string;
-  slug: string;
-  fabric: string | null;
-  sizes: string[];
-  packing: string | null;
-  quote_enabled: boolean;
-  retail_enabled: boolean;
-  price: number | null;
-  currency: string;
-  categories: { name: string; slug: string } | null;
-  product_images: { storage_path: string; alt_text: string; width: number | null; height: number | null; display_order: number }[];
-};
+type CardRow = Prisma.ProductGetPayload<{ include: typeof CARD_INCLUDE }>;
+
+/** Published and not archived. */
+const VISIBLE = { is_published: true, archived_at: null } satisfies Prisma.ProductWhereInput;
+
+/** Reads a Json column holding string[] (sizes). */
+export function jsonStrings(v: Prisma.JsonValue): string[] {
+  return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
+}
 
 function toCard(row: CardRow): ProductCard {
   return {
@@ -80,29 +79,22 @@ function toCard(row: CardRow): ProductCard {
     name: row.name,
     slug: row.slug,
     fabric: row.fabric,
-    sizes: row.sizes,
+    sizes: jsonStrings(row.sizes),
     packing: row.packing,
     quoteEnabled: row.quote_enabled,
     retailEnabled: row.retail_enabled,
     price: row.price,
     currency: row.currency,
-    category: row.categories,
-    images: [...row.product_images]
-      .sort((a, b) => a.display_order - b.display_order)
-      .map((i) => ({ url: publicMediaUrl(i.storage_path)!, alt: i.alt_text || row.name, width: i.width, height: i.height })),
+    category: row.category,
+    images: row.images.map((i) => ({ url: publicMediaUrl(i.storage_path)!, alt: i.alt_text || row.name, width: i.width, height: i.height })),
   };
 }
 
 export async function getCategories(): Promise<Category[]> {
   "use cache";
   cacheCatalogue();
-  const { data, error } = await createPublicClient()
-    .from("categories")
-    .select("id, name, slug, description, parent_id, cover_image_path, is_featured, display_order")
-    .eq("is_published", true)
-    .order("display_order");
-  if (error) throw error;
-  return data.map((c) => ({
+  const rows = await prisma.category.findMany({ where: { is_published: true }, orderBy: { display_order: "asc" } });
+  return rows.map((c) => ({
     id: c.id,
     name: c.name,
     slug: c.slug,
@@ -135,7 +127,7 @@ export async function getCategoryBySlug(slug: string) {
   return { category, trail, subtreeIds: descendants(category.id), children: all.filter((c) => c.parentId === category.id) };
 }
 
-/** PostgREST `or()` filter values cannot contain these characters unescaped. */
+/** Normalises free-text search input: strips punctuation, collapses spaces, caps length. */
 export function sanitiseSearch(q: string): string {
   return q.replace(/[,()%*\\:"'.]/g, " ").replace(/\s+/g, " ").trim().slice(0, 60);
 }
@@ -150,55 +142,58 @@ export type ProductQuery = {
   pageSize?: number;
 };
 
+/** Every word must match the name, fabric or SKU (substring, case-insensitive for ASCII). */
+export function searchWhere<T extends string>(q: string, fields: T[]) {
+  return q
+    .split(" ")
+    .filter(Boolean)
+    .map((w) => ({ OR: fields.map((f) => ({ [f]: { contains: w } }) as Record<T, { contains: string }>) }));
+}
+
 export async function listProducts(query: ProductQuery) {
   "use cache";
   cacheCatalogue();
   const pageSize = query.pageSize ?? PAGE_SIZE;
   const page = Math.max(1, query.page ?? 1);
-  let req = createPublicClient().from("products").select(CARD_COLUMNS, { count: "exact" }).eq("is_published", true).is("archived_at", null);
-
   const q = query.q ? sanitiseSearch(query.q) : "";
-  if (q) {
-    const words = q.split(" ").filter(Boolean);
-    // Every word must match the name, fabric or SKU (prefix-friendly, unlike full-text search).
-    for (const w of words) req = req.or(`name.ilike.%${w}%,fabric.ilike.%${w}%,sku.ilike.%${w}%`);
-  }
-  if (query.categoryIds?.length) req = req.in("category_id", query.categoryIds);
-  if (query.fabric) req = req.eq("fabric", query.fabric);
-  if (query.size) req = req.contains("sizes", [query.size]);
 
-  switch (query.sort ?? "featured") {
-    case "newest":
-      req = req.order("created_at", { ascending: false });
-      break;
-    case "name-asc":
-      req = req.order("name");
-      break;
-    case "name-desc":
-      req = req.order("name", { ascending: false });
-      break;
-    default:
-      req = req.order("is_featured", { ascending: false }).order("legacy_id", { ascending: true, nullsFirst: false });
-  }
+  let rows = await prisma.product.findMany({
+    where: {
+      ...VISIBLE,
+      AND: q ? searchWhere(q, ["name", "fabric", "sku"]) : undefined,
+      ...(query.categoryIds?.length && { category_id: { in: query.categoryIds } }),
+      ...(query.fabric && { fabric: query.fabric }),
+    },
+    include: CARD_INCLUDE,
+  });
+  // Sizes are a JSON list: filter in memory (the catalogue is small).
+  if (query.size) rows = rows.filter((r) => jsonStrings(r.sizes).includes(query.size!));
 
+  const byId = (a: CardRow, b: CardRow) => a.id.localeCompare(b.id);
+  const sorters: Record<SortKey, (a: CardRow, b: CardRow) => number> = {
+    newest: (a, b) => b.created_at.getTime() - a.created_at.getTime() || byId(a, b),
+    "name-asc": (a, b) => a.name.localeCompare(b.name) || byId(a, b),
+    "name-desc": (a, b) => b.name.localeCompare(a.name) || byId(a, b),
+    featured: (a, b) => Number(b.is_featured) - Number(a.is_featured) || (a.legacy_id ?? Infinity) - (b.legacy_id ?? Infinity) || byId(a, b),
+  };
+  rows.sort(sorters[query.sort ?? "featured"]);
+
+  const total = rows.length;
   const from = (page - 1) * pageSize;
-  const { data, count, error } = await req.order("id").range(from, from + pageSize - 1);
-  if (error) throw error;
-  const total = count ?? 0;
-  return { products: (data as unknown as CardRow[]).map(toCard), total, page, pageCount: Math.max(1, Math.ceil(total / pageSize)) };
+  return { products: rows.slice(from, from + pageSize).map(toCard), total, page, pageCount: Math.max(1, Math.ceil(total / pageSize)) };
 }
 
 /** Distinct filter values among published products (optionally within categories). */
 export async function getFacets(categoryIds?: string[]) {
   "use cache";
   cacheCatalogue();
-  let req = createPublicClient().from("products").select("fabric, sizes").eq("is_published", true).is("archived_at", null);
-  if (categoryIds?.length) req = req.in("category_id", categoryIds);
-  const { data, error } = await req;
-  if (error) throw error;
+  const data = await prisma.product.findMany({
+    where: { ...VISIBLE, ...(categoryIds?.length && { category_id: { in: categoryIds } }) },
+    select: { fabric: true, sizes: true },
+  });
   const SIZE_ORDER = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
   const fabrics = [...new Set(data.map((r) => r.fabric).filter((f): f is string => !!f))].sort();
-  const sizes = [...new Set(data.flatMap((r) => r.sizes))].sort((a, b) => {
+  const sizes = [...new Set(data.flatMap((r) => jsonStrings(r.sizes)))].sort((a, b) => {
     const ia = SIZE_ORDER.indexOf(a);
     const ib = SIZE_ORDER.indexOf(b);
     return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.localeCompare(b, undefined, { numeric: true });
@@ -209,28 +204,13 @@ export async function getFacets(categoryIds?: string[]) {
 export async function getProductBySlug(slug: string): Promise<ProductDetail | null> {
   "use cache";
   cacheCatalogue();
-  const { data, error } = await createPublicClient()
-    .from("products")
-    .select(`${CARD_COLUMNS}, sku, description, specs, seo_title, seo_description, category_id`)
-    .eq("slug", slug)
-    .eq("is_published", true)
-    .is("archived_at", null)
-    .maybeSingle();
-  if (error) throw error;
-  if (!data) return null;
-  const row = data as unknown as CardRow & {
-    sku: string | null;
-    description: string | null;
-    specs: Spec[];
-    seo_title: string | null;
-    seo_description: string | null;
-    category_id: string | null;
-  };
+  const row = await prisma.product.findFirst({ where: { ...VISIBLE, slug }, include: CARD_INCLUDE });
+  if (!row) return null;
   return {
     ...toCard(row),
     sku: row.sku,
     description: row.description,
-    specs: row.specs,
+    specs: (Array.isArray(row.specs) ? row.specs : []) as Spec[],
     seoTitle: row.seo_title,
     seoDescription: row.seo_description,
     categoryId: row.category_id,
@@ -241,31 +221,21 @@ export async function getRelatedProducts(categoryId: string | null, excludeId: s
   "use cache";
   cacheCatalogue();
   if (!categoryId) return [];
-  const { data, error } = await createPublicClient()
-    .from("products")
-    .select(CARD_COLUMNS)
-    .eq("is_published", true)
-    .is("archived_at", null)
-    .eq("category_id", categoryId)
-    .neq("id", excludeId)
-    .order("legacy_id")
-    .limit(limit);
-  if (error) throw error;
-  return (data as unknown as CardRow[]).map(toCard);
+  const rows = await prisma.product.findMany({
+    where: { ...VISIBLE, category_id: categoryId, id: { not: excludeId } },
+    include: CARD_INCLUDE,
+    orderBy: { legacy_id: "asc" },
+    take: limit,
+  });
+  return rows.map(toCard);
 }
 
 export async function getProductsBySlugs(slugs: string[]) {
   "use cache";
   cacheCatalogue();
   if (!slugs.length) return [];
-  const { data, error } = await createPublicClient()
-    .from("products")
-    .select(CARD_COLUMNS)
-    .in("slug", slugs)
-    .eq("is_published", true)
-    .is("archived_at", null);
-  if (error) throw error;
-  const cards = (data as unknown as CardRow[]).map(toCard);
+  const rows = await prisma.product.findMany({ where: { ...VISIBLE, slug: { in: slugs } }, include: CARD_INCLUDE });
+  const cards = rows.map(toCard);
   return slugs.map((s) => cards.find((c) => c.slug === s)).filter((c): c is ProductCard => !!c);
 }
 
@@ -273,33 +243,30 @@ export async function getProductsBySlugs(slugs: string[]) {
 export async function getQuotableProducts() {
   "use cache";
   cacheCatalogue();
-  const { data, error } = await createPublicClient()
-    .from("products")
-    .select("id, name, slug, categories(name)")
-    .eq("is_published", true)
-    .eq("quote_enabled", true)
-    .is("archived_at", null)
-    .order("name");
-  if (error) throw error;
-  return data.map((p) => ({ id: p.id, name: p.name, slug: p.slug, category: (p.categories as { name: string } | null)?.name ?? null }));
+  const rows = await prisma.product.findMany({
+    where: { ...VISIBLE, quote_enabled: true },
+    select: { id: true, name: true, slug: true, category: { select: { name: true } } },
+    orderBy: { name: "asc" },
+  });
+  return rows.map((p) => ({ id: p.id, name: p.name, slug: p.slug, category: p.category?.name ?? null }));
 }
 
 export async function getHomepageContent(): Promise<HomepageContent> {
   "use cache";
   cacheLife("hours");
   cacheTag(CONTENT_TAG);
-  const { data } = await createPublicClient().from("site_content").select("data").eq("key", "homepage").maybeSingle();
-  const parsed = homepageSchema.safeParse(data?.data);
+  const row = await prisma.siteContent.findUnique({ where: { key: "homepage" } });
+  const parsed = homepageSchema.safeParse(row?.data);
   return parsed.success ? parsed.data : DEFAULT_HOMEPAGE;
 }
 
 export async function getAllPublishedSlugs() {
   "use cache";
   cacheCatalogue();
-  const db = createPublicClient();
   const [products, categories] = await Promise.all([
-    db.from("products").select("slug, updated_at").eq("is_published", true).is("archived_at", null),
-    db.from("categories").select("slug, updated_at").eq("is_published", true),
+    prisma.product.findMany({ where: VISIBLE, select: { slug: true, updated_at: true } }),
+    prisma.category.findMany({ where: { is_published: true }, select: { slug: true, updated_at: true } }),
   ]);
-  return { products: products.data ?? [], categories: categories.data ?? [] };
+  const iso = (rows: { slug: string; updated_at: Date }[]) => rows.map((r) => ({ slug: r.slug, updated_at: r.updated_at.toISOString() }));
+  return { products: iso(products), categories: iso(categories) };
 }

@@ -85,7 +85,8 @@ export function EnquiryStatusBadge({ status }: { status: EnquiryStatus }) {
   return <Badge tone={STATUS_TONE[status]}>{ENQUIRY_STATUS_LABELS[status]}</Badge>;
 }
 
-export function SyncBadge({ status }: { status: "not_configured" | "pending" | "synced" | "failed" }) {
+export function SyncBadge({ status: raw }: { status: string }) {
+  const status = (["not_configured", "pending", "synced", "failed"].includes(raw) ? raw : "not_configured") as "not_configured" | "pending" | "synced" | "failed";
   const map = {
     not_configured: ["neutral", "CRM not configured"],
     pending: ["brass", "CRM pending"],
@@ -119,7 +120,7 @@ export function Pagination({ page, pageCount, href }: { page: number; pageCount:
   );
 }
 
-export function formatDate(iso: string | null | undefined, withTime = false) {
+export function formatDate(iso: string | Date | null | undefined, withTime = false) {
   if (!iso) return "—";
   return new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", ...(withTime && { timeStyle: "short" }), timeZone: "Asia/Kolkata" }).format(new Date(iso));
 }

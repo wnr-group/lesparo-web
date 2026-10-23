@@ -10,7 +10,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { Container, SectionHeading } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
 import { getCategoryTree, getHomepageContent, getProductsBySlugs, listProducts, type CategoryNode } from "@/lib/catalogue/queries";
-import { publicMediaUrl } from "@/lib/supabase/server";
+import { publicMediaUrl } from "@/lib/storage";
 
 const MILESTONES = [
   { year: "1979", text: "Mr. Yuvaraj founds R. Yuvaraj in Erode — lungis, dhoties and mull cloth for Kerala." },

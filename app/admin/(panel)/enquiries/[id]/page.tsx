@@ -6,7 +6,7 @@ import { ActionButton, ActionForm, FieldError } from "@/components/admin/forms";
 import { EnquiryStatusBadge, formatDate, PageHeader, Panel, SyncBadge } from "@/components/admin/ui";
 import { Badge } from "@/components/ui/primitives";
 import { getStaffSession } from "@/lib/auth/staff";
-import { createClient } from "@/lib/supabase/server";
+import { requestDb } from "@/lib/db";
 import { ENQUIRY_STATUSES, ENQUIRY_STATUS_LABELS, type EnquiryStatus } from "@/lib/validation/enquiry";
 import { addNote, retryIntegrationJob, updateEnquiry } from "../actions";
 
@@ -16,37 +16,37 @@ const JOB_LABELS: Record<string, string> = {
   "email.buyer_confirmation": "Buyer confirmation email",
 };
 
-function toLocalInput(iso: string | null) {
-  if (!iso) return "";
+function toLocalInput(date: Date | null) {
+  if (!date) return "";
   // datetime-local in IST
-  return new Date(new Date(iso).getTime() + 5.5 * 3600_000).toISOString().slice(0, 16);
+  return new Date(date.getTime() + 5.5 * 3600_000).toISOString().slice(0, 16);
 }
 
 export default async function EnquiryDetailPage(props: PageProps<"/admin/enquiries/[id]">) {
   const { id } = await props.params;
   if (!z.uuid().safeParse(id).success) notFound();
-  const db = await createClient();
+  const db = await requestDb();
   const session = await getStaffSession();
 
-  const { data: e } = await db
-    .from("wholesale_enquiries")
-    .select("*, enquiry_items(*), enquiry_attachments(*), enquiry_notes(*), enquiry_status_history(*)")
-    .eq("id", id)
-    .maybeSingle();
+  const e = await db.wholesaleEnquiry.findUnique({
+    where: { id },
+    include: {
+      items: { orderBy: { display_order: "asc" } },
+      attachments: true,
+      notes: { orderBy: { created_at: "asc" } },
+      status_history: { orderBy: { changed_at: "asc" } },
+    },
+  });
   if (!e) notFound();
-  const { data: jobs } = await db.from("integration_jobs").select("*").eq("entity_id", id).order("created_at");
+  const jobs = await db.integrationJob.findMany({ where: { entity_id: id }, orderBy: { created_at: "asc" } });
 
-  const attachments = await Promise.all(
-    e.enquiry_attachments.map(async (a) => {
-      const { data } = await db.storage.from("enquiry-attachments").createSignedUrl(a.storage_path, 300, { download: a.original_filename });
-      return { ...a, url: data?.signedUrl ?? null };
-    }),
-  );
-  const items = [...e.enquiry_items].sort((a, b) => a.display_order - b.display_order);
-  const notes = [...e.enquiry_notes].sort((a, b) => a.created_at.localeCompare(b.created_at));
-  const history = [...e.enquiry_status_history].sort((a, b) => a.changed_at.localeCompare(b.changed_at));
+  // Downloads go through a staff-only route (files are not publicly reachable).
+  const attachments = e.attachments.map((a) => ({ ...a, url: `/admin/attachments/${a.id}` }));
+  const items = e.items;
+  const notes = e.notes;
+  const history = e.status_history;
   const productIds = items.map((i) => i.product_id).filter((x): x is string => !!x);
-  const { data: products } = productIds.length ? await db.from("products").select("id, slug").in("id", productIds) : { data: [] };
+  const products = productIds.length ? await db.product.findMany({ where: { id: { in: productIds } }, select: { id: true, slug: true } }) : [];
 
   return (
     <>
@@ -67,7 +67,7 @@ export default async function EnquiryDetailPage(props: PageProps<"/admin/enquiri
           <Panel title="Requested products">
             <ol className="-my-3 divide-y divide-line">
               {items.map((i) => {
-                const slug = products?.find((p) => p.id === i.product_id)?.slug;
+                const slug = products.find((p) => p.id === i.product_id)?.slug;
                 return (
                   <li key={i.id} className="grid gap-1 py-3 sm:grid-cols-[1fr_auto]">
                     <div>
@@ -115,7 +115,7 @@ export default async function EnquiryDetailPage(props: PageProps<"/admin/enquiri
                     <span className="text-xs text-muted">{Math.ceil(a.file_size / 1024)} KB</span>
                   </li>
                 ))}
-                <li className="pt-1 text-xs text-muted">Download links are private and expire after 5 minutes.</li>
+                <li className="pt-1 text-xs text-muted">Downloads are available to signed-in staff only.</li>
               </ul>
             ) : (
               <p className="text-sm text-muted">No files attached.</p>
@@ -238,7 +238,7 @@ export default async function EnquiryDetailPage(props: PageProps<"/admin/enquiri
           </Panel>
 
           <Panel title="Integrations">
-            {jobs?.length ? (
+            {jobs.length ? (
               <ul className="space-y-3 text-sm">
                 {jobs.map((j) => (
                   <li key={j.id} className="border-b border-line pb-3 last:border-0 last:pb-0">

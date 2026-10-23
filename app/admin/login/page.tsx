@@ -21,7 +21,7 @@ export default function LoginPage() {
             <label htmlFor="email" className="mb-1.5 block text-sm font-medium">
               Email
             </label>
-            <input id="email" name="email" type="email" autoComplete="username" required defaultValue={state.email} className="field" />
+            <input id="email" name="email" type="email" autoComplete="username" required defaultValue={state.email ?? "admin@lesparo.com"} className="field" />
           </div>
           <div>
             <label htmlFor="password" className="mb-1.5 block text-sm font-medium">

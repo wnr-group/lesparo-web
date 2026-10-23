@@ -1,9 +1,6 @@
 import type { NextConfig } from "next";
 import legacyRedirects from "./data/legacy-redirects.json";
 
-const supabaseUrl = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://127.0.0.1:54321");
-const isLocalSupabase = ["127.0.0.1", "localhost"].includes(supabaseUrl.hostname);
-
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
@@ -18,18 +15,6 @@ const nextConfig: NextConfig = {
   experimental: {
     // Wholesale enquiries accept up to 3 reference files of 8 MB (validated again in lib/services/enquiries.ts).
     serverActions: { bodySizeLimit: "26mb" },
-  },
-  images: {
-    remotePatterns: [
-      {
-        protocol: supabaseUrl.protocol.replace(":", "") as "http" | "https",
-        hostname: supabaseUrl.hostname,
-        port: supabaseUrl.port,
-        pathname: "/storage/v1/object/public/**",
-      },
-    ],
-    // Local Supabase runs on 127.0.0.1; never enabled for a hosted project.
-    dangerouslyAllowLocalIP: isLocalSupabase,
   },
   async redirects() {
     return [
