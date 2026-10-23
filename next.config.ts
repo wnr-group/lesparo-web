@@ -1,7 +1,11 @@
+import { randomBytes } from "node:crypto";
 import type { NextConfig } from "next";
 import legacyRedirects from "./data/legacy-redirects.json";
 
 const nextConfig: NextConfig = {
+  // Without an AUTH_SECRET (e.g. on Vercel) each build signs sessions with its own random
+  // secret, inlined into the server code; staff simply sign in again after a deploy.
+  env: { AUTH_SECRET: process.env.AUTH_SECRET || randomBytes(32).toString("hex") },
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
