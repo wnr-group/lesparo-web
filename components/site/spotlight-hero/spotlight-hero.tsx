@@ -17,7 +17,7 @@ type Product = { id: string; label: string; frames: string[]; spots: Spot[]; spi
  */
 const STAND_IN: Record<string, { frames: string[]; spots: Spot[]; keys: string[] }> = {
   pants: {
-    frames: ["/spotlight/front.jpg", "/spotlight/model.jpg", "/spotlight/side.jpg", "/spotlight/waist.jpg"],
+    frames: ["/spotlight/front.webp", "/spotlight/model.webp", "/spotlight/side.webp", "/spotlight/waist.jpg"],
     keys: ["Front", "On model", "Back", "Waistband"],
     spots: [
       { frame: 0, x: 0.495, y: 0.085, label: "Drawstring waistband" },
@@ -34,7 +34,7 @@ const STAND_IN: Record<string, { frames: string[]; spots: Spot[]; keys: string[]
     ],
   },
   tee: {
-    frames: ["/spotlight/tee-front.jpg", "/spotlight/tee-three-quarter.jpg", "/spotlight/tee-detail.jpg", "/spotlight/tee-back.jpg"],
+    frames: ["/spotlight/tee-front.webp", "/spotlight/tee-three-quarter.webp", "/spotlight/tee-detail.webp", "/spotlight/tee-back.webp"],
     keys: ["Front", "Three-quarter", "On model", "Back"],
     spots: [
       { frame: 0, x: 0.5, y: 0.295, label: "Crew neckline" },
@@ -70,6 +70,24 @@ const DETAILS: Record<string, string> = {
   "Stitched hem": "A stitched hem keeps the bottom edge neat.",
 };
 const SPIN_KEYS = ["Front", "Right", "Back", "Left"];
+
+/** Frames with a transparent background (.webp or .png) float on the stage; anything else is shown as a photograph. */
+const isCut = (src: string) => /\.(webp|png)$/i.test(src);
+/** Close-ups in the detail panel use the original photograph, which keeps the cloth and its surroundings. */
+const detailSrc = (src: string) => (src.startsWith("/spotlight/") ? src.replace(/\.webp$/, ".jpg") : src);
+/** Where a stand-in photograph was cropped by the original shoot, that edge fades instead of ending in a hard line. */
+const FADE: Record<string, "top" | "bottom"> = {
+  "/spotlight/front.webp": "top",
+  "/spotlight/side.webp": "top",
+  "/spotlight/tee-front.webp": "bottom",
+  "/spotlight/tee-three-quarter.webp": "bottom",
+  "/spotlight/tee-detail.webp": "bottom",
+  "/spotlight/tee-back.webp": "bottom",
+};
+const FADE_MASK = {
+  top: "linear-gradient(to bottom, transparent 0, #000 9%)",
+  bottom: "linear-gradient(to top, transparent 0, #000 9%)",
+};
 
 const wrap = (i: number, n: number) => ((Math.round(i) % n) + n) % n;
 const ringDist = (a: number, b: number, n: number) => Math.min(Math.abs(a - b), n - Math.abs(a - b));
@@ -229,6 +247,8 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const keyOf = (s: Spot) => `${product.id}-${s.frame}-${s.label}`;
   const active = visibleSpots.find((s) => keyOf(s) === spotKey) ?? visibleSpots[0] ?? null;
   const activeIdx = active ? visibleSpots.indexOf(active) : -1;
+  const cutout = isCut(product.frames[frame]);
+  const fade = FADE[product.frames[frame]];
   const keyIndex = product.spin ? Math.min(3, Math.round((frame * 4) / n) % 4) : frame;
   const words = heading.trim().split(/\s+/);
   const cut = Math.ceil(words.length / 2);
@@ -312,12 +332,19 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
             if (e.key === "-") setZ(zoom - 0.6);
           }}
         >
-          <div className="absolute inset-0 bg-[#a8a595]" style={{ transform: `translate(${pan.x}%, ${pan.y}%) scale(${zoom})`, transformOrigin: "50% 50%", transition: dragging ? "none" : "transform 0.35s cubic-bezier(0.16,1,0.3,1)" }}>
+          {cutout && !fade && <div aria-hidden className="pointer-events-none absolute inset-x-[16%] bottom-0 h-[3.5%] rounded-[50%] bg-black/60 blur-xl" />}
+          <div className="absolute inset-0" style={{ transform: `translate(${pan.x}%, ${pan.y}%) scale(${zoom})`, transformOrigin: "50% 50%", transition: dragging ? "none" : "transform 0.35s cubic-bezier(0.16,1,0.3,1)" }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- frames swap quickly and are preloaded; the optimiser would add a round trip per frame */}
-            <img src={product.frames[frame]} alt={`${product.label}, ${product.keyLabels[keyIndex]} view`} draggable={false} decoding="async" fetchPriority="high" className="pointer-events-none absolute inset-0 size-full object-cover" />
+            <img
+              src={product.frames[frame]}
+              alt={`${product.label}, ${product.keyLabels[keyIndex]} view`}
+              draggable={false}
+              decoding="async"
+              fetchPriority="high"
+              className={`pointer-events-none absolute inset-0 size-full ${cutout ? "object-contain drop-shadow-[0_26px_28px_rgb(0_0_0/0.45)]" : "object-cover ring-1 ring-white/15"}`}
+              style={fade ? { maskImage: FADE_MASK[fade], WebkitMaskImage: FADE_MASK[fade] } : undefined}
+            />
           </div>
-          {/* A soft vignette seats the photograph in the stage. */}
-          <div aria-hidden className="pointer-events-none absolute inset-0 shadow-[inset_0_0_70px_rgb(3_8_30/0.35)]" />
 
           {visibleSpots.map((p, i) => {
             const on = p === active;
@@ -349,11 +376,11 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
             </button>
           </div>
 
-          <p aria-hidden className={`pointer-events-none absolute inset-x-0 bottom-4 z-10 text-center text-[0.7rem] font-bold uppercase tracking-[0.2em] text-white drop-shadow-[0_1px_6px_rgb(0_0_0/0.7)] transition-opacity duration-700 ${touched ? "opacity-0" : "opacity-100"}`}>
+          <p aria-hidden className={`pointer-events-none absolute inset-x-0 top-2 z-10 text-center text-[0.7rem] font-bold uppercase tracking-[0.2em] text-white drop-shadow-[0_1px_6px_rgb(0_0_0/0.7)] transition-opacity duration-700 ${touched ? "opacity-0" : "opacity-100"}`}>
             {product.spin ? "Drag to spin 360°" : "◀ Drag to turn ▶"}
           </p>
           {loaded < n && (
-            <p aria-hidden className="pointer-events-none absolute left-4 top-4 z-10 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-white/85 drop-shadow-[0_1px_4px_rgb(0_0_0/0.6)]">
+            <p aria-hidden className="pointer-events-none absolute bottom-3 left-3 z-10 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-white/85 drop-shadow-[0_1px_4px_rgb(0_0_0/0.6)]">
               Loading {loaded}/{n}
             </p>
           )}
@@ -380,7 +407,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       <div aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:left-8 lg:w-[16rem] lg:p-0 min-[1200px]:w-[22rem] min-[1440px]:left-12 min-[1440px]:w-[27rem]">
         {active ? (
           <div key={keyOf(active)} className="sp-detail flex flex-col gap-4 bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm sm:flex-row sm:items-start lg:flex-col min-[1200px]:flex-row">
-            <span aria-hidden className="block h-32 w-full shrink-0 bg-no-repeat sm:h-32 sm:w-32 lg:h-28 lg:w-full min-[1200px]:h-32 min-[1200px]:w-32 min-[1440px]:h-36 min-[1440px]:w-36" style={{ backgroundImage: `url(${product.frames[active.frame]})`, backgroundSize: "480% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
+            <span aria-hidden className="block h-32 w-full shrink-0 bg-no-repeat sm:h-32 sm:w-32 lg:h-28 lg:w-full min-[1200px]:h-32 min-[1200px]:w-32 min-[1440px]:h-36 min-[1440px]:w-36" style={{ backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "480% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
             <div className="min-w-0">
               <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#ffc82c]">
                 Detail {activeIdx + 1} of {visibleSpots.length}

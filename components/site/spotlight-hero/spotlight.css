@@ -48,9 +48,6 @@
     linear-gradient(180deg, transparent, #02061a 85%);
   pointer-events: none;
 }
-.sp-product {
-  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.14), 0 28px 56px rgb(0 0 0 / 0.55);
-}
 @keyframes sp-sway-a {
   50% {
     rotate: 4deg;
