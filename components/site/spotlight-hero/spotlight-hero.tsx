@@ -7,7 +7,7 @@ import "./spotlight.css";
 
 type Cta = { label: string; href: string };
 /** A numbered point on one frame. It shows while the viewer is within `tol` frames of that frame. */
-type Spot = { frame: number; x: number; y: number; label: string };
+type Spot = { frame: number; x: number; y: number; label: string; detail?: string };
 export type TurntableSet = { frames: string[]; spots: Spot[] };
 type Product = { id: string; label: string; frames: string[]; spots: Spot[]; spin: boolean; keyLabels: string[] };
 
@@ -22,7 +22,7 @@ const STAND_IN: Record<string, { frames: string[]; spots: Spot[]; keys: string[]
     spots: [
       { frame: 0, x: 0.495, y: 0.085, label: "Drawstring waistband" },
       { frame: 0, x: 0.25, y: 0.35, label: "Cargo pocket" },
-      { frame: 0, x: 0.54, y: 0.56, label: "Textured fabric" },
+      { frame: 0, x: 0.62, y: 0.56, label: "Textured fabric" },
       { frame: 1, x: 0.525, y: 0.475, label: "Drawstring waistband" },
       { frame: 1, x: 0.37, y: 0.56, label: "Cargo pocket" },
       { frame: 2, x: 0.57, y: 0.15, label: "Back pocket" },
@@ -53,7 +53,22 @@ const STAND_IN: Record<string, { frames: string[]; spots: Spot[]; keys: string[]
     ],
   },
 };
-const LABELS: Record<string, string> = { pants: "Track pants", tee: "T-shirt" };
+const LABELS: Record<string, string> = { pants: "Track pants", tee: "T-shirts" };
+/** Plain-language notes for each point. They only describe what the photograph shows. */
+const DETAILS: Record<string, string> = {
+  "Drawstring waistband": "A drawstring at the waist lets you adjust the fit.",
+  "Elastic waistband": "An elastic waistband holds the pants at the waist.",
+  "Herringbone drawstring": "The drawstring is woven in a herringbone pattern.",
+  "Cargo pocket": "A cargo pocket on the side of the leg, for carrying small things.",
+  "Cargo pocket flap": "The flap that closes over the cargo pocket.",
+  "Back pocket": "A pocket on the back, finished with neat stitching.",
+  "Textured fabric": "A fine, even texture that shows in the cloth up close.",
+  "LESPARO bird mark": "The LESPARO bird mark, the brand's sign on the garment.",
+  "Crew neckline": "A round crew neckline with a finished edge.",
+  "Back neckline": "The back of the neckline, with a finished edge.",
+  "Short sleeve": "A short sleeve with a clean, stitched edge.",
+  "Stitched hem": "A stitched hem keeps the bottom edge neat.",
+};
 const SPIN_KEYS = ["Front", "Right", "Back", "Left"];
 
 const wrap = (i: number, n: number) => ((Math.round(i) % n) + n) % n;
@@ -213,30 +228,34 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const visibleSpots = zoom > 1 ? [] : product.spots.filter((s) => ringDist(s.frame, frame, n) <= tol);
   const keyOf = (s: Spot) => `${product.id}-${s.frame}-${s.label}`;
   const active = visibleSpots.find((s) => keyOf(s) === spotKey) ?? visibleSpots[0] ?? null;
+  const activeIdx = active ? visibleSpots.indexOf(active) : -1;
+  const keyIndex = product.spin ? Math.min(3, Math.round((frame * 4) / n) % 4) : frame;
   const words = heading.trim().split(/\s+/);
   const cut = Math.ceil(words.length / 2);
   const keyFrames = product.spin ? [0, 1, 2, 3].map((k) => Math.round((k * n) / 4)) : product.frames.map((_, i) => i);
 
   return (
-    <section aria-labelledby="hero-heading" className="sp-stage relative isolate flex flex-col overflow-hidden text-white lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[40rem]">
-      {/* The stage: two beams from above, drifting dust, a floor. */}
+    <section aria-labelledby="hero-heading" className="sp-stage relative isolate flex flex-col overflow-hidden text-white lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
+      {/* The stage: one soft spotlight from above and a dark floor. */}
       <div aria-hidden className="sp-beam sp-beam-a" />
       <div aria-hidden className="sp-beam sp-beam-b" />
-      <div aria-hidden className="sp-dust" />
       <div aria-hidden className="sp-floor" />
 
-      {/* Words, top left. */}
-      <div className="sp-copy relative z-20 px-5 pt-7 sm:px-8 lg:absolute lg:left-10 lg:top-8 lg:max-w-[34rem] lg:p-0">
-        <p className="text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-white/60">{eyebrow}</p>
-        <h1 id="hero-heading" className="mt-3 font-display text-[clamp(2rem,0.9rem+2.6vw,3.5rem)] uppercase leading-[0.98] tracking-[-0.03em]">
-          <span className="block font-light text-white/80">
+      {/* Headline, top left: a small label, then a two-weight title kept to a narrow column. */}
+      <div className="sp-copy relative z-20 px-5 pt-8 sm:px-8 lg:absolute lg:left-8 lg:top-10 lg:max-w-[15rem] lg:p-0 xl:left-12 xl:max-w-[23rem]">
+        <p className="flex items-center gap-3 text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-white/75">
+          <span aria-hidden className="size-1.5 rounded-full bg-[#ffc82c]" />
+          {eyebrow}
+        </p>
+        <h1 id="hero-heading" className="mt-5 font-display text-[clamp(1.9rem,1rem+1.7vw,2.9rem)] leading-[1.06] tracking-[-0.03em] text-balance">
+          <span className="block font-light text-white/85">
             {words.slice(0, cut).map((w, i) => (
               <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: i }}>
                 {w}&nbsp;
               </span>
             ))}
           </span>
-          <span className="block font-extrabold text-white">
+          <span className="block font-bold text-white">
             {words.slice(cut).map((w, i) => (
               <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: cut + i }}>
                 {w}&nbsp;
@@ -246,27 +265,38 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         </h1>
       </div>
 
-      {/* Product switch, top right. */}
-      <div role="group" aria-label="Product" className="sp-copy relative z-20 mt-5 flex px-5 sm:px-8 lg:absolute lg:right-10 lg:top-8 lg:mt-0 lg:p-0">
-        <ul className="inline-flex border border-white/25 bg-white/5 backdrop-blur-sm">
-          {products.map((p, i) => (
-            <li key={p.id}>
-              <button type="button" aria-pressed={pi === i} onClick={() => choose(i)} className={`h-10 px-5 text-[0.66rem] font-bold uppercase tracking-[0.18em] transition-colors ${pi === i ? "bg-white/90 text-[#0e1b4f]" : "text-white/65 hover:text-white"}`}>
-                {p.label}
-              </button>
-            </li>
-          ))}
+      {/* Category selector, top right. */}
+      <div role="group" aria-label="Choose a product" className="sp-copy relative z-30 px-5 pt-5 sm:px-8 lg:absolute lg:right-8 lg:top-10 lg:p-0 xl:right-12">
+        <ul className="grid grid-cols-2 gap-2.5 lg:w-[19rem]">
+          {products.map((p, i) => {
+            const on = pi === i;
+            return (
+              <li key={p.id}>
+                <button
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => choose(i)}
+                  className={`flex h-12 w-full items-center justify-center gap-2 border px-3 text-[0.8rem] font-bold uppercase tracking-[0.14em] transition-[background-color,color,border-color] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c] ${
+                    on ? "border-white bg-white text-[#0e1b4f]" : "border-white/40 bg-[#0e1b4f]/70 text-white hover:border-white hover:bg-white/10"
+                  }`}
+                >
+                  <span aria-hidden className={`size-1.5 rounded-full transition-colors duration-200 ${on ? "bg-[#e5a800]" : "bg-transparent"}`} />
+                  {p.label}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </div>
 
-      {/* The 360-degree viewer, floating in the middle of the stage. */}
-      <div className="relative z-10 my-5 flex justify-center px-5 lg:absolute lg:inset-x-0 lg:bottom-[5rem] lg:top-[4.75rem] lg:my-0 lg:px-0">
+      {/* The product viewer. */}
+      <div className="relative z-10 my-6 flex justify-center px-5 lg:absolute lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[6.25rem] lg:my-0 lg:px-0">
         <div
           ref={box}
           role="group"
           aria-label={`${product.label}. Drag sideways, or use the arrow keys, to turn it. Plus and minus zoom.`}
           tabIndex={0}
-          className={`sp-product relative w-full max-w-[22rem] select-none overflow-hidden outline-offset-[3px] lg:h-full lg:w-auto lg:max-w-none ${zoom > 1 ? "cursor-move" : "cursor-grab active:cursor-grabbing"} touch-pan-y`}
+          className={`sp-product relative w-full max-w-[22rem] select-none overflow-hidden outline-offset-[4px] focus-visible:outline-2 focus-visible:outline-[#ffc82c] lg:h-full lg:w-auto lg:max-w-none ${zoom > 1 ? "cursor-move" : "cursor-grab active:cursor-grabbing"} touch-pan-y`}
           style={{ aspectRatio: "2 / 3" }}
           onPointerDown={onDown}
           onPointerMove={onMove}
@@ -284,54 +314,60 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         >
           <div className="absolute inset-0 bg-[#a8a595]" style={{ transform: `translate(${pan.x}%, ${pan.y}%) scale(${zoom})`, transformOrigin: "50% 50%", transition: dragging ? "none" : "transform 0.35s cubic-bezier(0.16,1,0.3,1)" }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- frames swap quickly and are preloaded; the optimiser would add a round trip per frame */}
-            <img src={product.frames[frame]} alt={`${product.label}, frame ${frame + 1} of ${n}`} draggable={false} decoding="async" fetchPriority="high" className="pointer-events-none absolute inset-0 size-full object-cover" />
+            <img src={product.frames[frame]} alt={`${product.label}, ${product.keyLabels[keyIndex]} view`} draggable={false} decoding="async" fetchPriority="high" className="pointer-events-none absolute inset-0 size-full object-cover" />
           </div>
+          {/* A soft vignette seats the photograph in the stage. */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 shadow-[inset_0_0_70px_rgb(3_8_30/0.35)]" />
 
-          {visibleSpots.map((p, i) => (
-            <button
-              key={keyOf(p)}
-              type="button"
-              aria-label={`${i + 1}. ${p.label}`}
-              aria-pressed={p === active}
-              onClick={() => setSpotKey(keyOf(p))}
-              onMouseEnter={() => setSpotKey(keyOf(p))}
-              onFocus={() => setSpotKey(keyOf(p))}
-              onPointerDown={(e) => e.stopPropagation()}
-              className="sp-pin absolute grid size-9 -translate-x-1/2 -translate-y-1/2 cursor-pointer place-items-center rounded-full border border-white/80 bg-black/10 backdrop-blur-[1px]"
-              style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}
-            >
-              <span aria-hidden className={`size-2.5 rounded-full ${p === active ? "bg-[#ffc82c]" : "bg-white"}`} />
-            </button>
-          ))}
+          {visibleSpots.map((p, i) => {
+            const on = p === active;
+            return (
+              <button
+                key={keyOf(p)}
+                type="button"
+                aria-label={`${i + 1} of ${visibleSpots.length}. ${p.label}`}
+                aria-pressed={on}
+                onClick={() => setSpotKey(keyOf(p))}
+                onFocus={() => setSpotKey(keyOf(p))}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="sp-pin group absolute grid size-11 -translate-x-1/2 -translate-y-1/2 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#ffc82c]"
+                style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}
+              >
+                <span aria-hidden className={`grid size-8 place-items-center rounded-full border-2 transition-[transform,background-color,border-color] duration-200 group-hover:scale-110 ${on ? "border-[#ffc82c] bg-[#0e1b4f]/55" : "border-white bg-[#0e1b4f]/35 group-hover:bg-[#0e1b4f]/60"}`}>
+                  <span className={`size-2.5 rounded-full transition-colors duration-200 ${on ? "bg-[#ffc82c]" : "bg-white"}`} />
+                </span>
+              </button>
+            );
+          })}
 
-          <div className="absolute bottom-3 right-3 z-20 flex flex-col border border-white/40 bg-[#0e1b4f]/70 backdrop-blur" onPointerDown={(e) => e.stopPropagation()}>
-            <button type="button" aria-label="Zoom in" disabled={zoom >= 2.6} onClick={() => setZ(zoom + 0.6)} className="grid size-9 place-items-center hover:bg-white/15 disabled:opacity-40">
+          <div className="absolute bottom-3 right-3 z-20 flex flex-col border border-white/40 bg-[#0e1b4f]/80 backdrop-blur" onPointerDown={(e) => e.stopPropagation()}>
+            <button type="button" aria-label="Zoom in" disabled={zoom >= 2.6} onClick={() => setZ(zoom + 0.6)} className="grid size-10 place-items-center hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-[#ffc82c] disabled:opacity-40">
               <Plus className="size-4" aria-hidden />
             </button>
-            <button type="button" aria-label="Zoom out" disabled={zoom <= 1} onClick={() => setZ(zoom - 0.6)} className="grid size-9 place-items-center border-t border-white/30 hover:bg-white/15 disabled:opacity-40">
+            <button type="button" aria-label="Zoom out" disabled={zoom <= 1} onClick={() => setZ(zoom - 0.6)} className="grid size-10 place-items-center border-t border-white/30 hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-[#ffc82c] disabled:opacity-40">
               <Minus className="size-4" aria-hidden />
             </button>
           </div>
 
-          <p aria-hidden className={`pointer-events-none absolute inset-x-0 bottom-4 z-10 text-center text-[0.64rem] font-bold uppercase tracking-[0.22em] text-white drop-shadow-[0_1px_6px_rgb(0_0_0/0.6)] transition-opacity duration-700 ${touched ? "opacity-0" : "opacity-100"}`}>
+          <p aria-hidden className={`pointer-events-none absolute inset-x-0 bottom-4 z-10 text-center text-[0.7rem] font-bold uppercase tracking-[0.2em] text-white drop-shadow-[0_1px_6px_rgb(0_0_0/0.7)] transition-opacity duration-700 ${touched ? "opacity-0" : "opacity-100"}`}>
             {product.spin ? "Drag to spin 360°" : "◀ Drag to turn ▶"}
           </p>
           {loaded < n && (
-            <p aria-hidden className="pointer-events-none absolute left-4 top-4 z-10 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-white/80 drop-shadow-[0_1px_4px_rgb(0_0_0/0.6)]">
+            <p aria-hidden className="pointer-events-none absolute left-4 top-4 z-10 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-white/85 drop-shadow-[0_1px_4px_rgb(0_0_0/0.6)]">
               Loading {loaded}/{n}
             </p>
           )}
         </div>
       </div>
 
-      {/* Angle tabs, bottom centre. */}
-      <div role="group" aria-label="Angle" className="sp-copy relative z-20 flex justify-center px-5 pb-5 lg:absolute lg:inset-x-0 lg:bottom-6 lg:p-0">
-        <ul className="inline-flex border border-white/25 bg-white/5 backdrop-blur-sm">
+      {/* View tabs, bottom centre. */}
+      <div role="group" aria-label="View" className="sp-copy relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
+        <ul className="flex w-full max-w-[24rem] border border-white/30 bg-[#0e1b4f]/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
           {keyFrames.map((f, i) => {
             const on = ringDist(f, frame, n) <= (product.spin ? Math.floor(n / 8) : 0);
             return (
-              <li key={f}>
-                <button type="button" aria-pressed={on} onClick={() => goTo(f)} className={`h-10 px-4 text-[0.66rem] font-bold uppercase tracking-[0.18em] transition-colors sm:px-5 ${on ? "bg-white/90 text-[#0e1b4f]" : "text-white/60 hover:text-white"}`}>
+              <li key={f} className="flex-1 sm:flex-none">
+                <button type="button" aria-pressed={on} onClick={() => goTo(f)} className={`min-h-11 w-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#ffc82c] sm:px-5 sm:py-0 ${on ? "bg-white text-[#0e1b4f]" : "text-white/80 hover:bg-white/10 hover:text-white"}`}>
                   {product.keyLabels[i]}
                 </button>
               </li>
@@ -340,25 +376,36 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         </ul>
       </div>
 
-      {/* Loupe, bottom left. */}
-      {active && (
-        <div className="sp-copy relative z-20 flex items-center gap-4 px-5 pb-5 sm:px-8 lg:absolute lg:bottom-8 lg:left-10 lg:p-0">
-          <span aria-hidden key={keyOf(active)} className="sp-loupe size-20 shrink-0 rounded-full ring-1 ring-white/70 lg:size-28" style={{ backgroundImage: `url(${product.frames[active.frame]})`, backgroundSize: "460% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
-          <p role="status" className="max-w-[10rem] text-[0.66rem] font-bold uppercase leading-snug tracking-[0.16em] text-white/80">
-            <span className="mb-1 block text-white/45">Under the loupe</span>
-            {active.label}
-          </p>
-        </div>
-      )}
+      {/* Detail panel, bottom left: the close-up, its name and what it is. */}
+      <div aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:left-8 lg:w-[16rem] lg:p-0 min-[1200px]:w-[22rem] min-[1440px]:left-12 min-[1440px]:w-[27rem]">
+        {active ? (
+          <div key={keyOf(active)} className="sp-detail flex flex-col gap-4 bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm sm:flex-row sm:items-start lg:flex-col min-[1200px]:flex-row">
+            <span aria-hidden className="block h-32 w-full shrink-0 bg-no-repeat sm:h-32 sm:w-32 lg:h-28 lg:w-full min-[1200px]:h-32 min-[1200px]:w-32 min-[1440px]:h-36 min-[1440px]:w-36" style={{ backgroundImage: `url(${product.frames[active.frame]})`, backgroundSize: "480% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
+            <div className="min-w-0">
+              <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#ffc82c]">
+                Detail {activeIdx + 1} of {visibleSpots.length}
+              </p>
+              <h2 className="mt-1 font-display text-[1.2rem] font-bold leading-tight tracking-tight">{active.label}</h2>
+              <p className="mt-2 text-[0.92rem] leading-relaxed text-white/85">{active.detail ?? DETAILS[active.label] ?? "Select another point to compare the cloth."}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm">
+            <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#ffc82c]">Product detail</p>
+            <h2 className="mt-1 font-display text-[1.2rem] font-bold leading-tight tracking-tight">{product.label}</h2>
+            <p className="mt-2 text-[0.92rem] leading-relaxed text-white/85">{zoom > 1 ? "Zoom out to see the marked points on the garment." : "Turn the garment to a view with marked points, then select one to see it close up."}</p>
+          </div>
+        )}
+      </div>
 
-      {/* Blurb and calls to action, bottom right. */}
-      <div className="sp-copy relative z-20 px-5 pb-8 sm:px-8 lg:absolute lg:bottom-8 lg:right-10 lg:max-w-[25rem] lg:p-0 lg:text-right">
-        <p className="text-[0.68rem] font-medium uppercase leading-relaxed tracking-[0.07em] text-white/65">{subheading}</p>
-        <div className="mt-4 flex flex-wrap gap-2.5 lg:justify-end">
-          <Link href={cta.href} className="inline-flex h-11 items-center gap-2 border border-white/80 px-6 text-[0.66rem] font-bold uppercase tracking-[0.2em] transition-colors hover:bg-white hover:text-[#0e1b4f]">
-            {cta.label} <ArrowRight className="size-3.5" aria-hidden />
+      {/* Description and actions, bottom right. */}
+      <div className="sp-copy relative z-20 px-5 pb-8 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[15rem] lg:p-0 min-[1200px]:w-[20rem] min-[1440px]:right-12 min-[1440px]:w-[27rem]">
+        <p className="text-[0.95rem] leading-relaxed text-white/85 lg:text-right">{subheading}</p>
+        <div className="mt-5 flex flex-wrap gap-3 lg:flex-col lg:items-stretch min-[1440px]:flex-row min-[1440px]:justify-end">
+          <Link href={cta.href} className="inline-flex h-12 items-center justify-center gap-2 bg-white px-7 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-[#0e1b4f] transition-colors duration-200 hover:bg-[#ffc82c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c]">
+            {cta.label} <ArrowRight className="size-4" aria-hidden />
           </Link>
-          <Link href={secondary.href} className="inline-flex h-11 items-center border border-white/25 px-5 text-[0.66rem] font-bold uppercase tracking-[0.2em] text-white/75 transition-colors hover:border-white/60 hover:text-white">
+          <Link href={secondary.href} className="inline-flex h-12 items-center justify-center border border-white/60 px-6 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-white transition-colors duration-200 hover:border-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c]">
             {secondary.label}
           </Link>
         </div>
