@@ -1,0 +1,33 @@
+/* Soft studio light behind the garment: one pool of light, no decoration. */
+.h3-light {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(48% 62% at 72% 52%, #ffffff 0%, rgb(255 255 255 / 0) 70%),
+    radial-gradient(60% 50% at 0% 100%, #e8eafc 0%, rgb(232 234 252 / 0) 70%);
+}
+
+@keyframes h3-rise {
+  from {
+    opacity: 0;
+    translate: 0 1.1rem;
+  }
+}
+@keyframes h3-in {
+  from {
+    opacity: 0;
+    scale: 0.97;
+  }
+}
+
+/* A staged opening: headline, copy, actions, then the garment. Only with motion allowed. */
+@media (prefers-reduced-motion: no-preference) {
+  .h3-line {
+    animation: h3-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--i, 0) * 110ms + 120ms);
+  }
+  .h3-stage {
+    animation: h3-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+  }
+}
