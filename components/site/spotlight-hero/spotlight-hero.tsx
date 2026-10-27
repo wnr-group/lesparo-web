@@ -112,6 +112,11 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const [spotKey, setSpotKey] = useState<string | null>(null);
+  // Click feedback: a ring that pings from the point, and a line that draws from it to the detail panel.
+  const [ping, setPing] = useState<{ key: string; n: number } | null>(null);
+  const [link, setLink] = useState<{ x1: number; y1: number; x2: number; y2: number; n: number } | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const [touched, setTouched] = useState(false);
   const [loaded, setLoaded] = useState(0);
   const box = useRef<HTMLDivElement>(null);
@@ -245,6 +250,19 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
 
   const visibleSpots = zoom > 1 ? [] : product.spots.filter((s) => ringDist(s.frame, frame, n) <= tol);
   const keyOf = (s: Spot) => `${product.id}-${s.frame}-${s.label}`;
+  const pick = (p: Spot, el: HTMLElement) => {
+    const k = keyOf(p);
+    setSpotKey(k);
+    setPing((v) => ({ key: k, n: (v?.n ?? 0) + 1 }));
+    const sec = sectionRef.current;
+    const panel = panelRef.current;
+    if (sec && panel && window.matchMedia("(min-width: 1024px)").matches) {
+      const a = el.getBoundingClientRect();
+      const b = panel.getBoundingClientRect();
+      const o = sec.getBoundingClientRect();
+      setLink((v) => ({ x1: a.left + a.width / 2 - o.left, y1: a.top + a.height / 2 - o.top, x2: b.left - o.left, y2: b.top - o.top + 40, n: (v?.n ?? 0) + 1 }));
+    }
+  };
   const active = visibleSpots.find((s) => keyOf(s) === spotKey) ?? visibleSpots[0] ?? null;
   const activeIdx = active ? visibleSpots.indexOf(active) : -1;
   const cutout = isCut(product.frames[frame]);
@@ -255,7 +273,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const keyFrames = product.spin ? [0, 1, 2, 3].map((k) => Math.round((k * n) / 4)) : product.frames.map((_, i) => i);
 
   return (
-    <section aria-labelledby="hero-heading" className="sp-stage relative isolate flex flex-col overflow-hidden text-white lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
+    <section ref={sectionRef} aria-labelledby="hero-heading" className="sp-stage relative isolate flex flex-col overflow-hidden text-white lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
       {/* The stage: a soft halo of light behind the product and a floor. */}
       <div aria-hidden className="sp-halo" />
       {/* The LESPARO bird from the logo, large and faint behind the product. */}
@@ -263,8 +281,17 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       <img aria-hidden src="/lesparo-bird.png" alt="" width={1140} height={1464} className="sp-bird" />
       <div aria-hidden className="sp-floor" />
 
+      {/* Line drawn from a clicked point to the detail panel. */}
+      {link && (
+        <svg key={link.n} aria-hidden className="pointer-events-none absolute inset-0 z-[15] hidden size-full lg:block">
+          <path d={`M${link.x1} ${link.y1} Q ${(link.x1 + link.x2) / 2} ${link.y1} ${link.x2} ${link.y2}`} pathLength={1} fill="none" stroke="#ffc82c" strokeWidth="2" strokeLinecap="round" strokeDasharray="1 1" className="sp-link" />
+          <circle cx={link.x2} cy={link.y2} r="5" fill="#ffc82c" className="sp-link-dot" />
+        </svg>
+      )}
+
       <div className="contents lg:absolute lg:left-8 lg:top-10 lg:z-20 lg:flex lg:max-w-[15rem] lg:flex-col xl:left-12 xl:max-w-[25rem]">
-        {/* Text column, top left: a small label, a two-weight title, then the description and actions. */}
+  
+      {/* Text column, top left: a small label, a two-weight title, then the description and actions. */}
         <div className="sp-copy relative z-20 px-5 pt-8 sm:px-8 lg:p-0">
           <p className="flex items-center gap-3 text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-white/75">
             <span aria-hidden className="size-1.5 rounded-full bg-[#ffc82c]" />
@@ -371,12 +398,13 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
                 type="button"
                 aria-label={`${i + 1} of ${visibleSpots.length}. ${p.label}`}
                 aria-pressed={on}
-                onClick={() => setSpotKey(keyOf(p))}
+                onClick={(e) => pick(p, e.currentTarget)}
                 onFocus={() => setSpotKey(keyOf(p))}
                 onPointerDown={(e) => e.stopPropagation()}
                 className="sp-pin group absolute grid size-11 -translate-x-1/2 -translate-y-1/2 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#ffc82c]"
                 style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}
               >
+                {ping?.key === keyOf(p) && <span key={ping.n} aria-hidden className="sp-ping pointer-events-none absolute left-1/2 top-1/2 size-8 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[#ffc82c]" />}
                 <span aria-hidden className={`grid size-8 place-items-center rounded-full border-2 transition-[transform,background-color,border-color] duration-200 group-hover:scale-110 ${on ? "border-[#ffc82c] bg-[#0e1b4f]/55" : "border-white bg-[#0e1b4f]/35 group-hover:bg-[#0e1b4f]/60"}`}>
                   <span className={`size-2.5 rounded-full transition-colors duration-200 ${on ? "bg-[#ffc82c]" : "bg-white"}`} />
                 </span>
@@ -421,10 +449,10 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       </div>
 
       {/* Detail panel, bottom right: the close-up, its name and what it is. */}
-      <div aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[16rem] lg:p-0 xl:w-[23rem] 2xl:right-12 2xl:w-[26rem]">
+      <div ref={panelRef} aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[16rem] lg:p-0 xl:w-[23rem] 2xl:right-12 2xl:w-[26rem]">
         {active ? (
           <div key={keyOf(active)} className="sp-detail flex flex-col gap-4 bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm ">
-            <span aria-hidden className="block h-44 w-full shrink-0 bg-no-repeat sm:h-52 lg:h-44 xl:h-52 2xl:h-56" style={{ backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "400% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
+            <span aria-hidden className="block h-44 w-full shrink-0 overflow-hidden sm:h-52 lg:h-44 xl:h-52 2xl:h-56"><span className="sp-detail-img block size-full bg-no-repeat" style={{ backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "400% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%`}} /></span>
             <div className="min-w-0">
               <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#ffc82c]">
                 Detail {activeIdx + 1} of {visibleSpots.length}
