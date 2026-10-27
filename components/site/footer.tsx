@@ -12,7 +12,7 @@ export async function Footer() {
       <div className="mx-auto grid max-w-page gap-12 px-4 py-16 sm:px-6 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:px-10">
         <div>
           <div className="inline-block rounded-2xl bg-white p-3">
-            <Image src="/lesparo-logo.png" alt="LESPARO" width={678} height={446} className="h-16 w-auto" />
+            <Image src="/lesparo-logo-v2.png" alt="LESPARO" width={900} height={484} className="h-20 w-auto" />
           </div>
           <p className="mt-6 max-w-xs font-display text-3xl font-bold tracking-tight text-white">{BUSINESS.tagline}</p>
           <address className="mt-6 text-sm not-italic leading-relaxed">
