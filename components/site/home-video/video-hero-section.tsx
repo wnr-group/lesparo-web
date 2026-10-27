@@ -9,9 +9,9 @@ import "./video.css";
 const FILM = { mp4: "/video/lesparo-hero.mp4", webm: "/video/lesparo-hero.webm" };
 
 /**
- * Cinematic hero: the film runs almost ungraded so the cloth stays clearly visible. Only two soft
- * shades sit over it, one at the foot (under the facts strip) and one at the left (under the headline),
- * and the headline carries its own faint shadow, so nothing hides the picture.
+ * Cinematic hero: the film runs almost ungraded so the picture stays clearly visible. The only shade is
+ * a thin one at the foot, under the facts strip; the type stays readable through its own text shadow,
+ * so there is no panel or banner over the film.
  */
 export function VideoHero({ hero, ranges }: { hero: HomepageContent["hero"]; ranges: HeroRange[] }) {
   const hasFilm = existsSync(join(process.cwd(), "public", "video", "lesparo-hero.mp4"));
@@ -23,7 +23,7 @@ export function VideoHero({ hero, ranges }: { hero: HomepageContent["hero"]; ran
           <div aria-hidden className="hv-weave absolute inset-0" />
           <div className="hv-zoom absolute inset-0">{hasFilm && <HeroVideo src={FILM.mp4} webm={FILM.webm} />}</div>
         </div>
-        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_right,rgb(18_22_76/0.42),transparent_62%),linear-gradient(to_top,rgb(18_22_76/0.55),transparent_38%)]" />
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_top,rgb(18_22_76/0.5),transparent_28%)]" />
       </div>
 
       <HeroCopy eyebrow={hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={hero.heading} subheading={hero.subheading} ranges={ranges} />

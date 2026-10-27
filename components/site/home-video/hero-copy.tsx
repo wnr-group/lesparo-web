@@ -38,7 +38,7 @@ export function HeroCopy({ eyebrow, heading, subheading, ranges }: { eyebrow: st
   const current = ranges[i];
   return (
     <>
-      <div className="hv-copy mx-auto flex h-full max-w-page flex-col justify-end px-4 pb-28 sm:px-6 lg:px-10 lg:pb-32 [text-shadow:0_2px_28px_rgb(10_12_40/0.45)]">
+      <div className="hv-copy mx-auto flex h-full max-w-page flex-col justify-end px-4 pb-28 sm:px-6 lg:px-10 lg:pb-32 [text-shadow:0_2px_30px_rgb(10_12_40/0.65),0_1px_4px_rgb(10_12_40/0.4)]">
         <p className="hv-in eyebrow !text-white" style={{ ["--d" as string]: 0 }}>
           {eyebrow}
         </p>
@@ -52,13 +52,13 @@ export function HeroCopy({ eyebrow, heading, subheading, ranges }: { eyebrow: st
           ))}
         </h1>
 
-        <p className="hv-in mt-6 max-w-md text-[1.05rem] leading-relaxed text-white/95" style={{ ["--d" as string]: 3 }}>
+        <p className="hv-in mt-6 max-w-md text-[1.05rem] font-medium leading-relaxed text-white" style={{ ["--d" as string]: 3 }}>
           {subheading}
         </p>
 
         <div className="hv-in mt-7 flex flex-wrap items-center gap-3 [text-shadow:none]" style={{ ["--d" as string]: 4 }}>
           {/* Pill switch: retail or wholesale. */}
-          <div role="group" aria-label="How do you want to buy?" className="inline-flex rounded-full bg-white/15 p-1 backdrop-blur-md ring-1 ring-white/40">
+          <div role="group" aria-label="How do you want to buy?" className="inline-flex rounded-full bg-indigo-deep/40 p-1 backdrop-blur-md ring-1 ring-white/40">
             {(Object.keys(CHANNELS) as (keyof typeof CHANNELS)[]).map((k) => {
               const Icon = CHANNELS[k].icon;
               const on = channel === k;
