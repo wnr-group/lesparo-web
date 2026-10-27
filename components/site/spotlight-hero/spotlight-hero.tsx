@@ -3,11 +3,25 @@
 import { ArrowRight, Minus, Plus } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./spotlight.css";
 
 // three.js is only fetched when a product has a .glb in public/models.
 const Garment3D = dynamic(() => import("./garment-3d"), { ssr: false });
+import type { Point3D } from "./garment-3d";
+
+/**
+ * Where each named point sits on a real 3D model: a ray is fired at the model from that side, across and up its
+ * box, and the point is pinned where it hits the cloth. Labels match the photo spots, which supply the close-up.
+ */
+const POINTS_3D: Record<string, { label: string; side: Point3D["side"]; u: number; v: number }[]> = {
+  pants: [
+    { label: "Drawstring waistband", side: "front", u: 0.5, v: 0.95 },
+    { label: "Cargo pocket", side: "right", u: 0.5, v: 0.62 },
+    { label: "Textured fabric", side: "front", u: 0.64, v: 0.5 },
+    { label: "Back pocket", side: "back", u: 0.42, v: 0.88 },
+  ],
+};
 
 type Cta = { label: string; href: string };
 /** A numbered point on one frame. It shows while the viewer is within `tol` frames of that frame. */
@@ -123,6 +137,14 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
 
   const product = products[pi];
   const model = models[product.id];
+  const points3d = useMemo<Point3D[]>(
+    () =>
+      (POINTS_3D[product.id] ?? []).flatMap((p) => {
+        const sp = STAND_IN[product.id]?.spots.find((x) => x.label === p.label);
+        return sp ? [{ ...p, key: `${product.id}-${sp.frame}-${sp.label}` }] : [];
+      }),
+    [product.id],
+  );
   const n = product.frames.length;
   const tol = product.spin ? 2 : 0;
 
@@ -293,9 +315,10 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
     if (!product.spin) live.current.vel = 0;
   };
 
-  const visibleSpots = zoom > 1 ? [] : product.spots.filter((s) => ringDist(s.frame, frame, n) <= tol);
+  // With a 3D model the points are the model's own; each borrows the close-up of the photo spot with the same name.
+  const visibleSpots = model ? points3d.flatMap((p) => product.spots.find((s) => s.label === p.label) ?? []) : zoom > 1 ? [] : product.spots.filter((s) => ringDist(s.frame, frame, n) <= tol);
   const keyOf = (s: Spot) => `${product.id}-${s.frame}-${s.label}`;
-  const active = model ? null : (visibleSpots.find((s) => keyOf(s) === spotKey) ?? visibleSpots[0] ?? null);
+  const active = visibleSpots.find((s) => keyOf(s) === spotKey) ?? visibleSpots[0] ?? null;
   const activeIdx = active ? visibleSpots.indexOf(active) : -1;
   const cutout = isCut(product.frames[frame]);
   const fade = FADE[product.frames[frame]];
@@ -380,7 +403,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       <div className="sp-leave-figure relative z-10 my-6 flex justify-center px-5 lg:absolute lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[6.25rem] lg:my-0 lg:px-0">
         {model ? (
           <div className="sp-product relative w-full max-w-[22rem] overflow-hidden lg:h-full lg:w-auto lg:max-w-none" style={{ aspectRatio: "2 / 3" }}>
-            <Garment3D key={model} src={model} label={product.label} poster={product.frames[0]} />
+            <Garment3D key={model} src={model} label={product.label} poster={product.frames[0]} points={points3d} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} />
           </div>
         ) : (
         <div
@@ -495,7 +518,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
           <div className="bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm">
             <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#ffc82c]">Product detail</p>
             <h2 className="mt-1 font-display text-[1.2rem] font-bold leading-tight tracking-tight">{product.label}</h2>
-            <p className="mt-2 text-[0.92rem] leading-relaxed text-white/85">{model ? "Drag to turn the garment any way, and scroll or pinch to move closer." : zoom > 1 ? "Zoom out to see the marked points on the garment." : "Turn the garment to a view with marked points, then select one to see it close up."}</p>
+            <p className="mt-2 text-[0.92rem] leading-relaxed text-white/85">{model ? "Select a numbered point on the garment to see it close up." : zoom > 1 ? "Zoom out to see the marked points on the garment." : "Turn the garment to a view with marked points, then select one to see it close up."}</p>
           </div>
         )}
       </div>
