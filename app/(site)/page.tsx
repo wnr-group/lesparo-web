@@ -4,7 +4,6 @@ import Link from "next/link";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BrandFilm } from "@/components/site/brand-film";
-import { Parallax } from "@/components/site/parallax";
 import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
 import { ErodeRoute } from "@/components/site/erode-route";
 import { ButtonLink } from "@/components/ui/button";
@@ -94,7 +93,7 @@ export default async function HomePage() {
       <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} turntables={{ pants: turntable("pants"), tee: turntable("tee") }} />
 
       {/* ---------------------------------------------------------------- film */}
-      <BrandFilm src="/lesparo_video.mp4" title="The LESPARO film" />
+      <BrandFilm open src="/lesparo_video.mp4" title="The LESPARO film" />
 
       {/* ---------------------------------------------------------- categories */}
       {sections.categories && (
@@ -170,16 +169,12 @@ export default async function HomePage() {
                 <p className="absolute left-6 top-6 z-10 rounded-full bg-white px-4 py-2 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-indigo shadow-sm">Abija Exports · Erode</p>
                 {lineup.find((l) => !l.kid) && (
                   <div className="absolute bottom-0 right-[4%] h-[90%] w-[78%]">
-                    <Parallax shift={0.05} className="relative size-full">
-                      <Image src={lineup.find((l) => !l.kid)!.image} alt="" fill sizes="(min-width:1024px) 26vw, 70vw" className="cutout object-contain object-bottom" />
-                    </Parallax>
+                    <Image src={lineup.find((l) => !l.kid)!.image} alt="" fill sizes="(min-width:1024px) 26vw, 70vw" className="cutout object-contain object-bottom" />
                   </div>
                 )}
                 {lineup.find((l) => l.kid) && (
                   <div className="absolute bottom-0 left-[2%] z-10 h-[56%] w-[40%] mix-blend-multiply">
-                    <Parallax shift={-0.045} className="relative size-full">
-                      <Image src={lineup.find((l) => l.kid)!.image} alt="" fill sizes="(min-width:1024px) 14vw, 36vw" className="cutout object-contain object-bottom" />
-                    </Parallax>
+                    <Image src={lineup.find((l) => l.kid)!.image} alt="" fill sizes="(min-width:1024px) 14vw, 36vw" className="cutout object-contain object-bottom" />
                   </div>
                 )}
               </div>

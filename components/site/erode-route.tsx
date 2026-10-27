@@ -132,7 +132,7 @@ export function ErodeRoute() {
   }
 
   return (
-    <section ref={root} aria-label="Where we supply" className="relative bg-paper" style={{ height: "320svh" }}>
+    <section ref={root} aria-label="Where we supply" className="relative bg-paper" style={{ height: "240svh" }}>
       <div className="sticky top-0 flex h-svh flex-col overflow-hidden px-5 pt-24 pb-8 sm:px-8 lg:px-[max(2rem,6vw)]">
         {head}
         <div className="relative flex min-h-0 flex-1 items-center">{art}</div>

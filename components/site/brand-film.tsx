@@ -4,8 +4,8 @@ import { Pause, Play } from "lucide-react";
 import { useRef, useState } from "react";
 import "./film.css";
 
-/** The LESPARO film: plays silently on a loop, with a visible pause button. */
-export function BrandFilm({ src, title }: { src: string; title: string }) {
+/** The LESPARO film: plays silently on a loop, with a visible pause button. `open` adds the scroll-linked opening, used once, straight after the hero. */
+export function BrandFilm({ src, title, open = false }: { src: string; title: string; open?: boolean }) {
   const video = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(true);
 
@@ -18,7 +18,7 @@ export function BrandFilm({ src, title }: { src: string; title: string }) {
 
   return (
     <section aria-label={title} className="bg-white">
-      <div className="film-open relative">
+      <div className={`relative ${open ? "film-open" : ""}`}>
         <video
           ref={video}
           src={src}

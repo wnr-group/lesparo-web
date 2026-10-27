@@ -121,47 +121,46 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const n = product.frames.length;
   const tol = product.spin ? 2 : 0;
 
-  // Depth: the figure leans toward the pointer in perspective and sways gently on its own, so it reads as a solid object.
+  // Depth: with a mouse, the figure leans a few degrees toward the pointer. It does nothing on its own, never runs on
+  // touch screens, and its frame loop sleeps whenever the figure is at rest.
   const tilt = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = tilt.current;
     const stage = box.current;
-    if (!el || !stage || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!el || !stage || !matchMedia("(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)").matches) return;
     let tx = 0;
     let ty = 0;
     let ry = 0;
     let rx = 0;
     let raf = 0;
-    let visible = true;
-    const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting));
-    io.observe(stage);
+    const step = () => {
+      raf = 0;
+      const gy = tx * 8;
+      const gx = -ty * 3.5;
+      ry += (gy - ry) * 0.1;
+      rx += (gx - rx) * 0.1;
+      el.style.transform = `perspective(1100px) rotateY(${ry.toFixed(2)}deg) rotateX(${rx.toFixed(2)}deg)`;
+      el.style.setProperty("--sx", `${(-ry * 2.4).toFixed(1)}px`);
+      if (Math.abs(gy - ry) > 0.02 || Math.abs(gx - rx) > 0.02) raf = requestAnimationFrame(step);
+    };
+    const wake = () => {
+      if (!raf) raf = requestAnimationFrame(step);
+    };
     const move = (e: PointerEvent) => {
       const b = stage.getBoundingClientRect();
       tx = Math.max(-1, Math.min(1, ((e.clientX - b.left) / b.width - 0.5) * 2));
       ty = Math.max(-1, Math.min(1, ((e.clientY - b.top) / b.height - 0.5) * 2));
+      wake();
     };
     const leave = () => {
       tx = 0;
       ty = 0;
+      wake();
     };
     stage.addEventListener("pointermove", move);
     stage.addEventListener("pointerleave", leave);
-    const step = (now: number) => {
-      raf = requestAnimationFrame(step);
-      if (!visible || document.hidden) return;
-      const sway = Math.sin(now / 2600);
-      const idle = live.current.hover ? 0 : 1;
-      const gy = tx * 11 + sway * 4 * idle;
-      const gx = -ty * 5 + Math.cos(now / 3100) * 1.6 * idle;
-      ry += (gy - ry) * 0.08;
-      rx += (gx - rx) * 0.08;
-      el.style.transform = `perspective(1100px) rotateY(${ry.toFixed(2)}deg) rotateX(${rx.toFixed(2)}deg)`;
-      el.style.setProperty("--sx", `${(-ry * 2.4).toFixed(1)}px`);
-    };
-    raf = requestAnimationFrame(step);
     return () => {
       cancelAnimationFrame(raf);
-      io.disconnect();
       stage.removeEventListener("pointermove", move);
       stage.removeEventListener("pointerleave", leave);
     };
