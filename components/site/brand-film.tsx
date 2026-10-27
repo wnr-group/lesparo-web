@@ -17,7 +17,7 @@ export function BrandFilm({ src, title }: { src: string; title: string }) {
 
   return (
     <section aria-label={title} className="bg-white">
-      <div className="relative">
+      <div className="film-open relative">
         <video
           ref={video}
           src={src}
