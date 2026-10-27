@@ -258,6 +258,9 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
     <section aria-labelledby="hero-heading" className="sp-stage relative isolate flex flex-col overflow-hidden text-white lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
       {/* The stage: a soft halo of light behind the product and a floor. */}
       <div aria-hidden className="sp-halo" />
+      {/* The LESPARO bird from the logo, large and faint behind the product. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- decorative, fixed-size mark */}
+      <img aria-hidden src="/lesparo-bird.png" alt="" width={1140} height={1464} className="sp-bird" />
       <div aria-hidden className="sp-floor" />
 
       <div className="contents lg:absolute lg:left-8 lg:top-10 lg:z-20 lg:flex lg:max-w-[15rem] lg:flex-col xl:left-12 xl:max-w-[25rem]">

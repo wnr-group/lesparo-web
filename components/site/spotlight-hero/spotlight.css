@@ -43,6 +43,30 @@
   border-radius: 50%;
   border: 1px solid rgb(255 255 255 / 0.14);
 }
+/* The logo bird, large behind the product. */
+.sp-bird {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  height: 116%;
+  width: auto;
+  max-width: none;
+  translate: -50% -50%;
+  opacity: 0.16;
+  pointer-events: none;
+  user-select: none;
+}
+@keyframes sp-bird-float {
+  50% {
+    translate: -50% calc(-50% - 1.2%);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sp-bird {
+    animation: sp-bird-float 9s ease-in-out infinite;
+  }
+}
 /* The floor the product stands on. */
 .sp-floor {
   position: absolute;
