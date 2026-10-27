@@ -5,13 +5,11 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BrandFilm } from "@/components/site/brand-film";
 import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
-import type { DeckItem } from "@/components/site/card-deck";
 import { ErodeRoute } from "@/components/site/erode-route";
-import { ProductReel } from "@/components/site/product-reel";
 import { ButtonLink } from "@/components/ui/button";
 import { Container, SectionHeading } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
-import { getCategoryTree, getHomepageContent, getProductsBySlugs, listProducts, type CategoryNode } from "@/lib/catalogue/queries";
+import { getCategoryTree, getHomepageContent, listProducts, type CategoryNode } from "@/lib/catalogue/queries";
 
 const STEPS = [
   ["Browse", "Add products to your enquiry list as you explore the catalogue."],
@@ -70,7 +68,6 @@ type LineupModel = { id: string; slug: string; name: string; image: string; kid?
 
 export default async function HomePage() {
   const [content, tree] = await Promise.all([getHomepageContent(), getCategoryTree()]);
-  const featured = await getProductsBySlugs(content.featuredProductSlugs);
   const fabrics = tree.find((t) => t.slug !== "garments");
   const featuredCategories = tree.flatMap((t) => t.children).filter((c) => content.featuredCategorySlugs.includes(c.slug));
   const { sections } = content;
@@ -89,19 +86,6 @@ export default async function HomePage() {
     ...pick("fine-comfort-track"),
     ...pick("new-york-kids-track", true),
   ];
-
-  // Featured deck: the admin's featured products that have a photo.
-  const deck: DeckItem[] = featured
-    .filter((p) => p.images[0])
-    .slice(0, 6)
-    .map((p) => ({
-      id: p.id,
-      slug: p.slug,
-      name: p.name,
-      category: p.category?.name ?? null,
-      detail: [p.fabric, p.sizes.length ? `Sizes ${p.sizes.join(" · ")}` : null].filter(Boolean).join(" — "),
-      image: p.images[0].url,
-    }));
 
   return (
     <>
@@ -135,9 +119,6 @@ export default async function HomePage() {
           </Container>
         </section>
       )}
-
-      {/* ------------------------------------------------------- featured reel */}
-      {sections.products && deck.length > 0 && <ProductReel items={deck} />}
 
       {/* ---------------------------------------------------------------- film */}
       <BrandFilm src="/lesparo_video.mp4" title="The LESPARO film" />
