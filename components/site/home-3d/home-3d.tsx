@@ -1,4 +1,5 @@
 import { ArrowRight, ArrowUpRight, RefreshCw, ShieldCheck } from "lucide-react";
+import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ProductGrid } from "@/components/site/product-card";
@@ -22,8 +23,10 @@ const STRIPS = [
 ];
 const TILT = ["-rotate-[1.4deg]", "rotate-[1deg]", "-rotate-[0.8deg]"];
 
-export function Home3D({ content, garments, fabrics, featured, panelImages, sections }: HomeData & { sections: HomeData["content"]["sections"] }) {
-  const { hero } = content;
+/** `hero` replaces the default cloth hero, so any other hero can be dropped in with one prop. */
+export function Home3D({ content, garments, fabrics, featured, panelImages, sections, hero: heroOverride }: HomeData & { sections: HomeData["content"]["sections"]; hero?: ReactNode }) {
+  const hero = heroOverride;
+  const { hero: copy } = content;
   const swatches = [
     ...garments.slice(0, 2).map((g) => ({ cat: g, items: g.children, image: panelImages[g.id] ?? g.coverUrl })),
     ...(fabrics ? [{ cat: fabrics, items: fabrics.children, image: null as string | null }] : []),
@@ -32,36 +35,38 @@ export function Home3D({ content, garments, fabrics, featured, panelImages, sect
   return (
     <>
       {/* ================================================================ hero: a length of cloth */}
-      <section aria-labelledby="hero-heading" className="relative isolate h-[calc(100svh-var(--hdr))] min-h-[34rem] overflow-hidden text-indigo-deep">
-        <div aria-hidden className="h3-check absolute inset-0 -z-10" />
-        <ClothCanvas />
-        {/* Keeps the type readable over the check without hiding the cloth. */}
-        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_top_right,rgb(243_238_227/0.96),rgb(243_238_227/0.82)_45%,rgb(243_238_227/0.25)_85%)]" />
+      {hero ?? (
+        <section aria-labelledby="hero-heading" className="relative isolate h-[calc(100svh-var(--hdr))] min-h-[34rem] overflow-hidden text-indigo-deep">
+          <div aria-hidden className="h3-check absolute inset-0 -z-10" />
+          <ClothCanvas />
+          {/* Keeps the type readable over the check without hiding the cloth. */}
+          <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_top_right,rgb(243_238_227/0.96),rgb(243_238_227/0.82)_45%,rgb(243_238_227/0.25)_85%)]" />
 
-        <div className="relative mx-auto flex h-full max-w-page flex-col justify-end px-4 pb-16 sm:px-6 lg:px-10 lg:pb-20">
-          <p className="h3-in eyebrow" style={{ ["--d" as string]: 0 }}>
-            {hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"}
-          </p>
-          <h1 id="hero-heading" className="h3-in mt-5 max-w-[15ch] font-display text-[clamp(3rem,1.4rem+7vw,9rem)] font-extrabold leading-[0.9] tracking-[-0.05em]" style={{ ["--d" as string]: 1 }}>
-            {hero.heading}
-          </h1>
-          <p className="h3-in mt-7 max-w-lg text-lg leading-relaxed text-indigo-deep/80" style={{ ["--d" as string]: 2 }}>
-            {hero.subheading}
-          </p>
-          <div className="h3-in mt-9 flex flex-wrap items-center gap-3" style={{ ["--d" as string]: 3 }}>
-            <ButtonLink href={hero.primaryCta.href} size="lg">
-              {hero.primaryCta.label} <ArrowRight className="size-4" aria-hidden />
-            </ButtonLink>
-            <ButtonLink href={hero.secondaryCta.href} variant="secondary" size="lg">
-              {hero.secondaryCta.label}
-            </ButtonLink>
+          <div className="relative mx-auto flex h-full max-w-page flex-col justify-end px-4 pb-16 sm:px-6 lg:px-10 lg:pb-20">
+            <p className="h3-in eyebrow" style={{ ["--d" as string]: 0 }}>
+              {copy.eyebrow || "Abija Exports · Erode, Tamil Nadu"}
+            </p>
+            <h1 id="hero-heading" className="h3-in mt-5 max-w-[15ch] font-display text-[clamp(3rem,1.4rem+7vw,9rem)] font-extrabold leading-[0.9] tracking-[-0.05em]" style={{ ["--d" as string]: 1 }}>
+              {copy.heading}
+            </h1>
+            <p className="h3-in mt-7 max-w-lg text-lg leading-relaxed text-indigo-deep/80" style={{ ["--d" as string]: 2 }}>
+              {copy.subheading}
+            </p>
+            <div className="h3-in mt-9 flex flex-wrap items-center gap-3" style={{ ["--d" as string]: 3 }}>
+              <ButtonLink href={copy.primaryCta.href} size="lg">
+                {copy.primaryCta.label} <ArrowRight className="size-4" aria-hidden />
+              </ButtonLink>
+              <ButtonLink href={copy.secondaryCta.href} variant="secondary" size="lg">
+                {copy.secondaryCta.label}
+              </ButtonLink>
+            </div>
           </div>
-        </div>
-        <p aria-hidden className="h3-hint absolute right-6 top-6 hidden rounded-full bg-white/85 px-4 py-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-indigo-deep md:block lg:right-10">
-          Move the pointer to catch the light
-        </p>
-        <div aria-hidden className="h3-pinked absolute inset-x-0 bottom-0 bg-white" />
-      </section>
+          <p aria-hidden className="h3-hint absolute right-6 top-6 hidden rounded-full bg-white/85 px-4 py-2 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-indigo-deep md:block lg:right-10">
+            Move the pointer to catch the light
+          </p>
+          <div aria-hidden className="h3-pinked absolute inset-x-0 bottom-0 bg-white" />
+        </section>
+      )}
 
       {/* ============================================================ swatch board */}
       {sections.categories && swatches.length > 0 && (
