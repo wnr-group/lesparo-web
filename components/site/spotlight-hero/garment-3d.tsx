@@ -52,7 +52,7 @@ function useHits(scene: Object3D, points: Point3D[]): Hit[] {
 }
 
 /** One numbered pin. It fades out when the garment turns its back on the camera, and can be pressed while it faces it. */
-function Marker({ hit, n, active, onPick }: { hit: Hit; n: number; active: boolean; onPick: (key: string) => void }) {
+function Marker({ hit, n, active, onPick, onZoom }: { hit: Hit; n: number; active: boolean; onPick: (key: string) => void; onZoom: (hit: Hit) => void }) {
   const btn = useRef<HTMLButtonElement>(null);
   const dir = useRef(new Vector3());
   useFrame(({ camera }) => {
@@ -70,7 +70,10 @@ function Marker({ hit, n, active, onPick }: { hit: Hit; n: number; active: boole
         type="button"
         aria-label={`${n}. ${hit.label}`}
         aria-pressed={active}
-        onClick={() => onPick(hit.key)}
+        onClick={() => {
+          onPick(hit.key);
+          onZoom(hit);
+        }}
         onFocus={() => onPick(hit.key)}
         onPointerDown={(e) => e.stopPropagation()}
         className="group grid size-11 cursor-pointer place-items-center rounded-full transition-opacity duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#ffc82c]"
@@ -84,19 +87,19 @@ function Marker({ hit, n, active, onPick }: { hit: Hit; n: number; active: boole
 }
 
 /** Size of the garment, so a guided view knows where the middle and the top edge are. */
-type Meta = { centerY: number; height: number; baseDist: number };
+type Meta = { centerX: number; centerY: number; centerZ: number; height: number; baseDist: number };
 
 /**
  * The garment and its points. It floats a hair up and down and leans a few degrees toward the pointer, so it feels
  * suspended in the light rather than pinned to the page.
  */
-function Model({ src, points, activeKey, onPick, metaRef, motion }: { src: string; points: Point3D[]; activeKey: string | null; onPick: (key: string) => void; metaRef: React.RefObject<Meta | null>; motion: boolean }) {
+function Model({ src, points, activeKey, onPick, onZoom, metaRef, motion }: { src: string; points: Point3D[]; activeKey: string | null; onPick: (key: string) => void; onZoom: (hit: Hit) => void; metaRef: React.RefObject<Meta | null>; motion: boolean }) {
   const { scene } = useGLTF(src);
   const hits = useHits(scene, points);
   const group = useRef<Group>(null);
   const size = useMemo(() => new Box3().setFromObject(scene), [scene]);
   useEffect(() => {
-    metaRef.current = { centerY: (size.min.y + size.max.y) / 2, height: size.max.y - size.min.y, baseDist: 0 };
+    metaRef.current = { centerX: (size.min.x + size.max.x) / 2, centerY: (size.min.y + size.max.y) / 2, centerZ: (size.min.z + size.max.z) / 2, height: size.max.y - size.min.y, baseDist: 0 };
   }, [metaRef, size]);
   useFrame(({ clock, pointer }) => {
     const g = group.current;
@@ -110,14 +113,14 @@ function Model({ src, points, activeKey, onPick, metaRef, motion }: { src: strin
     <group ref={group}>
       <primitive object={scene} />
       {hits.map((h, i) => (
-        <Marker key={h.key} hit={h} n={i + 1} active={h.key === activeKey} onPick={onPick} />
+        <Marker key={h.key} hit={h} n={i + 1} active={h.key === activeKey} onPick={onPick} onZoom={onZoom} />
       ))}
     </group>
   );
 }
 
-/** A view to glide to. */
-export type View3D = { id: string; az: number; zoom: number; aimY: number; n: number };
+/** A view to glide to. `at` is a point on the garment to look straight at (it replaces `aimY`). */
+export type View3D = { id: string; az: number; zoom: number; aimY: number; n: number; at?: [number, number, number] };
 
 /**
  * Glides the camera to a chosen view: round to the angle, in or out to the distance, and up or down to where to look,
@@ -153,14 +156,16 @@ function Director({ goalRef, metaRef, onGrab }: { goalRef: React.RefObject<View3
     const d = Math.atan2(Math.sin(g.az - cur), Math.cos(g.az - cur));
     c.setAzimuthalAngle(cur + d * (1 - Math.exp(-4 * k)));
     c.setPolarAngle(MathUtils.damp(c.getPolarAngle(), Math.PI / 2, 4, k));
-    const wantY = m.centerY + g.aimY * m.height;
-    c.target.setY(MathUtils.damp(c.target.y, wantY, 4, k));
+    const wantX = g.at ? g.at[0] : m.centerX;
+    const wantY = g.at ? g.at[1] : m.centerY + g.aimY * m.height;
+    const wantZ = g.at ? g.at[2] : m.centerZ;
+    c.target.set(MathUtils.damp(c.target.x, wantX, 4, k), MathUtils.damp(c.target.y, wantY, 4, k), MathUtils.damp(c.target.z, wantZ, 4, k));
     c.update();
     const want = m.baseDist * g.zoom;
     const nd = MathUtils.damp(dist, want, 4, k);
     c.object.position.sub(c.target).setLength(nd).add(c.target);
     c.update();
-    if (Math.abs(d) < 0.004 && Math.abs(dist - want) < 0.01 && Math.abs(c.target.y - wantY) < 0.002) goalRef.current = null;
+    if (Math.abs(d) < 0.004 && Math.abs(dist - want) < 0.01 && Math.abs(c.target.y - wantY) < 0.002 && Math.abs(c.target.x - wantX) < 0.002 && Math.abs(c.target.z - wantZ) < 0.002) goalRef.current = null;
   });
   return null;
 }
@@ -228,10 +233,12 @@ export default function Garment3D({
   const meta = useRef<Meta | null>(null);
 
   useEffect(() => {
+    // Clearing the view (the visitor took hold, or pressed a point) must not cancel a glide that is already under way.
+    if (!view) return;
     goal.current = view;
     // A chosen view is a visitor action: the idle turn must not fight the glide.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (view) setEngaged(true);
+    setEngaged(true);
   }, [view]);
 
   useEffect(() => {
@@ -252,6 +259,12 @@ export default function Garment3D({
     if (!c) return;
     c.object.position.sub(c.target).multiplyScalar(k).add(c.target);
     c.update();
+  };
+  // Pressing a point glides in on it: round to face that part of the cloth, close up, looking straight at the point.
+  const zoomTo = (hit: Hit) => {
+    setEngaged(true);
+    onGrab();
+    goal.current = { id: hit.key, az: Math.atan2(hit.normal.x, hit.normal.z), zoom: 0.4, aimY: 0, n: 0, at: [hit.pos.x, hit.pos.y, hit.pos.z] };
   };
   const reset = () => {
     setEngaged(true);
@@ -285,7 +298,7 @@ export default function Garment3D({
         <Canvas dpr={[1, 2]} camera={{ fov: 32, position: [0, 0.2, 5] }} gl={{ alpha: true, antialias: true }}>
           <Suspense fallback={null}>
             <Bounds fit clip observe margin={0.78}>
-              <Model src={src} points={points} activeKey={activeKey} onPick={onPick} metaRef={meta} motion={!reduced} />
+              <Model src={src} points={points} activeKey={activeKey} onPick={onPick} onZoom={zoomTo} metaRef={meta} motion={!reduced} />
               <FitApi apiRef={fit} />
             </Bounds>
             <ContactShadows position={[0, -1.2, 0]} opacity={0.5} scale={8} blur={2.6} far={3} />
