@@ -108,9 +108,6 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------------- hero */}
       <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} turntables={{ pants: turntable("pants"), tee: turntable("tee") }} />
 
-      {/* ---------------------------------------------------------------- film */}
-      <BrandFilm src="/lesparo_video.mp4" title="The LESPARO film" />
-
       {/* ---------------------------------------------------------- categories */}
       {sections.categories && (
         <section className="py-20 lg:py-28">
@@ -141,6 +138,9 @@ export default async function HomePage() {
 
       {/* ------------------------------------------------------- featured reel */}
       {sections.products && deck.length > 0 && <ProductReel items={deck} />}
+
+      {/* ---------------------------------------------------------------- film */}
+      <BrandFilm src="/lesparo_video.mp4" title="The LESPARO film" />
 
       {/* ----------------------------------------------------- where we supply */}
       <ErodeRoute />
