@@ -213,181 +213,154 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const visibleSpots = zoom > 1 ? [] : product.spots.filter((s) => ringDist(s.frame, frame, n) <= tol);
   const keyOf = (s: Spot) => `${product.id}-${s.frame}-${s.label}`;
   const active = visibleSpots.find((s) => keyOf(s) === spotKey) ?? visibleSpots[0] ?? null;
-  const activeIdx = active ? visibleSpots.indexOf(active) : -1;
   const words = heading.trim().split(/\s+/);
   const cut = Math.ceil(words.length / 2);
   const keyFrames = product.spin ? [0, 1, 2, 3].map((k) => Math.round((k * n) / 4)) : product.frames.map((_, i) => i);
 
   return (
-    <section aria-labelledby="hero-heading" className="sp-stage relative isolate overflow-hidden text-white lg:grid lg:h-[calc(100svh-var(--hdr))] lg:min-h-[38rem] lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,0.62fr)] lg:grid-rows-[minmax(0,1fr)]">
-      {/* ---------------------------------------------------------------- left: the words */}
-      <div className="sp-copy flex flex-col justify-center gap-10 px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
-        <div>
-          <p className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-white/70">{eyebrow}</p>
-          <h1 id="hero-heading" className="mt-4 max-w-[13ch] font-display text-[clamp(2.2rem,0.9rem+3.3vw,4.3rem)] leading-[0.97] tracking-[-0.035em]">
-            <span className="block font-light text-white/85">
-              {words.slice(0, cut).map((w, i) => (
-                <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: i }}>
-                  {w}&nbsp;
-                </span>
-              ))}
-            </span>
-            <span className="block font-extrabold">
-              {words.slice(cut).map((w, i) => (
-                <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: cut + i }}>
-                  {w}&nbsp;
-                </span>
-              ))}
-            </span>
-          </h1>
-          <p className="mt-5 max-w-md text-[1.02rem] leading-relaxed text-white/80">{subheading}</p>
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <Link href={cta.href} className="inline-flex h-12 items-center gap-2 bg-white px-7 text-xs font-bold uppercase tracking-[0.18em] text-[#0e1b4f] transition-colors hover:bg-[#ffc82c]">
-              {cta.label} <ArrowRight className="size-3.5" aria-hidden />
-            </Link>
-            <Link href={secondary.href} className="inline-flex h-12 items-center border border-white/50 px-6 text-xs font-bold uppercase tracking-[0.18em] transition-colors hover:bg-white/10">
-              {secondary.label}
-            </Link>
-          </div>
-        </div>
-        <dl className="grid max-w-md grid-cols-3 gap-4 border-t border-white/20 pt-5">
-          {[
-            ["1979", "Family trade begins"],
-            ["3 states", "Tamil Nadu, Kerala, Karnataka"],
-            ["2017", "LESPARO launches"],
-          ].map(([val, label]) => (
-            <div key={val}>
-              <dd className="font-display text-xl font-extrabold leading-none tracking-[-0.03em] sm:text-2xl">{val}</dd>
-              <dt className="mt-1.5 text-[0.62rem] font-semibold uppercase leading-snug tracking-[0.1em] text-white/60">{label}</dt>
-            </div>
+    <section aria-labelledby="hero-heading" className="sp-stage relative isolate flex flex-col overflow-hidden text-white lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[40rem]">
+      {/* The stage: two beams from above, drifting dust, a floor. */}
+      <div aria-hidden className="sp-beam sp-beam-a" />
+      <div aria-hidden className="sp-beam sp-beam-b" />
+      <div aria-hidden className="sp-dust" />
+      <div aria-hidden className="sp-floor" />
+
+      {/* Words, top left. */}
+      <div className="sp-copy relative z-20 px-5 pt-7 sm:px-8 lg:absolute lg:left-10 lg:top-8 lg:max-w-[34rem] lg:p-0">
+        <p className="text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-white/60">{eyebrow}</p>
+        <h1 id="hero-heading" className="mt-3 font-display text-[clamp(2rem,0.9rem+2.6vw,3.5rem)] uppercase leading-[0.98] tracking-[-0.03em]">
+          <span className="block font-light text-white/80">
+            {words.slice(0, cut).map((w, i) => (
+              <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: i }}>
+                {w}&nbsp;
+              </span>
+            ))}
+          </span>
+          <span className="block font-extrabold text-white">
+            {words.slice(cut).map((w, i) => (
+              <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: cut + i }}>
+                {w}&nbsp;
+              </span>
+            ))}
+          </span>
+        </h1>
+      </div>
+
+      {/* Product switch, top right. */}
+      <div role="group" aria-label="Product" className="sp-copy relative z-20 mt-5 flex px-5 sm:px-8 lg:absolute lg:right-10 lg:top-8 lg:mt-0 lg:p-0">
+        <ul className="inline-flex border border-white/25 bg-white/5 backdrop-blur-sm">
+          {products.map((p, i) => (
+            <li key={p.id}>
+              <button type="button" aria-pressed={pi === i} onClick={() => choose(i)} className={`h-10 px-5 text-[0.66rem] font-bold uppercase tracking-[0.18em] transition-colors ${pi === i ? "bg-white/90 text-[#0e1b4f]" : "text-white/65 hover:text-white"}`}>
+                {p.label}
+              </button>
+            </li>
           ))}
-        </dl>
+        </ul>
       </div>
 
-      {/* -------------------------------------------------- centre: the 360-degree viewer */}
-      <div
-        ref={box}
-        role="group"
-        aria-label={`${product.label}. Drag sideways, or use the arrow keys, to turn it. Plus and minus zoom.`}
-        tabIndex={0}
-        className={`sp-product relative mx-auto h-[68svh] min-h-[26rem] w-full max-w-[26rem] select-none overflow-hidden outline-offset-[-3px] lg:h-full lg:min-h-0 lg:w-auto lg:max-w-none ${zoom > 1 ? "cursor-move" : "cursor-grab active:cursor-grabbing"} touch-pan-y`}
-        style={{ aspectRatio: "2 / 3" }}
-        onPointerDown={onDown}
-        onPointerMove={onMove}
-        onPointerUp={onUp}
-        onPointerCancel={onUp}
-        onPointerEnter={() => (live.current.hover = true)}
-        onPointerLeave={() => (live.current.hover = false)}
-        onDoubleClick={() => setZ(zoom > 1 ? 1 : 2)}
-        onKeyDown={(e) => {
-          if (e.key === "ArrowRight") goTo(live.current.pos + 1);
-          if (e.key === "ArrowLeft") goTo(live.current.pos - 1);
-          if (e.key === "+" || e.key === "=") setZ(zoom + 0.6);
-          if (e.key === "-") setZ(zoom - 0.6);
-        }}
-      >
-        {/* Selvedge: the woven edge of a length of cloth. */}
-        <div aria-hidden className="sp-selvedge absolute inset-y-0 left-0 z-10 hidden w-3 lg:block" />
+      {/* The 360-degree viewer, floating in the middle of the stage. */}
+      <div className="relative z-10 my-5 flex justify-center px-5 lg:absolute lg:inset-x-0 lg:bottom-[5rem] lg:top-[4.75rem] lg:my-0 lg:px-0">
+        <div
+          ref={box}
+          role="group"
+          aria-label={`${product.label}. Drag sideways, or use the arrow keys, to turn it. Plus and minus zoom.`}
+          tabIndex={0}
+          className={`sp-product relative w-full max-w-[22rem] select-none overflow-hidden outline-offset-[3px] lg:h-full lg:w-auto lg:max-w-none ${zoom > 1 ? "cursor-move" : "cursor-grab active:cursor-grabbing"} touch-pan-y`}
+          style={{ aspectRatio: "2 / 3" }}
+          onPointerDown={onDown}
+          onPointerMove={onMove}
+          onPointerUp={onUp}
+          onPointerCancel={onUp}
+          onPointerEnter={() => (live.current.hover = true)}
+          onPointerLeave={() => (live.current.hover = false)}
+          onDoubleClick={() => setZ(zoom > 1 ? 1 : 2)}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowRight") goTo(live.current.pos + 1);
+            if (e.key === "ArrowLeft") goTo(live.current.pos - 1);
+            if (e.key === "+" || e.key === "=") setZ(zoom + 0.6);
+            if (e.key === "-") setZ(zoom - 0.6);
+          }}
+        >
+          <div className="absolute inset-0 bg-[#a8a595]" style={{ transform: `translate(${pan.x}%, ${pan.y}%) scale(${zoom})`, transformOrigin: "50% 50%", transition: dragging ? "none" : "transform 0.35s cubic-bezier(0.16,1,0.3,1)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- frames swap quickly and are preloaded; the optimiser would add a round trip per frame */}
+            <img src={product.frames[frame]} alt={`${product.label}, frame ${frame + 1} of ${n}`} draggable={false} decoding="async" fetchPriority="high" className="pointer-events-none absolute inset-0 size-full object-cover" />
+          </div>
 
-        <div className="absolute inset-0 bg-[#a8a595]" style={{ transform: `translate(${pan.x}%, ${pan.y}%) scale(${zoom})`, transformOrigin: "50% 50%", transition: dragging ? "none" : "transform 0.35s cubic-bezier(0.16,1,0.3,1)" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- frames swap quickly and are preloaded; the optimiser would add a round trip per frame */}
-          <img src={product.frames[frame]} alt={`${product.label}, frame ${frame + 1} of ${n}`} draggable={false} decoding="async" fetchPriority="high" className="pointer-events-none absolute inset-0 size-full object-cover" />
-        </div>
+          {visibleSpots.map((p, i) => (
+            <button
+              key={keyOf(p)}
+              type="button"
+              aria-label={`${i + 1}. ${p.label}`}
+              aria-pressed={p === active}
+              onClick={() => setSpotKey(keyOf(p))}
+              onMouseEnter={() => setSpotKey(keyOf(p))}
+              onFocus={() => setSpotKey(keyOf(p))}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="sp-pin absolute grid size-9 -translate-x-1/2 -translate-y-1/2 cursor-pointer place-items-center rounded-full border border-white/80 bg-black/10 backdrop-blur-[1px]"
+              style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}
+            >
+              <span aria-hidden className={`size-2.5 rounded-full ${p === active ? "bg-[#ffc82c]" : "bg-white"}`} />
+            </button>
+          ))}
 
-        {/* Stitched hem around the photograph. */}
-        <div aria-hidden className="pointer-events-none absolute inset-3 border border-dashed border-white/45" />
+          <div className="absolute bottom-3 right-3 z-20 flex flex-col border border-white/40 bg-[#0e1b4f]/70 backdrop-blur" onPointerDown={(e) => e.stopPropagation()}>
+            <button type="button" aria-label="Zoom in" disabled={zoom >= 2.6} onClick={() => setZ(zoom + 0.6)} className="grid size-9 place-items-center hover:bg-white/15 disabled:opacity-40">
+              <Plus className="size-4" aria-hidden />
+            </button>
+            <button type="button" aria-label="Zoom out" disabled={zoom <= 1} onClick={() => setZ(zoom - 0.6)} className="grid size-9 place-items-center border-t border-white/30 hover:bg-white/15 disabled:opacity-40">
+              <Minus className="size-4" aria-hidden />
+            </button>
+          </div>
 
-        {/* Running stitch between the points on this frame. */}
-        {visibleSpots.length > 1 && (
-          <svg aria-hidden viewBox="0 0 100 150" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 size-full">
-            <polyline points={visibleSpots.map((p) => `${p.x * 100},${p.y * 150}`).join(" ")} fill="none" stroke="#ffc82c" strokeOpacity="0.9" strokeWidth="0.55" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="2.4 1.6" className="sp-stitch" />
-          </svg>
-        )}
-        {visibleSpots.map((p, i) => (
-          <button
-            key={keyOf(p)}
-            type="button"
-            aria-label={`${i + 1}. ${p.label}`}
-            aria-pressed={p === active}
-            onClick={() => setSpotKey(keyOf(p))}
-            onMouseEnter={() => setSpotKey(keyOf(p))}
-            onFocus={() => setSpotKey(keyOf(p))}
-            onPointerDown={(e) => e.stopPropagation()}
-            className={`sp-pin absolute -ml-4 -mt-4 grid size-8 cursor-pointer place-items-center rounded-full text-[0.7rem] font-extrabold shadow-[0_2px_10px_rgb(0_0_0/0.35)] transition-colors ${p === active ? "bg-[#ffc82c] text-[#0e1b4f]" : "bg-white text-[#0e1b4f]"}`}
-            style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}
-          >
-            {i + 1}
-          </button>
-        ))}
-
-        {/* Zoom controls. */}
-        <div className="absolute bottom-4 right-4 z-20 flex flex-col border border-white/40 bg-[#0e1b4f]/70 backdrop-blur" onPointerDown={(e) => e.stopPropagation()}>
-          <button type="button" aria-label="Zoom in" disabled={zoom >= 2.6} onClick={() => setZ(zoom + 0.6)} className="grid size-10 place-items-center hover:bg-white/15 disabled:opacity-40">
-            <Plus className="size-4" aria-hidden />
-          </button>
-          <button type="button" aria-label="Zoom out" disabled={zoom <= 1} onClick={() => setZ(zoom - 0.6)} className="grid size-10 place-items-center border-t border-white/30 hover:bg-white/15 disabled:opacity-40">
-            <Minus className="size-4" aria-hidden />
-          </button>
-        </div>
-
-        <p aria-hidden className={`pointer-events-none absolute inset-x-0 bottom-5 z-10 text-center text-[0.68rem] font-bold uppercase tracking-[0.22em] text-white drop-shadow-[0_1px_6px_rgb(0_0_0/0.6)] transition-opacity duration-700 ${touched ? "opacity-0" : "opacity-100"}`}>
-          {product.spin ? "Drag to spin 360°" : "◀ Drag to turn ▶"}
-        </p>
-        {loaded < n && (
-          <p aria-hidden className="pointer-events-none absolute left-5 top-5 z-10 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-white/80 drop-shadow-[0_1px_4px_rgb(0_0_0/0.6)]">
-            Loading {loaded}/{n}
+          <p aria-hidden className={`pointer-events-none absolute inset-x-0 bottom-4 z-10 text-center text-[0.64rem] font-bold uppercase tracking-[0.22em] text-white drop-shadow-[0_1px_6px_rgb(0_0_0/0.6)] transition-opacity duration-700 ${touched ? "opacity-0" : "opacity-100"}`}>
+            {product.spin ? "Drag to spin 360°" : "◀ Drag to turn ▶"}
           </p>
-        )}
+          {loaded < n && (
+            <p aria-hidden className="pointer-events-none absolute left-4 top-4 z-10 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-white/80 drop-shadow-[0_1px_4px_rgb(0_0_0/0.6)]">
+              Loading {loaded}/{n}
+            </p>
+          )}
+        </div>
       </div>
 
-      {/* ------------------------------------------------- right: product, angle, loupe */}
-      <div className="sp-copy flex flex-col gap-6 bg-[#0b1642] px-5 py-8 sm:px-8 lg:px-7 lg:py-10">
-        <div role="group" aria-label="Product">
-          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-white/55">Product</p>
-          <ul className="mt-3 grid grid-cols-2 gap-2">
-            {products.map((p, i) => (
-              <li key={p.id}>
-                <button type="button" aria-pressed={pi === i} onClick={() => choose(i)} className={`h-11 w-full border px-3 text-[0.66rem] font-bold uppercase tracking-[0.14em] transition-colors ${pi === i ? "border-white bg-white text-[#0e1b4f]" : "border-white/30 text-white/80 hover:border-white/70 hover:text-white"}`}>
-                  {p.label}
+      {/* Angle tabs, bottom centre. */}
+      <div role="group" aria-label="Angle" className="sp-copy relative z-20 flex justify-center px-5 pb-5 lg:absolute lg:inset-x-0 lg:bottom-6 lg:p-0">
+        <ul className="inline-flex border border-white/25 bg-white/5 backdrop-blur-sm">
+          {keyFrames.map((f, i) => {
+            const on = ringDist(f, frame, n) <= (product.spin ? Math.floor(n / 8) : 0);
+            return (
+              <li key={f}>
+                <button type="button" aria-pressed={on} onClick={() => goTo(f)} className={`h-10 px-4 text-[0.66rem] font-bold uppercase tracking-[0.18em] transition-colors sm:px-5 ${on ? "bg-white/90 text-[#0e1b4f]" : "text-white/60 hover:text-white"}`}>
+                  {product.keyLabels[i]}
                 </button>
               </li>
-            ))}
-          </ul>
-        </div>
+            );
+          })}
+        </ul>
+      </div>
 
-        <div role="group" aria-label="Angle">
-          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-white/55">{product.spin ? "Jump to" : "Angle"}</p>
-          <ul className="mt-3 grid grid-cols-4 gap-1.5">
-            {keyFrames.map((f, i) => {
-              const on = ringDist(f, frame, n) <= (product.spin ? Math.floor(n / 8) : 0);
-              return (
-                <li key={f}>
-                  <button type="button" aria-pressed={on} aria-label={product.keyLabels[i]} onClick={() => goTo(f)} className={`block w-full text-left transition-opacity ${on ? "opacity-100" : "opacity-60 hover:opacity-100"}`}>
-                    <span className={`relative block aspect-[3/4] overflow-hidden bg-[#a8a595] ${on ? "ring-2 ring-white" : "ring-1 ring-white/25"}`}>
-                      {/* eslint-disable-next-line @next/next/no-img-element -- small thumbnail of a frame already cached by the viewer */}
-                      <img src={product.frames[f]} alt="" loading="lazy" draggable={false} className="size-full object-cover" />
-                    </span>
-                    <span className="mt-1.5 block text-[0.6rem] font-bold uppercase tracking-[0.12em]">{product.keyLabels[i]}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+      {/* Loupe, bottom left. */}
+      {active && (
+        <div className="sp-copy relative z-20 flex items-center gap-4 px-5 pb-5 sm:px-8 lg:absolute lg:bottom-8 lg:left-10 lg:p-0">
+          <span aria-hidden key={keyOf(active)} className="sp-loupe size-20 shrink-0 rounded-full ring-1 ring-white/70 lg:size-28" style={{ backgroundImage: `url(${product.frames[active.frame]})`, backgroundSize: "460% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
+          <p role="status" className="max-w-[10rem] text-[0.66rem] font-bold uppercase leading-snug tracking-[0.16em] text-white/80">
+            <span className="mb-1 block text-white/45">Under the loupe</span>
+            {active.label}
+          </p>
         </div>
+      )}
 
-        <div className="mt-auto">
-          <p className="text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-white/55">Under the loupe</p>
-          {active ? (
-            <div className="mt-3 flex items-center gap-4 lg:flex-col lg:items-center lg:gap-3 lg:text-center">
-              <span aria-hidden key={keyOf(active)} className="sp-loupe size-24 shrink-0 rounded-full ring-2 ring-white/80 lg:mx-auto lg:size-44" style={{ backgroundImage: `url(${product.frames[active.frame]})`, backgroundSize: "460% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
-              <p role="status" className="font-display text-lg font-bold leading-tight tracking-tight">
-                <span className="mr-2 text-[#ffc82c]">{activeIdx + 1}</span>
-                {active.label}
-              </p>
-            </div>
-          ) : (
-            <p className="mt-3 text-sm leading-relaxed text-white/60">Turn the garment to a marked angle, then point at a number to inspect the cloth.</p>
-          )}
+      {/* Blurb and calls to action, bottom right. */}
+      <div className="sp-copy relative z-20 px-5 pb-8 sm:px-8 lg:absolute lg:bottom-8 lg:right-10 lg:max-w-[25rem] lg:p-0 lg:text-right">
+        <p className="text-[0.68rem] font-medium uppercase leading-relaxed tracking-[0.07em] text-white/65">{subheading}</p>
+        <div className="mt-4 flex flex-wrap gap-2.5 lg:justify-end">
+          <Link href={cta.href} className="inline-flex h-11 items-center gap-2 border border-white/80 px-6 text-[0.66rem] font-bold uppercase tracking-[0.2em] transition-colors hover:bg-white hover:text-[#0e1b4f]">
+            {cta.label} <ArrowRight className="size-3.5" aria-hidden />
+          </Link>
+          <Link href={secondary.href} className="inline-flex h-11 items-center border border-white/25 px-5 text-[0.66rem] font-bold uppercase tracking-[0.2em] text-white/75 transition-colors hover:border-white/60 hover:text-white">
+            {secondary.label}
+          </Link>
         </div>
       </div>
     </section>

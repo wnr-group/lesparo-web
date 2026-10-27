@@ -19,8 +19,77 @@
 }
 .sp-stage {
   background:
-    radial-gradient(80% 70% at 15% 0%, #1c2f86 0%, transparent 65%),
-    linear-gradient(180deg, #0e1b4f 0%, #0a1442 100%);
+    radial-gradient(60% 55% at 50% 0%, #1b2a66 0%, transparent 70%),
+    linear-gradient(180deg, #0a1236 0%, #060c28 62%, #030818 100%);
+}
+/* Two beams from above, swaying slowly. */
+.sp-beam {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transform-origin: 50% 0;
+  mask-image: linear-gradient(180deg, #000 0%, rgb(0 0 0 / 0.75) 65%, transparent 100%);
+  pointer-events: none;
+}
+.sp-beam-a {
+  background: conic-gradient(from 146deg at 50% -4%, transparent 0deg, rgb(175 195 255 / 0.4) 15deg, transparent 32deg, transparent 360deg);
+}
+.sp-beam-b {
+  background: conic-gradient(from 182deg at 50% -4%, transparent 0deg, rgb(175 195 255 / 0.4) 15deg, transparent 32deg, transparent 360deg);
+}
+/* Drifting dust caught in the light. */
+.sp-dust {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle, rgb(255 255 255 / 0.55) 0 1.5px, transparent 2px),
+    radial-gradient(circle, rgb(255 255 255 / 0.35) 0 1px, transparent 1.6px),
+    radial-gradient(circle, rgb(255 255 255 / 0.25) 0 2.5px, transparent 3px);
+  background-size: 310px 270px, 190px 230px, 470px 390px;
+  background-position: 20px 40px, 90px 120px, 200px 10px;
+  mask-image: radial-gradient(70% 80% at 50% 25%, #000 20%, transparent 75%);
+  pointer-events: none;
+}
+/* The floor the product stands on. */
+.sp-floor {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 0;
+  height: 34%;
+  background:
+    radial-gradient(45% 30% at 50% 22%, rgb(40 70 170 / 0.45), transparent 70%),
+    linear-gradient(180deg, transparent, #02061a 85%);
+  pointer-events: none;
+}
+.sp-product {
+  box-shadow: 0 0 120px rgb(110 140 255 / 0.28), 0 40px 70px rgb(0 0 0 / 0.5);
+}
+@keyframes sp-sway-a {
+  50% {
+    rotate: 4deg;
+  }
+}
+@keyframes sp-sway-b {
+  50% {
+    rotate: -4deg;
+  }
+}
+@keyframes sp-drift {
+  to {
+    background-position: 20px -230px, 90px -110px, 200px -380px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sp-beam-a {
+    animation: sp-sway-a 11s ease-in-out infinite;
+  }
+  .sp-beam-b {
+    animation: sp-sway-b 13s ease-in-out infinite;
+  }
+  .sp-dust {
+    animation: sp-drift 38s linear infinite;
+  }
 }
 
 @keyframes sp-rise {
