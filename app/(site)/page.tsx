@@ -67,6 +67,9 @@ export default async function HomePage() {
     ...pick("new-york-kids-track", true),
   ];
 
+  // Hero: the real collections the rolling word and chip cycle through.
+  const heroRanges = [...(tree.find((t) => t.slug === "garments")?.children ?? []), ...(fabrics?.children ?? [])].map((c) => ({ name: c.name, slug: c.slug, image: c.coverUrl }));
+
   // Featured deck: the admin's featured products that have a photo.
   const deck: DeckItem[] = featured
     .filter((p) => p.images[0])
@@ -83,7 +86,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ---------------------------------------------------------------- hero */}
-      <VideoHero hero={content.hero} />
+      <VideoHero hero={content.hero} ranges={heroRanges} />
 
       {/* ---------------------------------------------------------- categories */}
       {sections.categories && (
