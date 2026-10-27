@@ -72,7 +72,8 @@ export function CardDeck({ items, interval = 5000 }: { items: DeckItem[]; interv
       onFocus={() => setPaused(true)}
       onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node) && setPaused(false)}
     >
-      <div className="relative mx-auto aspect-[4/5] w-[min(78vw,26rem)]">
+      {/* isolate: the cards' z-indexes order them within the deck only, never above the sticky header. */}
+      <div className="relative isolate mx-auto aspect-[4/5] w-[min(78vw,26rem)]">
         {items.map((item, n) => {
           const k = Math.min((n - cur + len) % len, 3);
           return (

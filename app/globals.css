@@ -94,27 +94,10 @@
     z-index: 0;
   }
 }
-/* Pinned facts appear one by one while the section is held. */
-@keyframes stat-in {
+/* Homepage story timeline line drawing down. */
+@keyframes timeline-fill {
   from {
-    opacity: 0;
-    transform: translateY(2rem);
-    filter: blur(6px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
-}
-@keyframes emblem-in {
-  from {
-    transform: scale(0.7) rotate(-20deg);
-    opacity: 0.4;
-  }
-  to {
-    transform: none;
-    opacity: 1;
+    scale: 1 0;
   }
 }
 
@@ -155,6 +138,53 @@
   }
 }
 /* Scroll-linked: ghost word drifts sideways. */
+/*
+ * Homepage hero (components/site/hero-apple.tsx). Motion follows the UI UX Pro Max rules: transform and
+ * opacity only, deceleration easing, short staggers, and only the headline and the line-up move.
+ *   word-in        headline words rise and fade in one after another (--w = word index)
+ *   figure-in      figures ease up from the floor, centre first
+ *   lineup-swell   on scroll the line-up grows a little (scroll timeline, no JavaScript)
+ *   hero-soften    on scroll the headline block recedes
+ * Pointer depth is set by hero-pointer.tsx, through --px on the line-up.
+ */
+@keyframes word-in {
+  from {
+    opacity: 0;
+    translate: 0 0.4em;
+  }
+}
+@keyframes figure-in {
+  from {
+    opacity: 0;
+    translate: 0 8%;
+    scale: 0.96;
+  }
+}
+@keyframes lineup-swell {
+  to {
+    scale: 1.12;
+    translate: 0 -2%;
+  }
+}
+@keyframes hero-soften {
+  to {
+    opacity: 0.2;
+    translate: 0 -2.5rem;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-word {
+    animation: word-in 1s cubic-bezier(0.16, 1, 0.3, 1) calc(0.15s + var(--w, 0) * 70ms) both;
+  }
+  .hero-figure {
+    animation: figure-in 1.3s cubic-bezier(0.16, 1, 0.3, 1) var(--d, 0.9s) both;
+  }
+  /* Pointer depth: outer figures drift further than the middle ones (--k), so the row gains depth. */
+  .hero-depth {
+    transform: translate3d(calc(var(--px, 0) * var(--k, 8) * 1px), 0, 0);
+    will-change: transform;
+  }
+}
 @keyframes ghost-drift {
   from {
     transform: translateX(12%);
@@ -260,13 +290,12 @@
     outline: 2px solid var(--color-indigo);
     outline-offset: 3px;
     border-radius: 1px;
-  }
-
-  h1,
+  }  h1,
   h2,
   h3 {
     text-wrap: balance;
   }
+
 
   p {
     text-wrap: pretty;
@@ -521,28 +550,32 @@
 /* Scroll-linked motion: progressive enhancement, no JavaScript (static where unsupported). */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    /* Oversized outline word drifts sideways behind a section. */
-    /* Pinned facts (desktop only, where the section pins): the tall section is the timeline and
-       each fact takes a slice of it. */
-    @media (min-width: 1024px) {
-      .stats-track {
-        view-timeline: --stats block;
-      }
-      .stat {
-        animation: stat-in linear both;
-        animation-timeline: --stats;
-        animation-range: contain calc(var(--n) * 16% + 4%) contain calc(var(--n) * 16% + 18%);
-      }
-      .emblem {
-        animation: emblem-in linear both;
-        animation-timeline: --stats;
-        animation-range: contain 0% contain 30%;
-      }
+    /* Homepage story timeline: the indigo line draws down as the list passes through the viewport
+       (shown complete where scroll timelines aren't supported). */
+    .timeline {
+      view-timeline: --timeline block;
     }
+    .timeline-fill {
+      animation: timeline-fill linear both;
+      animation-timeline: --timeline;
+      animation-range: cover 15% cover 70%;
+    }
+    /* Oversized outline word drifts sideways behind a section. */
     .ghost-drift {
       animation: ghost-drift linear both;
       animation-timeline: view();
       animation-range: cover 0% cover 100%;
+    }
+    .hero-lineup {
+      transform-origin: 50% 100%;
+      animation: lineup-swell linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 80svh;
+    }
+    .hero-fade {
+      animation: hero-soften linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 60svh;
     }
   }
 }

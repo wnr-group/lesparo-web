@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { RetailPurchase } from "@/components/site/cart";
 import { AddToEnquiryButton } from "@/components/site/enquiry-list";
 import { ProductCard } from "@/components/site/product-card";
 import { ProductGallery } from "@/components/site/product-gallery";
 import { ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
+import { formatPrice } from "@/lib/format";
 import { getAllPublishedSlugs, getProductBySlug, getRelatedProducts } from "@/lib/catalogue/queries";
 
 export async function generateStaticParams() {
@@ -42,7 +44,8 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
     p.sku && { label: "Reference", value: p.sku },
   ].filter(Boolean) as { label: string; value: string }[];
 
-  // Structured data limited to verified facts: no price, availability or ratings.
+  // Structured data: verified facts, plus the retail price only when the admin has switched retail on.
+  const retail = p.retailEnabled && p.price !== null;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -52,6 +55,7 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
     ...(p.category && { category: p.category.name }),
     ...(p.sku && { sku: p.sku }),
     ...(p.fabric && { material: p.fabric }),
+    ...(retail && { offers: { "@type": "Offer", price: p.price, priceCurrency: p.currency, url: `/products/${p.slug}` } }),
   };
 
   return (
@@ -83,7 +87,7 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
           <h1 className="mt-3 font-display text-headline font-bold">{p.name}</h1>
           {p.description && <p className="mt-5 leading-relaxed text-ink-soft">{p.description}</p>}
 
-          {p.sizes.length > 0 && (
+          {p.sizes.length > 0 && !retail && (
             <div className="mt-8">
               <p className="eyebrow !text-[0.65rem]">Available sizes</p>
               <ul className="mt-3 flex flex-wrap gap-2">
@@ -96,17 +100,34 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
             </div>
           )}
 
-          {p.retailEnabled && p.price !== null && (
-            <p className="mt-8 text-2xl">{new Intl.NumberFormat("en-IN", { style: "currency", currency: p.currency }).format(p.price)}</p>
+          {retail && (
+            <section aria-labelledby="retail-heading" className="mt-8 border border-indigo/25 bg-white p-5 sm:p-6">
+              <div className="flex items-baseline justify-between gap-4">
+                <h2 id="retail-heading" className="eyebrow">
+                  Buy online · Retail
+                </h2>
+                <p className="font-display text-3xl font-extrabold tabular-nums tracking-tight">{formatPrice(p.price!, p.currency)}</p>
+              </div>
+              <p className="mt-1 text-xs text-muted">Retail price per piece, inclusive of listed taxes where applicable.</p>
+              <div className="mt-5">
+                <RetailPurchase product={{ id: p.id, slug: p.slug, name: p.name, image: p.images[0]?.url ?? null, price: p.price!, currency: p.currency, sizes: p.sizes }} />
+              </div>
+            </section>
           )}
 
           {p.quoteEnabled && (
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              <AddToEnquiryButton product={{ id: p.id, slug: p.slug, name: p.name }} />
-              <ButtonLink href={`/wholesale?product=${p.slug}#enquire`} size="lg" className="h-12">
-                Request a quote
-              </ButtonLink>
-            </div>
+            <section aria-labelledby="wholesale-heading" className="mt-4 border border-line bg-paper p-5 sm:p-6">
+              <h2 id="wholesale-heading" className="eyebrow">
+                Buying in bulk · Wholesale
+              </h2>
+              <p className="mt-2 text-sm text-ink-soft">Shops, showrooms and resellers: ask for bulk pricing, pack sizes and supply details. Wholesale rates are quoted, not listed.</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <ButtonLink href={`/wholesale?product=${p.slug}#enquire`} size="lg" className="h-12">
+                  Enquire now
+                </ButtonLink>
+                <AddToEnquiryButton product={{ id: p.id, slug: p.slug, name: p.name }} />
+              </div>
+            </section>
           )}
           <p className="mt-4 text-sm text-muted">
             Prefer to talk? Call{" "}

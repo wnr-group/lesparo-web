@@ -84,6 +84,7 @@ model Product {
   updated_at      DateTime       @updatedAt
   images          ProductImage[]
   enquiry_items   EnquiryItem[]
+  order_items     RetailOrderItem[]
 
   @@index([category_id])
   @@index([is_published, created_at])
@@ -260,4 +261,55 @@ model Counter {
   value Int    @default(0)
 
   @@map("counters")
+}
+
+// ---------------------------------------------------------------------------
+// Retail (B2C) orders. Wholesale stays quote-first (WholesaleEnquiry above); retail
+// orders are placed from the cart. No payment gateway yet: payment_method records how
+// the customer will pay and payment_status stays "pending" until staff confirm it.
+// Unit prices are copied from the product at order time so later price edits never
+// change an order already placed.
+// ---------------------------------------------------------------------------
+
+model RetailOrder {
+  id               String            @id @default(uuid())
+  order_number     String            @unique
+  idempotency_key  String            @unique
+  customer_name    String
+  email            String
+  phone            String
+  address_line     String
+  city             String
+  state            String
+  postcode         String
+  notes            String?
+  /// cod | online_pending
+  payment_method   String            @default("cod")
+  /// pending | paid | refunded
+  payment_status   String            @default("pending")
+  /// new | confirmed | shipped | delivered | cancelled
+  status           String            @default("new")
+  currency         String            @default("INR")
+  subtotal         Float
+  created_at       DateTime          @default(now())
+  updated_at       DateTime          @updatedAt
+  items            RetailOrderItem[]
+
+  @@index([status, created_at])
+  @@map("retail_orders")
+}
+
+model RetailOrderItem {
+  id           String      @id @default(uuid())
+  order_id     String
+  order        RetailOrder @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product_id   String?
+  product      Product?    @relation(fields: [product_id], references: [id], onDelete: SetNull)
+  product_name String
+  size         String?
+  quantity     Int
+  unit_price   Float
+
+  @@index([order_id])
+  @@map("retail_order_items")
 }

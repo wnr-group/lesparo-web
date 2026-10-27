@@ -122,7 +122,7 @@ export default async function AdminProductsPage(props: PageProps<"/admin/product
                 </td>
                 <td className="px-4 py-2 text-ink-soft">{p.category?.name ?? "—"}</td>
                 <td className="px-4 py-2 text-ink-soft">{p.fabric ?? "—"}</td>
-                <td className="px-4 py-2 text-xs text-ink-soft">{[p.quote_enabled && "Quote", p.retail_enabled && "Retail"].filter(Boolean).join(" · ")}</td>
+                <td className="px-4 py-2 text-xs text-ink-soft">{[p.quote_enabled && "Wholesale", p.retail_enabled && "Retail"].filter(Boolean).join(" · ")}</td>
                 <td className="space-x-1 px-4 py-2">
                   {p.archived_at ? <Badge>Archived</Badge> : p.is_published ? <Badge tone="success">Published</Badge> : <Badge tone="warning">Draft</Badge>}
                   {p.is_featured && <Badge tone="brass">Featured</Badge>}

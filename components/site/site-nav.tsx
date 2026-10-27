@@ -5,6 +5,7 @@ import { ChevronDown, Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { CartLink } from "./cart";
 import { EnquiryListLink } from "./enquiry-list";
 
 export type NavGroup = { label: string; href: string; columns: { label: string; href: string; links: { label: string; href: string }[] }[] };
@@ -191,6 +192,7 @@ export function SiteNav({ groups }: Props) {
         >
           {search ? <X className="size-[18px]" aria-hidden /> : <Search className="size-[18px]" aria-hidden />}
         </button>
+        <CartLink className="flex h-10 items-center gap-1.5 rounded-full px-3 hover:bg-linen" />
         <EnquiryListLink className="hidden h-10 items-center gap-2 rounded-full bg-indigo px-4 text-[0.85rem] font-semibold text-white transition-colors hover:bg-indigo-deep sm:inline-flex" />
         <button type="button" onClick={() => setDrawer(true)} className="flex size-10 items-center justify-center rounded-full hover:bg-linen lg:hidden" aria-label="Open menu" aria-haspopup="dialog">
           <Menu className="size-5" aria-hidden />

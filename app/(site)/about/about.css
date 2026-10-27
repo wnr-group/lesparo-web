@@ -1,0 +1,93 @@
+/*
+ * About page scroll effects, in the manner of Scrolltide's section library:
+ *   focus reveal   vision words pull from blur into sharp as they travel up the screen
+ *   zoom reveal    history photographs open from a small inset window to full size
+ *   fan deck       the three range cards splay out of a gathered hand as the section arrives
+ *   layered depth  the hero photographs move at different rates from the panel behind them
+ *   ghost wordmark a giant LESPARO rises into the foot of the page, cropped by its edge
+ * All scroll-linked in CSS (animation-timeline) so there is no scroll listener. Content is fully visible
+ * where scroll timelines are unsupported, and nothing animates for reduced motion.
+ */
+@keyframes ab-focus {
+  from {
+    opacity: 0.18;
+    filter: blur(7px);
+  }
+}
+@keyframes ab-zoom {
+  from {
+    clip-path: inset(16% 16% 16% 16% round 1.5rem);
+    scale: 0.88;
+    opacity: 0.4;
+  }
+}
+@keyframes ab-fan {
+  from {
+    rotate: calc(var(--k, 0) * 9deg);
+    translate: calc(var(--k, 0) * -38%) 4%;
+    opacity: 0.5;
+  }
+}
+@keyframes ab-lag-a {
+  to {
+    translate: 0 -9%;
+  }
+}
+@keyframes ab-lag-b {
+  to {
+    translate: 0 -22%;
+  }
+}
+@keyframes ab-panel-zoom {
+  to {
+    scale: 1.06;
+  }
+}
+@keyframes ab-wordmark {
+  from {
+    translate: 0 38%;
+    opacity: 0.3;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ab-focus {
+      animation: ab-focus linear both;
+      animation-timeline: view();
+      animation-range: cover 8% cover 36%;
+    }
+    .ab-zoom {
+      animation: ab-zoom linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 38%;
+    }
+    .ab-fan {
+      transform-origin: 50% 110%;
+      animation: ab-fan linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 45%;
+    }
+    /* Hero: the panel breathes while the two photographs drift upward at different rates. */
+    .ab-panel {
+      animation: ab-panel-zoom linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90svh;
+    }
+    .ab-lag-a {
+      animation: ab-lag-a linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90svh;
+    }
+    .ab-lag-b {
+      animation: ab-lag-b linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90svh;
+    }
+    .ab-wordmark {
+      animation: ab-wordmark linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+  }
+}
