@@ -49,7 +49,6 @@ export function ProductReel({ items }: { items: DeckItem[] }) {
 
   const heading = (
     <div className="relative z-10 shrink-0 px-5 sm:px-8 md:w-[32vw] md:pl-[max(2rem,6vw)] md:pr-10">
-      <p className="eyebrow mb-4">From the catalogue</p>
       <h2 className="font-display text-headline font-bold">Everyday wear, made to supply</h2>
       <p className="mt-4 max-w-md text-[1.02rem] leading-relaxed text-ink-soft max-md:hidden">
         Shorts, tracks and 3/4ths in hosiery and jersey knits, packed in sets for retailers — alongside our lungis, kavi dhothies, towels and kerchiefs.
