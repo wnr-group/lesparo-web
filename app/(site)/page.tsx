@@ -1,7 +1,7 @@
 import { ArrowRight, ArrowUpRight, RefreshCw, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { HeroApple, type LineupModel } from "@/components/site/hero-apple";
+import { SpotlightHero } from "@/components/site/spotlight-hero/spotlight-hero";
 import { CardDeck, type DeckItem } from "@/components/site/card-deck";
 import { ButtonLink } from "@/components/ui/button";
 import { Container, SectionHeading } from "@/components/ui/primitives";
@@ -42,6 +42,9 @@ function CategoryTile({ category, square, sizes }: { category: CategoryNode; squ
   );
 }
 
+/** A photograph of a catalogue model, used by the quality section. */
+type LineupModel = { id: string; slug: string; name: string; image: string; kid?: boolean };
+
 export default async function HomePage() {
   const [content, tree] = await Promise.all([getHomepageContent(), getCategoryTree()]);
   const featured = await getProductsBySlugs(content.featuredProductSlugs);
@@ -80,13 +83,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ---------------------------------------------------------------- hero */}
-      <HeroApple
-        heading={content.hero.heading}
-        subheading={content.hero.subheading}
-        primaryCta={content.hero.primaryCta}
-        secondaryCta={content.hero.secondaryCta}
-        models={lineup}
-      />
+      <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} />
 
       {/* ---------------------------------------------------------- categories */}
       {sections.categories && (
