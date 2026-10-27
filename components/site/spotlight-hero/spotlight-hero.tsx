@@ -260,28 +260,43 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       <div aria-hidden className="sp-halo" />
       <div aria-hidden className="sp-floor" />
 
-      {/* Headline, top left: a small label, then a two-weight title kept to a narrow column. */}
-      <div className="sp-copy relative z-20 px-5 pt-8 sm:px-8 lg:absolute lg:left-8 lg:top-10 lg:max-w-[15rem] lg:p-0 xl:left-12 xl:max-w-[23rem]">
-        <p className="flex items-center gap-3 text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-white/75">
-          <span aria-hidden className="size-1.5 rounded-full bg-[#ffc82c]" />
-          {eyebrow}
-        </p>
-        <h1 id="hero-heading" className="mt-5 font-display text-[clamp(1.9rem,1rem+1.7vw,2.9rem)] leading-[1.06] tracking-[-0.03em] text-balance">
-          <span className="block font-light text-white/85">
-            {words.slice(0, cut).map((w, i) => (
-              <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: i }}>
-                {w}&nbsp;
-              </span>
-            ))}
-          </span>
-          <span className="block font-bold text-white">
-            {words.slice(cut).map((w, i) => (
-              <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: cut + i }}>
-                {w}&nbsp;
-              </span>
-            ))}
-          </span>
-        </h1>
+      <div className="contents lg:absolute lg:left-8 lg:top-10 lg:z-20 lg:flex lg:max-w-[15rem] lg:flex-col xl:left-12 xl:max-w-[25rem]">
+        {/* Text column, top left: a small label, a two-weight title, then the description and actions. */}
+        <div className="sp-copy relative z-20 px-5 pt-8 sm:px-8 lg:p-0">
+          <p className="flex items-center gap-3 text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-white/75">
+            <span aria-hidden className="size-1.5 rounded-full bg-[#ffc82c]" />
+            {eyebrow}
+          </p>
+          <h1 id="hero-heading" className="mt-5 font-display text-[clamp(1.9rem,1rem+1.7vw,2.9rem)] leading-[1.06] tracking-[-0.03em] text-balance">
+            <span className="block font-light text-white/85">
+              {words.slice(0, cut).map((w, i) => (
+                <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: i }}>
+                  {w}&nbsp;
+                </span>
+              ))}
+            </span>
+            <span className="block font-bold text-white">
+              {words.slice(cut).map((w, i) => (
+                <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: cut + i }}>
+                  {w}&nbsp;
+                </span>
+              ))}
+            </span>
+          </h1>
+        </div>
+
+          {/* Description and actions, under the headline. */}
+        <div className="sp-copy relative z-20 order-last px-5 pb-8 sm:px-8 lg:order-none lg:mt-8 lg:p-0">
+          <p className="text-[0.95rem] leading-relaxed text-white/85">{subheading}</p>
+          <div className="mt-5 flex flex-wrap gap-3 lg:flex-col lg:items-stretch xl:flex-row">
+            <Link href={cta.href} className="inline-flex h-12 items-center justify-center gap-2 bg-white px-7 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-[#0e1b4f] transition-colors duration-200 hover:bg-[#ffc82c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c]">
+              {cta.label} <ArrowRight className="size-4" aria-hidden />
+            </Link>
+            <Link href={secondary.href} className="inline-flex h-12 items-center justify-center border border-white/60 px-6 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-white transition-colors duration-200 hover:border-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c]">
+              {secondary.label}
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* Category selector, top right. */}
@@ -402,8 +417,8 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         </ul>
       </div>
 
-      {/* Detail panel, bottom left: the close-up, its name and what it is. */}
-      <div aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:left-8 lg:w-[16rem] lg:p-0 xl:w-[23rem] 2xl:left-12 2xl:w-[26rem]">
+      {/* Detail panel, bottom right: the close-up, its name and what it is. */}
+      <div aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[16rem] lg:p-0 xl:w-[23rem] 2xl:right-12 2xl:w-[26rem]">
         {active ? (
           <div key={keyOf(active)} className="sp-detail flex flex-col gap-4 bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm ">
             <span aria-hidden className="block h-44 w-full shrink-0 bg-no-repeat sm:h-52 lg:h-44 xl:h-52 2xl:h-56" style={{ backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "400% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
@@ -424,18 +439,6 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         )}
       </div>
 
-      {/* Description and actions, bottom right. */}
-      <div className="sp-copy relative z-20 px-5 pb-8 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[15rem] lg:p-0 xl:w-[20rem] 2xl:right-12 2xl:w-[27rem]">
-        <p className="text-[0.95rem] leading-relaxed text-white/85">{subheading}</p>
-        <div className="mt-5 flex flex-wrap gap-3 lg:flex-col lg:items-stretch 2xl:flex-row">
-          <Link href={cta.href} className="inline-flex h-12 items-center justify-center gap-2 bg-white px-7 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-[#0e1b4f] transition-colors duration-200 hover:bg-[#ffc82c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c]">
-            {cta.label} <ArrowRight className="size-4" aria-hidden />
-          </Link>
-          <Link href={secondary.href} className="inline-flex h-12 items-center justify-center border border-white/60 px-6 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-white transition-colors duration-200 hover:border-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c]">
-            {secondary.label}
-          </Link>
-        </div>
-      </div>
     </section>
   );
 }
