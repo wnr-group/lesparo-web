@@ -18,11 +18,8 @@ export function VideoHero({ hero, ranges }: { hero: HomepageContent["hero"]; ran
 
   return (
     <section aria-labelledby="hero-heading" className="relative isolate h-[calc(100svh-var(--hdr))] min-h-[36rem] overflow-hidden text-white">
-      <div className="hv-film absolute inset-0 -z-10">
-        <div className="hv-frame absolute inset-0 overflow-hidden">
-          <div aria-hidden className="hv-weave absolute inset-0" />
-          <div className="hv-zoom absolute inset-0">{hasFilm && <HeroVideo src={FILM.mp4} webm={FILM.webm} />}</div>
-        </div>
+      <div className="hv-film absolute inset-0 -z-10 overflow-hidden bg-[#77736c]">
+        {hasFilm && <HeroVideo src={FILM.mp4} webm={FILM.webm} />}
         <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_top,rgb(16_16_20/0.55),transparent_28%)]" />
       </div>
 
