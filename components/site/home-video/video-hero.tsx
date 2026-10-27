@@ -49,7 +49,9 @@ export function HeroVideo({ src, webm }: { src: string; webm?: string }) {
         if (ref.current) ref.current.playbackRate = 0.85;
         setReady(true);
       }}
-      className={`absolute inset-0 size-full object-cover transition-opacity duration-1000 ${ready ? "opacity-100" : "opacity-0"}`}
+      // The clip has a pale panel with garbled lettering on its left edge in the factory shot, so the film is
+      // enlarged toward the right and that strip falls outside the frame.
+      className={`absolute inset-0 size-full origin-right scale-[1.42] object-cover transition-opacity duration-1000 ${ready ? "opacity-100" : "opacity-0"}`}
     >
       {webm && <source src={webm} type="video/webm" />}
       <source src={src} type="video/mp4" />
