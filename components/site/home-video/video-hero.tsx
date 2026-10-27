@@ -44,7 +44,11 @@ export function HeroVideo({ src, webm }: { src: string; webm?: string }) {
       playsInline
       autoPlay
       preload="metadata"
-      onCanPlay={() => setReady(true)}
+      onCanPlay={() => {
+        // A touch slower reads as more cinematic and softens the cuts in the clip.
+        if (ref.current) ref.current.playbackRate = 0.85;
+        setReady(true);
+      }}
       className={`absolute inset-0 size-full object-cover transition-opacity duration-1000 ${ready ? "opacity-100" : "opacity-0"}`}
     >
       {webm && <source src={webm} type="video/webm" />}

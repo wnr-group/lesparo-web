@@ -26,7 +26,7 @@ export function VideoHero({ hero, ranges }: { hero: HomepageContent["hero"]; ran
         <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_right,rgb(18_22_76/0.42),transparent_62%),linear-gradient(to_top,rgb(18_22_76/0.55),transparent_38%)]" />
       </div>
 
-      <HeroCopy eyebrow={hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={hero.heading} subheading={hero.subheading} secondary={hero.secondaryCta} ranges={ranges} />
+      <HeroCopy eyebrow={hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={hero.heading} subheading={hero.subheading} ranges={ranges} />
 
       <dl className="absolute inset-x-0 bottom-0 mx-auto grid max-w-page grid-cols-3 border-t border-white/35 px-4 sm:px-6 lg:px-10">
         {[

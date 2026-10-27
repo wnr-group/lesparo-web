@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ButtonLink } from "@/components/ui/button";
 
-type Cta = { label: string; href: string };
 export type HeroRange = { name: string; slug: string; image: string | null };
 
 const CHANNELS = {
@@ -19,12 +18,12 @@ const CHANNELS = {
  *   focus reveal   headline words pull from blur into sharp, one after another (CSS, on load)
  *   pill switch    Buy online / Wholesale: one control that swaps the line and the main action,
  *                  so retail and wholesale visitors each see their own route
- *   word roll      "Explore ..." rolls through the real collection names, and a chip beside the
- *                  film shows and links the one currently named
+ *   chip           a "Now showing" chip beside the film rolls through the real collections and links
+ *                  the one currently named
  * The roll is the only timer: it runs while the tab is visible, pauses on hover or focus, and stays on
  * the first name for reduced motion.
  */
-export function HeroCopy({ eyebrow, heading, subheading, secondary, ranges }: { eyebrow: string; heading: string; subheading: string; secondary: Cta; ranges: HeroRange[] }) {
+export function HeroCopy({ eyebrow, heading, subheading, ranges }: { eyebrow: string; heading: string; subheading: string; ranges: HeroRange[] }) {
   const [channel, setChannel] = useState<keyof typeof CHANNELS>("retail");
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -43,7 +42,7 @@ export function HeroCopy({ eyebrow, heading, subheading, secondary, ranges }: { 
         <p className="hv-in eyebrow !text-white" style={{ ["--d" as string]: 0 }}>
           {eyebrow}
         </p>
-        <h1 id="hero-heading" className="mt-5 max-w-[14ch] font-display text-[clamp(2.8rem,1.3rem+6.4vw,8rem)] font-extrabold leading-[0.9] tracking-[-0.05em]">
+        <h1 id="hero-heading" className="mt-4 max-w-[15ch] font-display text-[clamp(2.6rem,1.2rem+5.4vw,6.6rem)] font-extrabold leading-[0.9] tracking-[-0.05em]">
           {heading.split(" ").map((w, n) => (
             <span key={n}>
               <span className="hv-focus inline-block" style={{ ["--w" as string]: n }}>
@@ -53,26 +52,11 @@ export function HeroCopy({ eyebrow, heading, subheading, secondary, ranges }: { 
           ))}
         </h1>
 
-        {/* Rolling word. */}
-        {current && (
-          <p className="hv-in mt-5 flex items-baseline gap-3 font-display text-[clamp(1.3rem,1rem+1.2vw,2rem)] font-bold tracking-[-0.02em]" style={{ ["--d" as string]: 3 }} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-            <span className="text-white/85">Explore</span>
-            <span className="hv-roll text-sun" aria-live="off" style={{ ["--i" as string]: i }}>
-              <span className="sr-only">{ranges.map((r) => r.name).join(", ")}</span>
-              <span aria-hidden>
-                {ranges.map((r) => (
-                  <span key={r.slug}>{r.name}</span>
-                ))}
-              </span>
-            </span>
-          </p>
-        )}
-
-        <p className="hv-in mt-5 max-w-lg text-lg leading-relaxed text-white" style={{ ["--d" as string]: 4 }}>
+        <p className="hv-in mt-6 max-w-md text-[1.05rem] leading-relaxed text-white/95" style={{ ["--d" as string]: 3 }}>
           {subheading}
         </p>
 
-        <div className="hv-in mt-8 flex flex-wrap items-center gap-4 [text-shadow:none]" style={{ ["--d" as string]: 5 }}>
+        <div className="hv-in mt-7 flex flex-wrap items-center gap-3 [text-shadow:none]" style={{ ["--d" as string]: 4 }}>
           {/* Pill switch: retail or wholesale. */}
           <div role="group" aria-label="How do you want to buy?" className="inline-flex rounded-full bg-white/15 p-1 backdrop-blur-md ring-1 ring-white/40">
             {(Object.keys(CHANNELS) as (keyof typeof CHANNELS)[]).map((k) => {
@@ -88,11 +72,8 @@ export function HeroCopy({ eyebrow, heading, subheading, secondary, ranges }: { 
           <ButtonLink href={c.cta.href} variant="accent" size="lg" className="hv-pop" key={channel}>
             {c.cta.label} <ArrowRight className="size-4" aria-hidden />
           </ButtonLink>
-          <Link href={secondary.href} className="hidden h-13 items-center px-2 text-sm font-semibold underline-offset-4 hover:underline sm:inline-flex">
-            {secondary.label}
-          </Link>
         </div>
-        <p aria-live="polite" className="mt-3 max-w-md text-sm text-white/85 [text-shadow:none]">
+        <p aria-live="polite" className="sr-only">
           {c.line}
         </p>
       </div>
