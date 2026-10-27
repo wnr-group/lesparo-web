@@ -16,8 +16,8 @@ export function BrandFilm({ src, title }: { src: string; title: string }) {
   };
 
   return (
-    <section aria-label={title} className="bg-[#050b27]">
-      <div className="relative mx-auto max-w-[120rem]">
+    <section aria-label={title} className="bg-white">
+      <div className="relative">
         <video
           ref={video}
           src={src}
@@ -29,7 +29,7 @@ export function BrandFilm({ src, title }: { src: string; title: string }) {
           preload="metadata"
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
-          className="block aspect-video w-full object-cover"
+          className="block aspect-video w-full"
         />
         <button
           type="button"
