@@ -123,6 +123,9 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* ------------------------------------------------------------ lookbook film */}
+      <BrandFilm src="/lesparo-video-1.mp4" title="The LESPARO lookbook" />
+
       {/* ----------------------------------------------------- where we supply */}
       <ErodeRoute />
 
