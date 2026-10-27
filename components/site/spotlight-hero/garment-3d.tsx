@@ -4,13 +4,19 @@ import { Bounds, ContactShadows, Environment, Lightformer, OrbitControls, useBou
 import { Canvas } from "@react-three/fiber";
 import { RotateCcw } from "lucide-react";
 import { Suspense, useEffect, useRef, useState } from "react";
+import { Box3, Vector3 } from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
 type Api = { reset: () => void };
 
+/** Some generators export Z-up. If the model is clearly longer in Z than in Y, stand it upright. */
 function Model({ src }: { src: string }) {
   const { scene } = useGLTF(src);
-  return <primitive object={scene} />;
+  const zUp = (() => {
+    const size = new Box3().setFromObject(scene).getSize(new Vector3());
+    return size.z > size.y * 1.5;
+  })();
+  return <primitive object={scene} rotation={zUp ? [-Math.PI / 2, 0, 0] : [0, 0, 0]} />;
 }
 
 /** Hands the "fit the garment to the view" call up to the reset button. */
@@ -104,14 +110,16 @@ export default function Garment3D({ src, label, poster }: { src: string; label: 
       }}
     >
       {gl && (
-        <Canvas dpr={[1, 2]} camera={{ fov: 32, position: [0, 0.2, 5] }} gl={{ alpha: true, antialias: true }}>
+        <Canvas dpr={[1, 2]} camera={{ fov: 32, position: [0, 0.1, 5] }} gl={{ alpha: true, antialias: true }}>
           <Suspense fallback={null}>
-            <Bounds fit clip observe margin={1.25}>
+            <Bounds fit clip observe margin={1.02}>
               <Model src={src} />
               <FitApi apiRef={fit} />
             </Bounds>
             <ContactShadows position={[0, -1.2, 0]} opacity={0.5} scale={8} blur={2.6} far={3} />
-            <Environment resolution={256}>
+            <ambientLight intensity={0.9} />
+            <directionalLight position={[2, 4, 4]} intensity={2.2} />
+            <Environment resolution={256} environmentIntensity={1.6}>
               <Lightformer form="rect" intensity={3} position={[0, 4, 3]} scale={[8, 3, 1]} />
               <Lightformer form="rect" intensity={1.6} position={[-5, 1, 2]} scale={[3, 6, 1]} color="#9fb4ff" />
               <Lightformer form="rect" intensity={1.2} position={[5, 1, -2]} scale={[3, 6, 1]} />
