@@ -147,3 +147,40 @@
     animation: sp-detail 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 }
+
+/*
+ * Leaving the hero: as the page scrolls on, the figure eases up and back and the text column drifts off a little
+ * faster, so the next section arrives over a hero that is already receding. Tied to the scroll position through a
+ * named view timeline (reversible, no JavaScript). Desktop only, with motion allowed, where timelines exist.
+ * Individual transform properties are used so they sit on top of the entrance animations.
+ */
+@keyframes sp-leave-figure {
+  to {
+    translate: 0 -5%;
+    scale: 0.9;
+    opacity: 0.55;
+  }
+}
+@keyframes sp-leave-text {
+  to {
+    translate: 0 -12%;
+    opacity: 0;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 1024px) {
+    .sp-stage {
+      view-timeline: --sp-hero block;
+    }
+    .sp-leave-figure {
+      animation: sp-leave-figure linear both;
+      animation-timeline: --sp-hero;
+      animation-range: exit 5% exit 85%;
+    }
+    .sp-leave-text {
+      animation: sp-leave-text linear both;
+      animation-timeline: --sp-hero;
+      animation-range: exit 0% exit 55%;
+    }
+  }
+}

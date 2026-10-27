@@ -309,7 +309,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       <img aria-hidden src="/lesparo-bird.png" alt="" width={1140} height={1464} className="sp-bird" />
       <div aria-hidden className="sp-floor" />
 
-      <div className="contents lg:absolute lg:left-8 lg:top-10 lg:z-20 lg:flex lg:max-w-[15rem] lg:flex-col xl:left-12 xl:max-w-[25rem]">
+      <div className="sp-leave-text contents lg:absolute lg:left-8 lg:top-10 lg:z-20 lg:flex lg:max-w-[15rem] lg:flex-col xl:left-12 xl:max-w-[25rem]">
         {/* Text column, top left: a small label, a two-weight title, then the description and actions. */}
         <div className="sp-copy relative z-20 px-5 pt-8 sm:px-8 lg:p-0">
           <p className="flex items-center gap-3 text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-white/75">
@@ -373,7 +373,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       </div>
 
       {/* The product viewer. */}
-      <div className="relative z-10 my-6 flex justify-center px-5 lg:absolute lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[6.25rem] lg:my-0 lg:px-0">
+      <div className="sp-leave-figure relative z-10 my-6 flex justify-center px-5 lg:absolute lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[6.25rem] lg:my-0 lg:px-0">
         <div
           ref={box}
           role="group"
