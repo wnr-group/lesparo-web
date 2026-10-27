@@ -45,6 +45,11 @@ function CategoryTile({ category, square, sizes }: { category: CategoryNode; squ
   );
 }
 
+/** A real 3D garment: public/models/<id>.glb (pants.glb, tee.glb). When present it replaces the photo viewer. */
+function model3d(id: string): string | undefined {
+  return existsSync(join(process.cwd(), "public", "models", `${id}.glb`)) ? `/models/${id}.glb` : undefined;
+}
+
 /**
  * A product with a real 360-degree turntable set: 8 or more frames in public/turntable/<id>/ (sorted by file
  * name), plus an optional hotspots.json of { frame, x, y, label }. Products without one use stand-in photos.
@@ -90,7 +95,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ---------------------------------------------------------------- hero */}
-      <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} turntables={{ pants: turntable("pants"), tee: turntable("tee") }} />
+      <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} turntables={{ pants: turntable("pants"), tee: turntable("tee") }} models={{ pants: model3d("pants"), tee: model3d("tee") }} />
 
       {/* ---------------------------------------------------------------- film */}
       <BrandFilm open src="/lesparo_video.mp4" title="The LESPARO film" />

@@ -1,9 +1,13 @@
 "use client";
 
 import { ArrowRight, Minus, Plus } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import "./spotlight.css";
+
+// three.js is only fetched when a product has a .glb in public/models.
+const Garment3D = dynamic(() => import("./garment-3d"), { ssr: false });
 
 type Cta = { label: string; href: string };
 /** A numbered point on one frame. It shows while the viewer is within `tol` frames of that frame. */
@@ -98,7 +102,7 @@ const ringDist = (a: number, b: number, n: number) => Math.min(Math.abs(a - b), 
  * at a numbered spot to read it and see that cloth under a loupe cut from the same frame. A product with a real
  * turntable set (8 or more frames in public/turntable) spins smoothly; until then four real photographs stand in.
  */
-export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, turntables }: { eyebrow: string; heading: string; subheading: string; cta: Cta; secondary: Cta; turntables: Partial<Record<string, TurntableSet>> }) {
+export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, turntables, models = {} }: { eyebrow: string; heading: string; subheading: string; cta: Cta; secondary: Cta; turntables: Partial<Record<string, TurntableSet>>; models?: Partial<Record<string, string>> }) {
   const products: Product[] = ["pants", "tee"].map((id) => {
     const real = turntables[id];
     return real
@@ -118,6 +122,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const live = useRef({ pos: 0, vel: 0, drag: false, x: 0, y: 0, moved: false, hover: false, zoom: 1, pan: { x: 0, y: 0 } });
 
   const product = products[pi];
+  const model = models[product.id];
   const n = product.frames.length;
   const tol = product.spin ? 2 : 0;
 
@@ -290,7 +295,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
 
   const visibleSpots = zoom > 1 ? [] : product.spots.filter((s) => ringDist(s.frame, frame, n) <= tol);
   const keyOf = (s: Spot) => `${product.id}-${s.frame}-${s.label}`;
-  const active = visibleSpots.find((s) => keyOf(s) === spotKey) ?? visibleSpots[0] ?? null;
+  const active = model ? null : (visibleSpots.find((s) => keyOf(s) === spotKey) ?? visibleSpots[0] ?? null);
   const activeIdx = active ? visibleSpots.indexOf(active) : -1;
   const cutout = isCut(product.frames[frame]);
   const fade = FADE[product.frames[frame]];
@@ -373,6 +378,11 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
 
       {/* The product viewer. */}
       <div className="sp-leave-figure relative z-10 my-6 flex justify-center px-5 lg:absolute lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[6.25rem] lg:my-0 lg:px-0">
+        {model ? (
+          <div className="sp-product relative w-full max-w-[22rem] overflow-hidden lg:h-full lg:w-auto lg:max-w-none" style={{ aspectRatio: "2 / 3" }}>
+            <Garment3D key={model} src={model} label={product.label} />
+          </div>
+        ) : (
         <div
           ref={box}
           role="group"
@@ -449,10 +459,11 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
             </p>
           )}
         </div>
+        )}
       </div>
 
       {/* View tabs, bottom centre. */}
-      <div role="group" aria-label="View" className="sp-copy relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
+      {!model && <div role="group" aria-label="View" className="sp-copy relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
         <ul className="flex w-full max-w-[24rem] border border-white/30 bg-[#0e1b4f]/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
           {keyFrames.map((f, i) => {
             const on = ringDist(f, frame, n) <= (product.spin ? Math.floor(n / 8) : 0);
@@ -465,7 +476,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
             );
           })}
         </ul>
-      </div>
+      </div>}
 
       {/* Detail panel, bottom right: the close-up, its name and what it is. */}
       <div aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[16rem] lg:p-0 xl:w-[23rem] 2xl:right-12 2xl:w-[26rem]">
@@ -484,7 +495,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
           <div className="bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm">
             <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#ffc82c]">Product detail</p>
             <h2 className="mt-1 font-display text-[1.2rem] font-bold leading-tight tracking-tight">{product.label}</h2>
-            <p className="mt-2 text-[0.92rem] leading-relaxed text-white/85">{zoom > 1 ? "Zoom out to see the marked points on the garment." : "Turn the garment to a view with marked points, then select one to see it close up."}</p>
+            <p className="mt-2 text-[0.92rem] leading-relaxed text-white/85">{model ? "Drag to turn the garment any way, and scroll or pinch to move closer." : zoom > 1 ? "Zoom out to see the marked points on the garment." : "Turn the garment to a view with marked points, then select one to see it close up."}</p>
           </div>
         )}
       </div>
