@@ -1,6 +1,6 @@
 /*
  * Variant A, "cinematic": the hero is a film (or, until footage exists, a macro-textile weave) under a
- * quiet indigo grade. Below it, light chapters stack like cut cloth. Scroll-linked effects are CSS
+ * quiet indigo grade. Scroll-linked effects are CSS
  * timelines (progressive enhancement); nothing moves for reduced motion.
  */
 
@@ -45,20 +45,6 @@
     translate: 0 2rem;
   }
 }
-@keyframes hv-pan {
-  from {
-    translate: 0 -7%;
-  }
-  to {
-    translate: 0 7%;
-  }
-}
-@keyframes hv-grow {
-  from {
-    scale: 0.86;
-    border-radius: 3rem;
-  }
-}
 
 @media (prefers-reduced-motion: no-preference) {
   .hv-weave::after {
@@ -80,29 +66,9 @@
       animation-timeline: scroll(root block);
       animation-range: 10svh 70svh;
     }
-    .hv-pan {
-      animation: hv-pan linear both;
-      animation-timeline: view();
-    }
-    .hv-grow {
-      animation: hv-grow linear both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 30%;
-    }
   }
 }
 
-/* Chapters stack: each panel pins under the header and the next one slides over it. */
-.hv-stack {
-  position: sticky;
-  top: var(--hdr, 4.5rem);
-}
-@media (max-width: 1023px), (prefers-reduced-motion: reduce) {
-  .hv-stack {
-    position: relative;
-    top: auto;
-  }
-}
 
 :root {
   --hdr: 4rem;
