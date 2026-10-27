@@ -2,6 +2,7 @@
 
 import { Pause, Play } from "lucide-react";
 import { useRef, useState } from "react";
+import "./film.css";
 
 /** The LESPARO film: plays silently on a loop, with a visible pause button. */
 export function BrandFilm({ src, title }: { src: string; title: string }) {
