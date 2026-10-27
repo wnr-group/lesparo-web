@@ -1,9 +1,9 @@
-import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment } from "react";
-import { ButtonLink } from "@/components/ui/button";
+import { HeroActions } from "./hero-actions";
 import { HeroPointer } from "./hero-pointer";
+import { HeroSpotlight } from "./hero-spotlight";
 
 type Cta = { label: string; href: string };
 export type LineupModel = { id: string; slug: string; name: string; image: string; kid?: boolean };
@@ -17,7 +17,9 @@ export type LineupModel = { id: string; slug: string; name: string; image: strin
  * photography: full-length models standing on the white stage (the studio white of the photographs
  * is lifted to pure white to meet it), each linking to its product, kids drawn smaller than adults.
  *
- * Motion: the headline lines rise from behind a mask, the line-up eases up from below with a soft fade,
+ * Motion (after Dribbble and Scrolltide): headline words pull into focus, a soft disc opens behind the line-up,
+ * a Buy online / Wholesale pill drives the main action, and a spotlight walks along the figures with a
+ * "Now showing" chip. Also: the headline lines rise from behind a mask, the line-up eases up from below with a soft fade,
  * one figure after another from the centre outwards. As the page scrolls the line-up swells a little
  * and the headline softens (CSS scroll timeline, so nothing runs in JavaScript; static where
  * unsupported). Reduced motion: everything in place.
@@ -48,16 +50,10 @@ export function HeroApple({ heading, subheading, primaryCta, secondaryCta, model
             ))}
           </h1>
           <p className="mx-auto mt-5 max-w-[36rem] text-[clamp(1rem,0.92rem+0.35vw,1.2rem)] leading-snug tracking-[-0.01em] text-[#6e6e73] animate-rise [animation-delay:0.55s]">{subheading}</p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-3 animate-rise [animation-delay:0.7s]">
-            <ButtonLink href={primaryCta.href} size="lg">
-              {primaryCta.label}
-            </ButtonLink>
-            <Link href={secondaryCta.href} className="group inline-flex items-center gap-1.5 text-[1.05rem] font-medium text-indigo hover:underline">
-              {secondaryCta.label}
-              <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
-            </Link>
-          </div>
+          <HeroActions primary={primaryCta} secondary={secondaryCta} />
         </div>
+
+        <HeroSpotlight models={models.map((m) => ({ slug: m.slug, name: m.name }))} />
 
         {/* The line-up: one row of full-length models on the stage floor. */}
         <ul className="hero-lineup relative mt-10 flex h-[min(36svh,28rem,38vw)] sm:mt-auto sm:h-[min(36svh,28rem,46vw)] w-full max-w-[84rem] items-end justify-center gap-[2%] pt-6">
@@ -67,7 +63,7 @@ export function HeroApple({ heading, subheading, primaryCta, secondaryCta, model
               <li
                 key={m.id}
                 style={{ ["--d" as string]: `${0.9 + d * 0.12}s`, ["--k" as string]: 6 + d * 7, height: m.kid ? "74%" : "100%", aspectRatio: "513 / 655" }}
-                className={`hero-figure relative shrink-0 ${d > 1.5 ? "max-sm:hidden" : ""}`}
+                className={`hero-figure relative shrink-0 mix-blend-multiply ${d > 1.5 ? "max-sm:hidden" : ""}`}
               >
                 <Link href={`/products/${m.slug}`} aria-label={m.name} className="hero-depth group block size-full">
                   <div className="relative size-full">
@@ -78,6 +74,8 @@ export function HeroApple({ heading, subheading, primaryCta, secondaryCta, model
               </li>
             );
           })}
+          {/* Zoom reveal: a soft disc opens behind the line-up. Last child, so figure order is unchanged. */}
+          <li aria-hidden className="hero-halo" />
         </ul>
       </div>
     </section>
