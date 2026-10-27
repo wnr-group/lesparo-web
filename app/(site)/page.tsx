@@ -1,7 +1,9 @@
 import { ArrowRight, ArrowUpRight, RefreshCw, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { SpotlightHero } from "@/components/site/spotlight-hero/spotlight-hero";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
 import { CardDeck, type DeckItem } from "@/components/site/card-deck";
 import { ButtonLink } from "@/components/ui/button";
 import { Container, SectionHeading } from "@/components/ui/primitives";
@@ -40,6 +42,24 @@ function CategoryTile({ category, square, sizes }: { category: CategoryNode; squ
       </div>
     </Link>
   );
+}
+
+/**
+ * A product with a real 360-degree turntable set: 8 or more frames in public/turntable/<id>/ (sorted by file
+ * name), plus an optional hotspots.json of { frame, x, y, label }. Products without one use stand-in photos.
+ */
+function turntable(id: string): TurntableSet | undefined {
+  const dir = join(process.cwd(), "public", "turntable", id);
+  if (!existsSync(dir)) return undefined;
+  const files = readdirSync(dir)
+    .filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
+    .sort();
+  if (files.length < 8) return undefined;
+  let spots: TurntableSet["spots"] = [];
+  try {
+    spots = JSON.parse(readFileSync(join(dir, "hotspots.json"), "utf8"));
+  } catch {}
+  return { frames: files.map((f) => `/turntable/${id}/${f}`), spots };
 }
 
 /** A photograph of a catalogue model, used by the quality section. */
@@ -83,7 +103,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ---------------------------------------------------------------- hero */}
-      <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} />
+      <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} turntables={{ pants: turntable("pants"), tee: turntable("tee") }} />
 
       {/* ---------------------------------------------------------- categories */}
       {sections.categories && (

@@ -1,85 +1,32 @@
 /*
- * Spotlight hero, after Blue & Blues: one product alone on a deep-navy stage. The navy is the LESPARO
- * logo navy (#0e1b4f). Light beams fall from above, dust drifts, and the floor shows a faint reflection and
- * slow ripples. The product keeps its true colours; its studio backdrop fades into the navy. What is LESPARO's
- * own: a woven-thread loom floor, drifting cotton fibres, a running-stitch thread sewn between the hotspots,
- * and a fabric loupe that magnifies the spot you point at. Nothing moves for reduced motion.
+ * Spotlight hero: a tailor's inspection table in the LESPARO logo navy (#0e1b4f). The product photograph runs the
+ * full height of the hero in its true colours; around it, a stitched hem, a woven selvedge edge, a running
+ * stitch between the numbered points, and a loupe that magnifies the point you choose. Motion is limited to
+ * a soft entrance, the moving stitch and the loupe popping in, and none of it runs for reduced motion.
  */
 :root {
   --hdr: 4rem;
-  --navy: #0e1b4f;
-  --navy-deep: #070d2b;
 }
 @media (min-width: 1024px) {
   :root {
     --hdr: 4.5rem;
   }
 }
+/* Woven edge of a length of cloth: navy and sun threads. */
+.sp-selvedge {
+  background-image: repeating-linear-gradient(180deg, #0e1b4f 0 6px, #ffc82c 6px 9px, #0e1b4f 9px 15px, transparent 15px 18px);
+  background-color: #1c2f86;
+}
 .sp-stage {
   background:
-    radial-gradient(70% 55% at 50% -5%, #223690 0%, transparent 70%),
-    radial-gradient(90% 60% at 50% 105%, #14256b 0%, transparent 60%),
-    linear-gradient(180deg, #0e1b4f 0%, #080f33 55%, #060b26 100%);
-}
-.sp-beams {
-  position: absolute;
-  inset: -20% -10% 30% -10%;
-  background: conic-gradient(from 168deg at 50% -6%, transparent 0deg, rgb(170 195 255 / 0.3) 6deg, transparent 15deg, transparent 20deg, rgb(170 195 255 / 0.2) 27deg, transparent 38deg, transparent 44deg, rgb(170 195 255 / 0.26) 52deg, transparent 64deg);
-  filter: blur(14px);
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 85%);
-  mask-image: linear-gradient(to bottom, #000 0%, transparent 85%);
-  transform-origin: 50% 0;
-  rotate: calc(var(--px, 0) * 2.5deg);
-}
-.sp-floor {
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 36%;
-  overflow: hidden;
-  background: radial-gradient(60% 80% at 50% 0%, rgb(60 90 210 / 0.3), transparent 70%);
-}
-/* A loom floor: warp and weft threads receding to the horizon. */
-.sp-loom {
-  position: absolute;
-  inset: 0 -40% -30% -40%;
-  background-image: repeating-linear-gradient(90deg, rgb(160 190 255 / 0.16) 0 1px, transparent 1px 22px), repeating-linear-gradient(0deg, rgb(160 190 255 / 0.12) 0 1px, transparent 1px 22px);
-  transform: perspective(420px) rotateX(62deg);
-  transform-origin: 50% 0;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, transparent 90%);
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, transparent 90%);
-}
-.sp-dust {
-  position: absolute;
-  height: 1.5px;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, transparent, rgb(215 228 255 / 0.9), transparent);
-  rotate: var(--r, 20deg);
-}
-.sp-photo {
-  -webkit-mask-image: radial-gradient(62% 56% at 50% 47%, #000 52%, transparent 100%);
-  mask-image: radial-gradient(60% 55% at 50% 46%, #000 48%, transparent 98%);
-}
-.sp-photo img {
-  filter: contrast(1.06) saturate(1.05);
-}
-.sp-ring::before,
-.sp-ring::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 9999px;
-  border: 1.5px solid rgb(255 255 255 / 0.7);
-}
-.sp-ring::after {
-  inset: -9px;
-  border-color: rgb(255 255 255 / 0.28);
+    radial-gradient(80% 70% at 15% 0%, #1c2f86 0%, transparent 65%),
+    linear-gradient(180deg, #0e1b4f 0%, #0a1442 100%);
 }
 
 @keyframes sp-rise {
   from {
     opacity: 0;
-    translate: 0 4%;
-    scale: 0.97;
+    translate: 0 3%;
   }
 }
 @keyframes sp-fade {
@@ -94,37 +41,6 @@
     translate: 0 0.28em;
   }
 }
-@keyframes sp-float {
-  0%,
-  100% {
-    translate: 0 0;
-    opacity: 0.2;
-  }
-  50% {
-    translate: 6px -26px;
-    opacity: 0.95;
-  }
-}
-@keyframes sp-pulse {
-  0% {
-    scale: 1;
-    opacity: 0.9;
-  }
-  100% {
-    scale: 1.7;
-    opacity: 0;
-  }
-}
-@keyframes sp-sway {
-  50% {
-    rotate: 2deg;
-  }
-}
-@keyframes sp-weft {
-  to {
-    background-position: 0 0, 0 22px;
-  }
-}
 @keyframes sp-stitch {
   to {
     stroke-dashoffset: -4;
@@ -132,36 +48,36 @@
 }
 @keyframes sp-loupe {
   from {
-    opacity: 0;
-    scale: 0.7;
+    opacity: 0.2;
+    scale: 0.85;
+  }
+}
+@keyframes sp-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(255 255 255 / 0.55), 0 2px 10px rgb(0 0 0 / 0.35);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgb(255 255 255 / 0), 0 2px 10px rgb(0 0 0 / 0.35);
   }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .sp-beams {
-    animation: sp-fade 2.4s ease-out 0.1s both, sp-sway 11s ease-in-out infinite;
-  }
   .sp-product {
-    animation: sp-rise 1.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+    animation: sp-rise 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
   }
   .sp-copy {
-    animation: sp-fade 1.2s ease-out 0.9s both;
+    animation: sp-fade 1s ease-out 0.4s both;
   }
   .sp-word {
-    animation: sp-focus 1.1s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--w, 0) * 120ms + 0.5s) both;
-  }
-  .sp-dust {
-    animation: sp-float var(--t, 9s) ease-in-out var(--dl, 0s) infinite;
-  }
-  .sp-ring::before {
-    animation: sp-pulse 2.2s ease-out infinite;
-  }
-  .sp-loom {
-    animation: sp-weft 6s linear infinite;
+    animation: sp-focus 1.1s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--w, 0) * 120ms + 0.4s) both;
   }
   .sp-stitch {
     animation: sp-stitch 1.2s linear infinite;
   }
   .sp-loupe {
-    animation: sp-loupe 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: sp-loupe 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .sp-pin[aria-pressed="true"] {
+    animation: sp-pulse 1.8s ease-out infinite;
   }
 }
+
