@@ -19,52 +19,38 @@
 }
 .sp-stage {
   background:
-    radial-gradient(60% 55% at 50% 0%, #1b2a66 0%, transparent 70%),
-    linear-gradient(180deg, #0a1236 0%, #060c28 62%, #030818 100%);
+    radial-gradient(70% 90% at 0% 0%, #2a3f9a 0%, transparent 60%),
+    radial-gradient(60% 80% at 100% 100%, #1a2a78 0%, transparent 62%),
+    linear-gradient(135deg, #14226b 0%, #0b1445 55%, #070d33 100%);
 }
-/* Two beams from above, swaying slowly. */
-.sp-beam {
+/* A soft halo of light and one fine ring behind the product. */
+.sp-halo {
   position: absolute;
-  inset: 0;
+  top: 52%;
+  left: 50%;
   z-index: 0;
-  transform-origin: 50% 0;
-  mask-image: linear-gradient(180deg, #000 0%, rgb(0 0 0 / 0.75) 65%, transparent 100%);
+  width: min(62vw, 56rem);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(150 175 255 / 0.4) 0%, rgb(110 140 240 / 0.14) 42%, transparent 68%);
   pointer-events: none;
 }
-.sp-beam-a {
-  background: conic-gradient(from 146deg at 50% -4%, transparent 0deg, rgb(175 195 255 / 0.2) 15deg, transparent 32deg, transparent 360deg);
-}
-.sp-beam-b {
-  background: conic-gradient(from 182deg at 50% -4%, transparent 0deg, rgb(175 195 255 / 0.2) 15deg, transparent 32deg, transparent 360deg);
+.sp-halo::after {
+  content: "";
+  position: absolute;
+  inset: 17%;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 0.14);
 }
 /* The floor the product stands on. */
 .sp-floor {
   position: absolute;
   inset: auto 0 0 0;
   z-index: 0;
-  height: 34%;
-  background:
-    radial-gradient(45% 30% at 50% 22%, rgb(40 70 170 / 0.45), transparent 70%),
-    linear-gradient(180deg, transparent, #02061a 85%);
+  height: 26%;
+  background: linear-gradient(180deg, transparent, rgb(3 7 30 / 0.7));
   pointer-events: none;
-}
-@keyframes sp-sway-a {
-  50% {
-    rotate: 4deg;
-  }
-}
-@keyframes sp-sway-b {
-  50% {
-    rotate: -4deg;
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .sp-beam-a {
-    animation: sp-sway-a 11s ease-in-out infinite;
-  }
-  .sp-beam-b {
-    animation: sp-sway-b 13s ease-in-out infinite;
-  }
 }
 
 @keyframes sp-rise {

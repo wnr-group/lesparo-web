@@ -256,9 +256,8 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
 
   return (
     <section aria-labelledby="hero-heading" className="sp-stage relative isolate flex flex-col overflow-hidden text-white lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
-      {/* The stage: one soft spotlight from above and a dark floor. */}
-      <div aria-hidden className="sp-beam sp-beam-a" />
-      <div aria-hidden className="sp-beam sp-beam-b" />
+      {/* The stage: a soft halo of light behind the product and a floor. */}
+      <div aria-hidden className="sp-halo" />
       <div aria-hidden className="sp-floor" />
 
       {/* Headline, top left: a small label, then a two-weight title kept to a narrow column. */}
@@ -427,8 +426,8 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
 
       {/* Description and actions, bottom right. */}
       <div className="sp-copy relative z-20 px-5 pb-8 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[15rem] lg:p-0 xl:w-[20rem] 2xl:right-12 2xl:w-[27rem]">
-        <p className="text-[0.95rem] leading-relaxed text-white/85 lg:text-right">{subheading}</p>
-        <div className="mt-5 flex flex-wrap gap-3 lg:flex-col lg:items-stretch 2xl:flex-row 2xl:justify-end">
+        <p className="text-[0.95rem] leading-relaxed text-white/85">{subheading}</p>
+        <div className="mt-5 flex flex-wrap gap-3 lg:flex-col lg:items-stretch 2xl:flex-row">
           <Link href={cta.href} className="inline-flex h-12 items-center justify-center gap-2 bg-white px-7 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-[#0e1b4f] transition-colors duration-200 hover:bg-[#ffc82c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c]">
             {cta.label} <ArrowRight className="size-4" aria-hidden />
           </Link>
