@@ -404,10 +404,10 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       </div>
 
       {/* Detail panel, bottom left: the close-up, its name and what it is. */}
-      <div aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:left-8 lg:w-[16rem] lg:p-0 min-[1200px]:w-[22rem] min-[1440px]:left-12 min-[1440px]:w-[27rem]">
+      <div aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:left-8 lg:w-[16rem] lg:p-0 xl:w-[23rem] 2xl:left-12 2xl:w-[26rem]">
         {active ? (
-          <div key={keyOf(active)} className="sp-detail flex flex-col gap-4 bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm sm:flex-row sm:items-start lg:flex-col min-[1200px]:flex-row">
-            <span aria-hidden className="block h-32 w-full shrink-0 bg-no-repeat sm:h-32 sm:w-32 lg:h-28 lg:w-full min-[1200px]:h-32 min-[1200px]:w-32 min-[1440px]:h-36 min-[1440px]:w-36" style={{ backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "480% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
+          <div key={keyOf(active)} className="sp-detail flex flex-col gap-4 bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm ">
+            <span aria-hidden className="block h-44 w-full shrink-0 bg-no-repeat sm:h-52 lg:h-44 xl:h-52 2xl:h-56" style={{ backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "400% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
             <div className="min-w-0">
               <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#ffc82c]">
                 Detail {activeIdx + 1} of {visibleSpots.length}
@@ -426,9 +426,9 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       </div>
 
       {/* Description and actions, bottom right. */}
-      <div className="sp-copy relative z-20 px-5 pb-8 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[15rem] lg:p-0 min-[1200px]:w-[20rem] min-[1440px]:right-12 min-[1440px]:w-[27rem]">
+      <div className="sp-copy relative z-20 px-5 pb-8 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[15rem] lg:p-0 xl:w-[20rem] 2xl:right-12 2xl:w-[27rem]">
         <p className="text-[0.95rem] leading-relaxed text-white/85 lg:text-right">{subheading}</p>
-        <div className="mt-5 flex flex-wrap gap-3 lg:flex-col lg:items-stretch min-[1440px]:flex-row min-[1440px]:justify-end">
+        <div className="mt-5 flex flex-wrap gap-3 lg:flex-col lg:items-stretch 2xl:flex-row 2xl:justify-end">
           <Link href={cta.href} className="inline-flex h-12 items-center justify-center gap-2 bg-white px-7 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-[#0e1b4f] transition-colors duration-200 hover:bg-[#ffc82c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c]">
             {cta.label} <ArrowRight className="size-4" aria-hidden />
           </Link>
