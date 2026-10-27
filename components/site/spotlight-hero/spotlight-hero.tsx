@@ -121,6 +121,52 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const n = product.frames.length;
   const tol = product.spin ? 2 : 0;
 
+  // Depth: the figure leans toward the pointer in perspective and sways gently on its own, so it reads as a solid object.
+  const tilt = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = tilt.current;
+    const stage = box.current;
+    if (!el || !stage || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let tx = 0;
+    let ty = 0;
+    let ry = 0;
+    let rx = 0;
+    let raf = 0;
+    let visible = true;
+    const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting));
+    io.observe(stage);
+    const move = (e: PointerEvent) => {
+      const b = stage.getBoundingClientRect();
+      tx = Math.max(-1, Math.min(1, ((e.clientX - b.left) / b.width - 0.5) * 2));
+      ty = Math.max(-1, Math.min(1, ((e.clientY - b.top) / b.height - 0.5) * 2));
+    };
+    const leave = () => {
+      tx = 0;
+      ty = 0;
+    };
+    stage.addEventListener("pointermove", move);
+    stage.addEventListener("pointerleave", leave);
+    const step = (now: number) => {
+      raf = requestAnimationFrame(step);
+      if (!visible || document.hidden) return;
+      const sway = Math.sin(now / 2600);
+      const idle = live.current.hover ? 0 : 1;
+      const gy = tx * 11 + sway * 4 * idle;
+      const gx = -ty * 5 + Math.cos(now / 3100) * 1.6 * idle;
+      ry += (gy - ry) * 0.08;
+      rx += (gx - rx) * 0.08;
+      el.style.transform = `perspective(1100px) rotateY(${ry.toFixed(2)}deg) rotateX(${rx.toFixed(2)}deg)`;
+      el.style.setProperty("--sx", `${(-ry * 2.4).toFixed(1)}px`);
+    };
+    raf = requestAnimationFrame(step);
+    return () => {
+      cancelAnimationFrame(raf);
+      io.disconnect();
+      stage.removeEventListener("pointermove", move);
+      stage.removeEventListener("pointerleave", leave);
+    };
+  }, [pi]);
+
   // Keep the animation loop's view of zoom and pan current.
   useEffect(() => {
     live.current.zoom = zoom;
@@ -350,6 +396,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
           }}
         >
           {cutout && !fade && <div aria-hidden className="pointer-events-none absolute inset-x-[16%] bottom-0 h-[3.5%] rounded-[50%] bg-black/60 blur-xl" />}
+          <div ref={tilt} className="absolute inset-0 will-change-transform" style={{ transformStyle: "preserve-3d" }}>
           <div className="absolute inset-0" style={{ transform: `translate(${pan.x}%, ${pan.y}%) scale(${zoom})`, transformOrigin: "50% 50%", transition: dragging ? "none" : "transform 0.35s cubic-bezier(0.16,1,0.3,1)" }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- frames swap quickly and are preloaded; the optimiser would add a round trip per frame */}
             <img
@@ -358,7 +405,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
               draggable={false}
               decoding="async"
               fetchPriority="high"
-              className={`pointer-events-none absolute inset-0 size-full ${cutout ? "object-contain drop-shadow-[0_26px_28px_rgb(0_0_0/0.45)]" : "object-cover ring-1 ring-white/15"}`}
+              className={`pointer-events-none absolute inset-0 size-full ${cutout ? "object-contain drop-shadow-[var(--sx,0px)_26px_28px_rgb(0_0_0/0.45)]" : "object-cover ring-1 ring-white/15"}`}
               style={fade ? { maskImage: FADE_MASK[fade], WebkitMaskImage: FADE_MASK[fade] } : undefined}
             />
           </div>
@@ -383,6 +430,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
               </button>
             );
           })}
+          </div>
 
           <div className="absolute bottom-3 right-3 z-20 flex flex-col border border-white/40 bg-[#0e1b4f]/80 backdrop-blur" onPointerDown={(e) => e.stopPropagation()}>
             <button type="button" aria-label="Zoom in" disabled={zoom >= 2.6} onClick={() => setZ(zoom + 0.6)} className="grid size-10 place-items-center hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-[#ffc82c] disabled:opacity-40">
