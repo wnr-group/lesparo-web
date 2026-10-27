@@ -23,7 +23,7 @@ export function VideoHero({ hero, ranges }: { hero: HomepageContent["hero"]; ran
           <div aria-hidden className="hv-weave absolute inset-0" />
           <div className="hv-zoom absolute inset-0">{hasFilm && <HeroVideo src={FILM.mp4} webm={FILM.webm} />}</div>
         </div>
-        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_top,rgb(18_22_76/0.5),transparent_28%)]" />
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_top,rgb(16_16_20/0.55),transparent_28%)]" />
       </div>
 
       <HeroCopy eyebrow={hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={hero.heading} subheading={hero.subheading} ranges={ranges} />
