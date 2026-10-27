@@ -4,6 +4,7 @@ import Link from "next/link";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BrandFilm } from "@/components/site/brand-film";
+import { Parallax } from "@/components/site/parallax";
 import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
 import { ErodeRoute } from "@/components/site/erode-route";
 import { ButtonLink } from "@/components/ui/button";
@@ -28,13 +29,13 @@ function CategoryTile({ category, square, sizes }: { category: CategoryNode; squ
             alt=""
             fill
             sizes={sizes}
-            className="object-contain p-[8%] cutout transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.06]"
+            className="object-contain p-[8%] cutout transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.06] group-focus-visible:scale-[1.06] group-active:scale-[1.04]"
           />
         )}
       </div>
       <div className="flex flex-1 items-center justify-between gap-3 px-0.5 pt-4">
         <div className="min-w-0">
-          <h3 className="font-display text-xl font-bold tracking-tight transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:translate-x-1 sm:text-2xl">{category.name}</h3>
+          <h3 className="font-display text-xl font-bold tracking-tight transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:translate-x-1 group-focus-visible:translate-x-1 group-active:translate-x-1 sm:text-2xl">{category.name}</h3>
           <p className="mt-0.5 truncate text-sm text-muted">{category.children.map((g) => g.name).join(" · ") || "View range"}</p>
         </div>
         <span className="hidden size-10 shrink-0 items-center justify-center rounded-full bg-paper ring-1 ring-line transition-colors duration-300 group-hover:bg-indigo group-hover:text-white group-hover:ring-indigo sm:flex">
@@ -169,12 +170,16 @@ export default async function HomePage() {
                 <p className="absolute left-6 top-6 z-10 rounded-full bg-white px-4 py-2 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-indigo shadow-sm">Abija Exports · Erode</p>
                 {lineup.find((l) => !l.kid) && (
                   <div className="absolute bottom-0 right-[4%] h-[90%] w-[78%]">
-                    <Image src={lineup.find((l) => !l.kid)!.image} alt="" fill sizes="(min-width:1024px) 26vw, 70vw" className="cutout object-contain object-bottom" />
+                    <Parallax shift={0.05} className="relative size-full">
+                      <Image src={lineup.find((l) => !l.kid)!.image} alt="" fill sizes="(min-width:1024px) 26vw, 70vw" className="cutout object-contain object-bottom" />
+                    </Parallax>
                   </div>
                 )}
                 {lineup.find((l) => l.kid) && (
                   <div className="absolute bottom-0 left-[2%] z-10 h-[56%] w-[40%] mix-blend-multiply">
-                    <Image src={lineup.find((l) => l.kid)!.image} alt="" fill sizes="(min-width:1024px) 14vw, 36vw" className="cutout object-contain object-bottom" />
+                    <Parallax shift={-0.045} className="relative size-full">
+                      <Image src={lineup.find((l) => l.kid)!.image} alt="" fill sizes="(min-width:1024px) 14vw, 36vw" className="cutout object-contain object-bottom" />
+                    </Parallax>
                   </div>
                 )}
               </div>
