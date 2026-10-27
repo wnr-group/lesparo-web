@@ -5,7 +5,9 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BrandFilm } from "@/components/site/brand-film";
 import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
-import { CardDeck, type DeckItem } from "@/components/site/card-deck";
+import type { DeckItem } from "@/components/site/card-deck";
+import { ErodeRoute } from "@/components/site/erode-route";
+import { ProductReel } from "@/components/site/product-reel";
 import { ButtonLink } from "@/components/ui/button";
 import { Container, SectionHeading } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
@@ -137,26 +139,11 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ------------------------------------------------------- featured deck */}
-      {sections.products && deck.length > 0 && (
-        <section className="overflow-hidden py-20 lg:py-28">
-          <Container>
-            <SectionHeading
-              eyebrow="From the catalogue"
-              title="Everyday wear, made to supply"
-              intro="Shorts, tracks and 3/4ths in hosiery and jersey knits, packed in sets for retailers — alongside our lungis, kavi dhothies, towels and kerchiefs."
-              action={
-                <ButtonLink href="/shop" size="sm" className="self-start md:self-auto">
-                  Shop all products <ArrowRight className="size-3.5" aria-hidden />
-                </ButtonLink>
-              }
-            />
-            <div className="mt-14" data-reveal="up">
-              <CardDeck items={deck} />
-            </div>
-          </Container>
-        </section>
-      )}
+      {/* ------------------------------------------------------- featured reel */}
+      {sections.products && deck.length > 0 && <ProductReel items={deck} />}
+
+      {/* ----------------------------------------------------- where we supply */}
+      <ErodeRoute />
 
       {/* ------------------------------------------------------- quality promise */}
       {sections.story && (
