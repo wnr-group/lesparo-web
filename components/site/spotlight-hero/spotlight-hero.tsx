@@ -14,6 +14,18 @@ import type { Point3D } from "./garment-3d";
  * Where each named point sits on a real 3D model: a ray is fired at the model from that side, across and up its
  * box, and the point is pinned where it hits the cloth. Labels match the photo spots, which supply the close-up.
  */
+/**
+ * Guided views of a 3D model, like the tabs on a luxury product page: each one glides the camera round to that angle.
+ * `az` is the angle round the garment, `zoom` how close (1 is the whole garment), `aimY` where to look (0 is the middle,
+ * 0.5 the top edge) and `point` the numbered point that view introduces.
+ */
+const VIEWS_3D = [
+  { id: "front", label: "Front", az: 0, zoom: 1, aimY: 0, point: "Drawstring waistband" },
+  { id: "side", label: "Side", az: Math.PI / 2, zoom: 1, aimY: 0, point: "Cargo pocket" },
+  { id: "back", label: "Back", az: Math.PI, zoom: 1, aimY: 0, point: "Back pocket" },
+  { id: "waist", label: "Waistband", az: 0, zoom: 0.5, aimY: 0.36, point: "Drawstring waistband" },
+];
+
 const POINTS_3D: Record<string, { label: string; side: Point3D["side"]; u: number; v: number }[]> = {
   pants: [
     { label: "Drawstring waistband", side: "front", u: 0.5, v: 0.95 },
@@ -137,6 +149,8 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
 
   const product = products[pi];
   const model = models[product.id];
+  // The view a 3D model is gliding to (null once the visitor takes hold of it).
+  const [view3d, setView3d] = useState<(typeof VIEWS_3D)[number] & { n: number } | null>(null);
   const points3d = useMemo<Point3D[]>(
     () =>
       (POINTS_3D[product.id] ?? []).flatMap((p) => {
@@ -403,7 +417,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       <div className="sp-leave-figure relative z-10 my-6 flex justify-center px-5 lg:absolute lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[6.25rem] lg:my-0 lg:px-0">
         {model ? (
           <div className="sp-product relative w-full max-w-[22rem] overflow-hidden lg:h-full lg:w-auto lg:max-w-none" style={{ aspectRatio: "2 / 3" }}>
-            <Garment3D key={model} src={model} label={product.label} poster={product.frames[0]} points={points3d} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} />
+            <Garment3D key={model} src={model} label={product.label} poster={product.frames[0]} points={points3d} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} view={view3d} onGrab={() => setView3d(null)} />
           </div>
         ) : (
         <div
@@ -486,6 +500,31 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       </div>
 
       {/* View tabs, bottom centre. */}
+      {model && (
+        <div role="group" aria-label="View" className="sp-copy relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
+          <ul className="flex w-full max-w-[24rem] border border-white/30 bg-[#0e1b4f]/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
+            {VIEWS_3D.map((v) => {
+              const on = view3d?.id === v.id;
+              return (
+                <li key={v.id} className="flex-1 sm:flex-none">
+                  <button
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => {
+                      setView3d({ ...v, n: (view3d?.n ?? 0) + 1 });
+                      const sp = product.spots.find((s) => s.label === v.point);
+                      if (sp) setSpotKey(keyOf(sp));
+                    }}
+                    className={`min-h-11 w-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#ffc82c] sm:px-5 sm:py-0 ${on ? "bg-white text-[#0e1b4f]" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
+                  >
+                    {v.label}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
       {!model && <div role="group" aria-label="View" className="sp-copy relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
         <ul className="flex w-full max-w-[24rem] border border-white/30 bg-[#0e1b4f]/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
           {keyFrames.map((f, i) => {

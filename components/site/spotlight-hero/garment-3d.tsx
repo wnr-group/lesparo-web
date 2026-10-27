@@ -1,10 +1,10 @@
 "use client";
 
 import { Bounds, ContactShadows, Environment, Html, Lightformer, OrbitControls, useBounds, useGLTF, useProgress } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { RotateCcw } from "lucide-react";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Box3, Raycaster, Vector3, type Mesh, type Object3D } from "three";
+import { Box3, MathUtils, Raycaster, Vector3, type Group, type Mesh, type Object3D } from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
 type Api = { reset: () => void };
@@ -83,17 +83,86 @@ function Marker({ hit, n, active, onPick }: { hit: Hit; n: number; active: boole
   );
 }
 
-function Model({ src, points, activeKey, onPick }: { src: string; points: Point3D[]; activeKey: string | null; onPick: (key: string) => void }) {
+/** Size of the garment, so a guided view knows where the middle and the top edge are. */
+type Meta = { centerY: number; height: number; baseDist: number };
+
+/**
+ * The garment and its points. It floats a hair up and down and leans a few degrees toward the pointer, so it feels
+ * suspended in the light rather than pinned to the page.
+ */
+function Model({ src, points, activeKey, onPick, metaRef, motion }: { src: string; points: Point3D[]; activeKey: string | null; onPick: (key: string) => void; metaRef: React.RefObject<Meta | null>; motion: boolean }) {
   const { scene } = useGLTF(src);
   const hits = useHits(scene, points);
+  const group = useRef<Group>(null);
+  const size = useMemo(() => new Box3().setFromObject(scene), [scene]);
+  useEffect(() => {
+    metaRef.current = { centerY: (size.min.y + size.max.y) / 2, height: size.max.y - size.min.y, baseDist: 0 };
+  }, [metaRef, size]);
+  useFrame(({ clock, pointer }) => {
+    const g = group.current;
+    if (!g || !motion) return;
+    const h = size.max.y - size.min.y;
+    g.position.y = MathUtils.damp(g.position.y, Math.sin(clock.elapsedTime * 0.9) * h * 0.012, 6, 1 / 60);
+    g.rotation.y = MathUtils.damp(g.rotation.y, pointer.x * 0.09, 3, 1 / 60);
+    g.rotation.x = MathUtils.damp(g.rotation.x, -pointer.y * 0.035, 3, 1 / 60);
+  });
   return (
-    <>
+    <group ref={group}>
       <primitive object={scene} />
       {hits.map((h, i) => (
         <Marker key={h.key} hit={h} n={i + 1} active={h.key === activeKey} onPick={onPick} />
       ))}
-    </>
+    </group>
   );
+}
+
+/** A view to glide to. */
+export type View3D = { id: string; az: number; zoom: number; aimY: number; n: number };
+
+/**
+ * Glides the camera to a chosen view: round to the angle, in or out to the distance, and up or down to where to look,
+ * all eased together. Taking hold of the model cancels it, so it never fights the visitor's hand.
+ */
+function Director({ goalRef, metaRef, onGrab }: { goalRef: React.RefObject<View3D | null>; metaRef: React.RefObject<Meta | null>; onGrab: () => void }) {
+  const controls = useThree((s) => s.controls) as OrbitControlsImpl | null;
+  const born = useRef(0);
+  useEffect(() => {
+    if (!controls) return;
+    const grab = () => {
+      goalRef.current = null;
+      onGrab();
+    };
+    controls.addEventListener("start", grab);
+    return () => controls.removeEventListener("start", grab);
+  }, [controls, goalRef, onGrab]);
+  useFrame(({ clock }, dt) => {
+    const c = controls;
+    const m = metaRef.current;
+    if (!c || !m) return;
+    const dist = c.object.position.distanceTo(c.target);
+    // The framing settles in the first moments; whatever distance it ends at is "the whole garment".
+    if (!m.baseDist) {
+      born.current ||= clock.elapsedTime;
+      if (clock.elapsedTime - born.current > 1.6) m.baseDist = dist;
+      return;
+    }
+    const g = goalRef.current;
+    if (!g) return;
+    const k = Math.min(dt, 0.05);
+    const cur = c.getAzimuthalAngle();
+    const d = Math.atan2(Math.sin(g.az - cur), Math.cos(g.az - cur));
+    c.setAzimuthalAngle(cur + d * (1 - Math.exp(-4 * k)));
+    c.setPolarAngle(MathUtils.damp(c.getPolarAngle(), Math.PI / 2, 4, k));
+    const wantY = m.centerY + g.aimY * m.height;
+    c.target.setY(MathUtils.damp(c.target.y, wantY, 4, k));
+    c.update();
+    const want = m.baseDist * g.zoom;
+    const nd = MathUtils.damp(dist, want, 4, k);
+    c.object.position.sub(c.target).setLength(nd).add(c.target);
+    c.update();
+    if (Math.abs(d) < 0.004 && Math.abs(dist - want) < 0.01 && Math.abs(c.target.y - wantY) < 0.002) goalRef.current = null;
+  });
+  return null;
 }
 
 /** Hands the "fit the garment to the view" call up to the reset button. */
@@ -137,6 +206,8 @@ export default function Garment3D({
   points = [],
   activeKey = null,
   onPick = () => {},
+  view = null,
+  onGrab = () => {},
 }: {
   src: string;
   label: string;
@@ -144,11 +215,24 @@ export default function Garment3D({
   points?: Point3D[];
   activeKey?: string | null;
   onPick?: (key: string) => void;
+  view?: View3D | null;
+  onGrab?: () => void;
 }) {
   const [gl, setGl] = useState<boolean | null>(null);
   const [reduced, setReduced] = useState(true);
+  // Once the visitor has chosen a view or taken hold of the model, the idle turn stops for good.
+  const [engaged, setEngaged] = useState(false);
   const controls = useRef<OrbitControlsImpl>(null);
   const fit = useRef<Api>(null);
+  const goal = useRef<View3D | null>(null);
+  const meta = useRef<Meta | null>(null);
+
+  useEffect(() => {
+    goal.current = view;
+    // A chosen view is a visitor action: the idle turn must not fight the glide.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (view) setEngaged(true);
+  }, [view]);
 
   useEffect(() => {
     // Feature detection can only run in the browser, after hydration.
@@ -170,13 +254,10 @@ export default function Garment3D({
     c.update();
   };
   const reset = () => {
-    const c = controls.current;
-    if (c) {
-      c.setAzimuthalAngle(0);
-      c.setPolarAngle(Math.PI / 2);
-      c.update();
-    }
-    fit.current?.reset();
+    setEngaged(true);
+    onGrab();
+    // Glide home: round to the front, the whole garment, looking at its middle.
+    goal.current = { id: "home", az: 0, zoom: 1, aimY: 0, n: 0 };
   };
 
   if (gl === false) {
@@ -204,7 +285,7 @@ export default function Garment3D({
         <Canvas dpr={[1, 2]} camera={{ fov: 32, position: [0, 0.2, 5] }} gl={{ alpha: true, antialias: true }}>
           <Suspense fallback={null}>
             <Bounds fit clip observe margin={0.78}>
-              <Model src={src} points={points} activeKey={activeKey} onPick={onPick} />
+              <Model src={src} points={points} activeKey={activeKey} onPick={onPick} metaRef={meta} motion={!reduced} />
               <FitApi apiRef={fit} />
             </Bounds>
             <ContactShadows position={[0, -1.2, 0]} opacity={0.5} scale={8} blur={2.6} far={3} />
@@ -216,7 +297,8 @@ export default function Garment3D({
               <Lightformer form="rect" intensity={1.2} position={[5, 1, -2]} scale={[3, 6, 1]} />
             </Environment>
           </Suspense>
-          <OrbitControls ref={controls} makeDefault enablePan={false} minDistance={2.5} maxDistance={9} autoRotate={!reduced} autoRotateSpeed={1.2} />
+          <OrbitControls ref={controls} makeDefault enablePan={false} minDistance={1} maxDistance={9} autoRotate={!reduced && !engaged} autoRotateSpeed={1.2} />
+          <Director goalRef={goal} metaRef={meta} onGrab={() => { setEngaged(true); onGrab(); }} />
         </Canvas>
       )}
       <Loading />
