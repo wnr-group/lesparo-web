@@ -106,12 +106,14 @@ export default function Garment3D({ src, label, poster }: { src: string; label: 
       {gl && (
         <Canvas dpr={[1, 2]} camera={{ fov: 32, position: [0, 0.2, 5] }} gl={{ alpha: true, antialias: true }}>
           <Suspense fallback={null}>
-            <Bounds fit clip observe margin={1.25}>
+            <Bounds fit clip observe margin={0.78}>
               <Model src={src} />
               <FitApi apiRef={fit} />
             </Bounds>
             <ContactShadows position={[0, -1.2, 0]} opacity={0.5} scale={8} blur={2.6} far={3} />
-            <Environment resolution={256}>
+            <ambientLight intensity={1.5} />
+            <directionalLight position={[2.5, 4, 4]} intensity={3.2} />
+            <Environment resolution={256} environmentIntensity={2.4}>
               <Lightformer form="rect" intensity={3} position={[0, 4, 3]} scale={[8, 3, 1]} />
               <Lightformer form="rect" intensity={1.6} position={[-5, 1, 2]} scale={[3, 6, 1]} color="#9fb4ff" />
               <Lightformer form="rect" intensity={1.2} position={[5, 1, -2]} scale={[3, 6, 1]} />
