@@ -719,3 +719,134 @@
   }
 }
 
+
+/* Pointer effects (components/site/pointer-fx.tsx). */
+.tilt-plate {
+  transition: transform 0.5s var(--ease-out-soft);
+  will-change: transform;
+}
+.tilt-plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at var(--lx, 50%) var(--ly, 50%), rgb(255 255 255 / 0.55), transparent 55%);
+  transition: opacity 0.4s;
+}
+@media (hover: hover) {
+  .tilt-plate:hover::after {
+    opacity: 0.5;
+  }
+}
+.magnetic {
+  transition: translate 0.35s var(--ease-out-soft);
+}
+
+/* Hero depth: the halo and the large bird drift opposite the pointer, at different rates (see PointerDepth in the hero). */
+@media (prefers-reduced-motion: no-preference) {
+  .sp-halo {
+    transform: translate3d(calc(var(--px, 0) * 26px), calc(var(--py, 0) * 18px), 0);
+    transition: transform 0.9s var(--ease-out-soft);
+  }
+  .sp-bird {
+    transform: translate3d(calc(var(--px, 0) * -34px), calc(var(--py, 0) * -22px), 0);
+    transition: transform 1.2s var(--ease-out-soft);
+  }
+}
+
+/* Mobile menu: the links rise in one after another when the drawer opens. */
+@keyframes menu-item-in {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  dialog[open] .menu-list > li {
+    animation: menu-item-in 0.5s var(--ease-out-soft) both;
+    animation-delay: calc(0.12s + var(--i, 0) * 55ms);
+  }
+}
+.menu-list > li:nth-child(2) { --i: 1; }
+.menu-list > li:nth-child(3) { --i: 2; }
+.menu-list > li:nth-child(4) { --i: 3; }
+.menu-list > li:nth-child(5) { --i: 4; }
+.menu-list > li:nth-child(6) { --i: 5; }
+.menu-list > li:nth-child(n + 7) { --i: 6; }
+
+/*
+ * The studio edit as a scroll-driven horizontal sequence (components/site/more-sections.tsx).
+ * On wide screens with scroll timelines and motion allowed, the section is tall and its content sticks to the screen
+ * while the row of looks slides sideways with the scroll, and the background eases from white to sand and back.
+ * Everywhere else (phones, reduced motion, older browsers) it stays the plain wrapping grid.
+ */
+@keyframes edit-slide {
+  to {
+    translate: calc(-100% + 100vw - var(--edit-ml)) 0;
+  }
+}
+@keyframes edit-bg {
+  0%,
+  100% {
+    background-color: #fff;
+  }
+  35%,
+  65% {
+    background-color: #efe8da;
+  }
+}
+@keyframes edit-title {
+  from {
+    letter-spacing: 0.04em;
+    opacity: 0.4;
+  }
+  to {
+    letter-spacing: -0.01em;
+    opacity: 1;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 1024px) and (hover: hover) {
+    .edit-track {
+      height: 300vh;
+      view-timeline: --edit block;
+      animation: edit-bg linear both;
+      animation-timeline: --edit;
+      animation-range: cover 0% cover 100%;
+    }
+    .edit-sticky {
+      position: sticky;
+      top: var(--hdr);
+      height: calc(100svh - var(--hdr));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: clip;
+    }
+    .edit-row {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 1.5rem;
+      width: max-content;
+      max-width: none;
+      --edit-ml: max(2.5rem, calc((100vw - 80rem) / 2 + 2.5rem));
+      margin-left: var(--edit-ml);
+      padding-right: 2.5rem;
+      animation: edit-slide linear both;
+      animation-timeline: --edit;
+      animation-range: cover 24% cover 76%;
+    }
+    .edit-item {
+      width: min(26vw, 26rem);
+      flex: none;
+    }
+    .edit-title {
+      animation: edit-title linear both;
+      animation-timeline: --edit;
+      animation-range: cover 5% cover 28%;
+    }
+  }
+}
+

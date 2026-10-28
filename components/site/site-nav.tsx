@@ -223,7 +223,7 @@ export function SiteNav({ groups }: Props) {
           </div>
           <div className="flex-1 overflow-y-auto px-5 py-6">
             <SearchBar onClose={() => setDrawer(false)} />
-            <ul className="mt-8 space-y-1 font-display font-semibold text-[1.7rem] leading-tight">
+            <ul className="menu-list mt-8 space-y-1 font-display font-semibold text-[1.7rem] leading-tight">
               <li>
                 <Link href="/shop" className="block py-1.5">
                   Shop all

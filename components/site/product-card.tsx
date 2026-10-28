@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ViewTransition } from "react";
 import type { ProductCard as Product } from "@/lib/catalogue/queries";
 import { formatPrice } from "@/lib/format";
+import { Tilt } from "./pointer-fx";
 import { QuickAddButton } from "./cart";
 import { AddToEnquiryButton } from "./enquiry-list";
 
@@ -14,7 +15,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
       {/* Grey plate: the photos are shot on white, so multiply drops the white and the product sits on the grey.
           Same view-transition name as the product page gallery, so the plate morphs across the navigation. */}
       <ViewTransition name={`product-${product.id}`} share="morph" default="none">
-        <div className="relative aspect-[513/655] overflow-hidden rounded-2xl bg-[#f1efe9] transition-colors duration-500 group-hover:bg-[#e9e5da]">
+        <Tilt className="relative aspect-[513/655] overflow-hidden rounded-2xl bg-[#f1efe9] transition-colors duration-500 group-hover:bg-[#e9e5da]">
           {primary ? (
             <>
               <Image
@@ -48,7 +49,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
               </div>
             </div>
           )}
-        </div>
+        </Tilt>
       </ViewTransition>
       <div className="mt-3.5 flex flex-1 flex-col px-0.5">
         {product.category && <p className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-brass">{product.category.name}</p>}

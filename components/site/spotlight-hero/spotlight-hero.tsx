@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Minus, Plus } from "lucide-react";
+import { PointerDepth } from "@/components/site/pointer-fx";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -378,6 +379,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   return (
     <section aria-labelledby="hero-heading" className="sp-stage relative isolate flex flex-col overflow-hidden text-white lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
       {/* The stage: a soft halo of light behind the product and a floor. */}
+      <PointerDepth />
       <div aria-hidden className="sp-halo" />
       {/* The LESPARO bird from the logo, large and faint behind the product. */}
       {/* eslint-disable-next-line @next/next/no-img-element -- decorative, fixed-size mark */}

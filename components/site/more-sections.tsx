@@ -1,6 +1,7 @@
 import { Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Magnetic } from "@/components/site/pointer-fx";
 import { SplitWords } from "@/components/site/split-words";
 import { BUSINESS } from "@/lib/business";
 
@@ -41,7 +42,10 @@ export function DetailPanels() {
   );
 }
 
-/** Four studio looks from the LESPARO shoot, each linking on to the part of the shop it belongs to. */
+/**
+ * Four studio looks from the LESPARO shoot. On wide screens this is a pinned, scroll-driven sequence: the looks slide
+ * sideways as the page scrolls (see .edit-track in globals.css). Elsewhere it is a plain grid of links.
+ */
 export function StudioLooks() {
   const looks = [
     { src: "/looks/grey-tee.jpg", pos: "50% 30%", title: "Everyday tee", href: "/shop" },
@@ -50,30 +54,32 @@ export function StudioLooks() {
     { src: "/looks/white-tee.jpg", pos: "50% 35%", title: "Training fit", href: "/collections/gents" },
   ];
   return (
-    <section aria-labelledby="looks" className="mx-auto max-w-page px-4 py-16 sm:px-6 lg:px-10 lg:py-24">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <h2 id="looks" className="font-display text-[clamp(1.8rem,1.2rem+2.4vw,3.2rem)] font-extrabold uppercase tracking-tight">
-          <SplitWords>The studio edit</SplitWords>
-        </h2>
-        <Link href="/shop" className="inline-flex h-11 items-center rounded-full bg-[#e4e0d3] px-5 text-sm font-semibold transition-colors hover:bg-ink hover:text-white">
-          Shop everything
-        </Link>
+    <section aria-labelledby="looks" className="edit-track">
+      <div className="edit-sticky mx-auto w-full py-16 lg:py-0">
+        <div className="mx-auto flex w-full max-w-page flex-wrap items-end justify-between gap-4 px-4 sm:px-6 lg:px-10">
+          <h2 id="looks" className="edit-title font-display text-[clamp(1.8rem,1.2rem+2.4vw,3.2rem)] font-extrabold uppercase tracking-tight">
+            <SplitWords>The studio edit</SplitWords>
+          </h2>
+          <Link href="/shop" className="inline-flex h-11 items-center rounded-full bg-[#e4e0d3] px-5 text-sm font-semibold transition-colors hover:bg-ink hover:text-white">
+            Shop everything
+          </Link>
+        </div>
+        <ul className="edit-row mx-auto mt-8 grid max-w-page grid-cols-2 gap-3 px-4 sm:px-6 md:grid-cols-4 lg:gap-5 lg:px-10">
+          {looks.map((l, i) => (
+            <li key={l.title} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }} className={`edit-item ${i % 2 ? "md:mt-10" : ""}`}>
+              <Link href={l.href} className="group block">
+                <span className="relative block aspect-[3/4] overflow-clip bg-[#22231f]">
+                  <Image src={l.src} alt="" fill sizes="(min-width:768px) 26vw, 48vw" className="scrub-parallax hz object-cover" style={{ objectPosition: l.pos }} />
+                </span>
+                <span className="mt-3 flex items-center justify-between gap-3">
+                  <span className="hline font-display text-lg font-extrabold uppercase tracking-tight">{l.title}</span>
+                  <span aria-hidden className="text-xl transition-transform duration-300 group-hover:translate-x-1">→</span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4 lg:gap-5">
-        {looks.map((l, i) => (
-          <li key={l.title} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }} className={i % 2 ? "md:mt-10" : ""}>
-            <Link href={l.href} className="group block">
-              <span className="relative block aspect-[3/4] overflow-clip bg-[#22231f]">
-                <Image src={l.src} alt="" fill sizes="(min-width:768px) 24vw, 48vw" className="scrub-parallax hz object-cover" style={{ objectPosition: l.pos }} />
-              </span>
-              <span className="mt-3 flex items-center justify-between gap-3">
-                <span className="hline font-display text-lg font-extrabold uppercase tracking-tight">{l.title}</span>
-                <span aria-hidden className="text-xl transition-transform duration-300 group-hover:translate-x-1">→</span>
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }
@@ -98,9 +104,11 @@ export function BuyerFaq() {
           <h2 id="faq" className="mt-4 font-display text-[clamp(2rem,1.2rem+3vw,3.8rem)] font-extrabold uppercase leading-[0.98] tracking-tight">
             <SplitWords>Questions, answered.</SplitWords>
           </h2>
-          <Link href="/contact" className="mt-8 inline-flex h-12 items-center rounded-full bg-ink px-6 text-sm font-bold text-white transition-colors hover:bg-indigo-deep">
-            Ask us directly
-          </Link>
+          <Magnetic className="mt-8">
+            <Link href="/contact" className="inline-flex h-12 items-center rounded-full bg-ink px-6 text-sm font-bold text-white transition-colors hover:bg-indigo-deep">
+              Ask us directly
+            </Link>
+          </Magnetic>
         </div>
         <div data-reveal="up" className="divide-y divide-line border-y border-line">
           {FAQ.map(([q, a]) => (

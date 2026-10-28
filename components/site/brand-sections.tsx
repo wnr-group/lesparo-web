@@ -1,6 +1,8 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { CountUp } from "@/components/site/count-up";
+import { Magnetic } from "@/components/site/pointer-fx";
 import { SplitWords } from "@/components/site/split-words";
 import { BUSINESS } from "@/lib/business";
 
@@ -23,9 +25,11 @@ export function BrandStatement() {
               </li>
             ))}
           </ul>
-          <Link href="/shop" className="group/btn mt-10 inline-flex h-12 w-fit items-center gap-2 rounded-full bg-ink px-6 text-sm font-bold text-white transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-indigo-deep">
+          <Magnetic className="mt-10 w-fit">
+          <Link href="/shop" className="group/btn inline-flex h-12 w-fit items-center gap-2 rounded-full bg-ink px-6 text-sm font-bold text-white transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-indigo-deep">
             Shop the range <ArrowRight className="size-4 transition-transform duration-300 group-hover/btn:translate-x-1" aria-hidden />
           </Link>
+          </Magnetic>
         </div>
         <div className="group relative min-h-80 overflow-clip lg:min-h-0">
           <Image src="/looks/training.jpg" alt="" fill sizes="(min-width:1024px) 38vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: "50% 30%" }} />
@@ -45,7 +49,7 @@ export function BrandStory() {
   return (
     <section aria-labelledby="brand-story" className="py-16 lg:py-24">
       <div className="mx-auto grid max-w-page items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20 lg:px-10">
-        <div data-reveal="clip" className="group relative aspect-[4/5] overflow-clip rounded-[1.6rem] bg-[#22231f]">
+        <div data-reveal="clip" className="group relative aspect-[4/5] lg:sticky lg:top-32 lg:self-start overflow-clip rounded-[1.6rem] bg-[#22231f]">
           <Image src="/collections/range.jpg" alt="A LESPARO polo in brown knit, worn in the studio" fill sizes="(min-width:1024px) 42vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: "50% 30%" }} />
         </div>
         <div>
@@ -61,14 +65,16 @@ export function BrandStory() {
           <dl data-reveal="stagger" className="mt-10 divide-y divide-line border-y border-line">
             {facts.map(([v, l]) => (
               <div key={v} className="grid grid-cols-[8.5rem_1fr] items-baseline gap-4 py-5">
-                <dt className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">{v}</dt>
+                <dt className="font-display text-3xl font-extrabold tabular-nums tracking-tight sm:text-4xl">{v === "3 states" ? <><CountUp value={3} /> states</> : v}</dt>
                 <dd className="text-ink-soft">{l}</dd>
               </div>
             ))}
           </dl>
-          <Link href="/about" className="group/btn mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-sm font-bold text-white transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-indigo-deep">
+          <Magnetic className="mt-8">
+          <Link href="/about" className="group/btn inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-sm font-bold text-white transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-indigo-deep">
             Read our story <ArrowRight className="size-4 transition-transform duration-300 group-hover/btn:translate-x-1" aria-hidden />
           </Link>
+          </Magnetic>
         </div>
       </div>
     </section>
