@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 
 /**
  * Splits a heading into words that rise one after another from behind a mask once it scrolls into view
@@ -10,12 +10,14 @@ export function SplitWords({ children, className = "", as: Tag = "span", onLoad 
   return (
     <Tag {...(onLoad ? { "data-onload": "" } : { "data-reveal": "words" })} aria-label={children} className={className}>
       {words.map((w, i) => (
-        <span key={i} aria-hidden className="sw-mask">
-          <span className="sw-word" style={{ ["--i" as string]: i } as React.CSSProperties}>
-            {w}
+        <Fragment key={i}>
+          <span aria-hidden className="sw-mask">
+            <span className="sw-word" style={{ ["--i" as string]: i } as React.CSSProperties}>
+              {w}
+            </span>
           </span>
           {i < words.length - 1 ? " " : ""}
-        </span>
+        </Fragment>
       ))}
     </Tag>
   );
