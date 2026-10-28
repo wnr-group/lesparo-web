@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getCategoryTree } from "@/lib/catalogue/queries";
+import { AnnouncementBar } from "./announcement-bar";
 import { SiteNav, type NavGroup } from "./site-nav";
 
 async function navGroups(): Promise<NavGroup[]> {
@@ -21,6 +22,7 @@ export async function Header() {
   const groups = await navGroups();
   return (
     <header style={{ viewTransitionName: "site-header" }} className="sticky top-0 z-30 border-b border-line/70 bg-white/90 backdrop-blur-xl supports-[backdrop-filter]:bg-white/75">
+      <AnnouncementBar />
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:bg-paper focus:px-3 focus:py-2">
         Skip to content
       </a>

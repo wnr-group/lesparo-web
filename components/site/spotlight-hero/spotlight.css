@@ -5,11 +5,11 @@
  * a soft entrance, the moving stitch and the loupe popping in, and none of it runs for reduced motion.
  */
 :root {
-  --hdr: 4rem;
+  --hdr: 6.2rem; /* announcement bar + header */
 }
 @media (min-width: 1024px) {
   :root {
-    --hdr: 4.5rem;
+    --hdr: 6.7rem;
   }
 }
 /* Woven edge of a length of cloth: navy and sun threads. */

@@ -5,6 +5,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BrandFilm } from "@/components/site/brand-film";
 import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
+import { NewLaunches, ShopByRange, TopCollections } from "@/components/site/home-sections";
 import { ErodeRoute } from "@/components/site/erode-route";
 import { ButtonLink } from "@/components/ui/button";
 import { Container, SectionHeading } from "@/components/ui/primitives";
@@ -84,6 +85,11 @@ export default async function HomePage() {
     const p = bySlug.get(slug);
     return p?.images[0] ? [{ id: p.id, slug: p.slug, name: p.name, image: p.images[0].url, kid }] : [];
   };
+  const shortcuts = tree
+    .flatMap((t) => t.children.flatMap((c) => (c.children.length ? c.children.map((g) => ({ ...g, name: `${c.name} ${g.name.toLowerCase()}` })) : [c])))
+    .filter((c) => c.coverUrl)
+    .slice(0, 6);
+  const { products: newest } = await listProducts({ sort: "newest", pageSize: 8 });
   const lineup: LineupModel[] = [
     ...pick("loom-kids", true),
     ...pick("fine-comfort-34-th"),
@@ -102,30 +108,11 @@ export default async function HomePage() {
 
       {/* ---------------------------------------------------------- categories */}
       {sections.categories && (
-        <section className="py-20 lg:py-28">
-          <Container>
-            <SectionHeading
-              eyebrow="Collections"
-              title={
-                <>
-                  Garments, and the cloth <span className="text-indigo">behind them</span>
-                </>
-              }
-              action={
-                <ButtonLink href="/collections" variant="secondary" size="sm" className="self-start md:self-auto">
-                  All collections <ArrowRight className="size-3.5" aria-hidden />
-                </ButtonLink>
-              }
-            />
-            <ul className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
-              {showcase.map((c, i) => (
-                <li key={c.id} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }}>
-                  <CategoryTile category={c} sizes="(min-width:768px) 22vw, 45vw" />
-                </li>
-              ))}
-            </ul>
-          </Container>
-        </section>
+        <>
+          <TopCollections items={shortcuts} />
+          <ShopByRange items={showcase} />
+          <NewLaunches products={newest} />
+        </>
       )}
 
       {/* ------------------------------------------------------------ lookbook film */}

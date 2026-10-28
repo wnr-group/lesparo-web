@@ -57,7 +57,7 @@ function DesktopMenu({ group, pathname }: { group: NavGroup; pathname: string })
         aria-expanded={open}
         aria-controls={id}
         onClick={() => setOpen((o) => !o)}
-        className={clsx("nav-link flex items-center gap-1 rounded-full px-3.5 py-2 text-[0.9rem] font-medium transition-colors hover:text-indigo", (active || open) && "text-indigo")}
+        className={clsx("nav-link flex items-center gap-1 rounded-full px-3.5 py-2 text-[0.82rem] font-bold uppercase tracking-[0.06em] transition-colors hover:text-indigo", (active || open) && "text-indigo")}
         aria-current={active ? "page" : undefined}
       >
         {group.label}
@@ -158,7 +158,7 @@ export function SiteNav({ groups }: Props) {
           <li>
             <Link
               href="/shop"
-              className="nav-link rounded-full px-3.5 py-2 text-[0.9rem] font-medium transition-colors hover:text-indigo aria-[current=page]:text-indigo"
+              className="nav-link rounded-full px-3.5 py-2 text-[0.82rem] font-bold uppercase tracking-[0.06em] transition-colors hover:text-indigo aria-[current=page]:text-indigo"
               aria-current={isActive(pathname, "/shop") ? "page" : undefined}
             >
               Shop
@@ -171,7 +171,7 @@ export function SiteNav({ groups }: Props) {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className="nav-link rounded-full px-3.5 py-2 text-[0.9rem] font-medium transition-colors hover:text-indigo aria-[current=page]:text-indigo"
+                className="nav-link rounded-full px-3.5 py-2 text-[0.82rem] font-bold uppercase tracking-[0.06em] transition-colors hover:text-indigo aria-[current=page]:text-indigo"
                 aria-current={isActive(pathname, l.href) ? "page" : undefined}
               >
                 {l.label}
