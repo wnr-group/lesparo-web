@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ClipVideo } from "@/components/site/clip-video";
 import type { ReactNode } from "react";
 
 /** Studio photographs from the LESPARO shoot, in public/collections. `pos` keeps the subject in frame when the portrait is cropped wide. */
@@ -30,7 +31,7 @@ export function photoFor(slug?: string) {
  * A wide banner: text on a warm charcoal panel, and on the right either a studio photograph (the gents garment ranges)
  * or the collection's own product images standing on a stone panel (kids, 3/4ths, lungi, kavi, towels, kerchiefs).
  */
-export function CollectionBanner({ slug, products, video, children }: { slug?: string; products?: { src: string; alt: string }[]; video?: string; children: ReactNode }) {
+export function CollectionBanner({ slug, products, video, clip, children }: { slug?: string; products?: { src: string; alt: string }[]; video?: string; clip?: [number, number]; children: ReactNode }) {
   const photo = photoFor(slug);
   const own = !hasPhoto(slug) && products && products.length > 0 ? products.slice(0, 3) : null;
   return (
@@ -40,7 +41,11 @@ export function CollectionBanner({ slug, products, video, children }: { slug?: s
         {video && (
           <>
             <Image src={photo.src} alt="" fill priority sizes="100vw" className="-z-20 object-cover" style={{ objectPosition: photo.pos }} />
-            <video src={video} poster={photo.src} autoPlay muted loop playsInline preload="metadata" aria-hidden className="absolute inset-0 -z-10 size-full object-cover motion-reduce:hidden" />
+            {clip ? (
+              <ClipVideo src={video} poster={photo.src} start={clip[0]} end={clip[1]} className="absolute inset-0 -z-10 size-full object-cover motion-reduce:hidden" />
+            ) : (
+              <video src={video} poster={photo.src} autoPlay muted loop playsInline preload="metadata" aria-hidden className="absolute inset-0 -z-10 size-full object-cover motion-reduce:hidden" />
+            )}
             <span aria-hidden className="absolute inset-0 -z-[5] bg-gradient-to-r from-[#22231f]/90 via-[#22231f]/45 to-transparent" />
           </>
         )}

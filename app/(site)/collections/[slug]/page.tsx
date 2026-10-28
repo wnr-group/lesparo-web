@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -23,6 +25,12 @@ export async function generateMetadata(props: PageProps<"/collections/[slug]">):
   };
 }
 
+/** A promo film for a collection, if public/videos/<slug>_video.mp4 exists (gents_video.mp4 for Gents). */
+function filmFor(slug: string) {
+  const name = `${slug}_video.mp4`;
+  return existsSync(join(process.cwd(), "public", "videos", name)) ? `/videos/${name}` : undefined;
+}
+
 async function CollectionHeader({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const found = await getCategoryBySlug(slug);
@@ -32,7 +40,7 @@ async function CollectionHeader({ params }: { params: Promise<{ slug: string }> 
   const { products: own } = hasPhoto(slug) ? { products: [] } : await listProducts({ categoryIds: found.subtreeIds, pageSize: 3 });
   const bannerProducts = own.filter((p) => p.images[0]).map((p) => ({ src: p.images[0].url, alt: p.name }));
   return (
-    <CollectionBanner slug={slug} products={bannerProducts}>
+    <CollectionBanner slug={slug} products={bannerProducts} video={filmFor(slug)} clip={filmFor(slug) ? [6, 12] : undefined}>
       <nav aria-label="Breadcrumb" className="text-sm text-white/60">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
