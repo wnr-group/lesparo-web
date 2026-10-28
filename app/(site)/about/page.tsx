@@ -70,8 +70,8 @@ const VISION = ["To be India’s most customer-centric company of leisure wear",
 /** The three ranges, each with a photograph from the studio shoot or the lifestyle artwork. */
 const RANGES = [
   { name: "Gents", href: "/collections/gents", note: "Shorts, tracks, 3/4th and T-shirts for men.", src: "/collections/gents.jpg", pos: "50% 28%" },
-  { name: "Kids", href: "/collections/kids", note: "Shorts, tracks and 3/4th for kids.", src: "/collections/banner-kids.jpg", pos: "72% 40%" },
-  { name: "Fabric unstitched", href: "/collections/fabric-unstitched", note: "Lungi, kavi dhothy, towels and kerchiefs: the woven lines the family trade began with.", src: "/collections/banner-towels.jpg", pos: "75% 50%" },
+  { name: "Kids", href: "/collections/kids", note: "Shorts, tracks and 3/4th for kids.", src: "/about/range-kids.jpg", pos: "50% 50%" },
+  { name: "Fabric unstitched", href: "/collections/fabric-unstitched", note: "Lungi, kavi dhothy, towels and kerchiefs: the woven lines the family trade began with.", src: "/about/range-fabric.jpg", pos: "50% 50%" },
 ];
 
 /** The quality policy in four short lines; the full wording is one click away, unchanged. */
@@ -121,14 +121,14 @@ export default function AboutPage() {
       <BrandFilm open src="/videos/brand-film.mp4" title="LESPARO: 40 years in every thread" />
 
       {/* ========================================================== vision */}
-      <section aria-labelledby="vision-heading" className="relative isolate overflow-clip bg-[#1c1d1a] py-24 text-white lg:py-36">
+      <section aria-labelledby="vision-heading" className="relative isolate overflow-clip bg-[#1c1d1a] py-16 text-white lg:py-24">
         <Image src="/collections/banner-kids.jpg" alt="" fill sizes="100vw" className="scrub-parallax -z-10 object-cover opacity-45" style={{ objectPosition: "70% 40%" }} />
         <span aria-hidden className="absolute inset-0 -z-[5] bg-gradient-to-r from-black/85 via-black/55 to-black/25" />
         <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
           <p data-reveal="up" className="eyebrow !text-white/60">
             Our vision
           </p>
-          <h2 id="vision-heading" className="mt-5 max-w-5xl font-display text-[clamp(2.2rem,1.1rem+4.8vw,6rem)] font-extrabold uppercase leading-[0.98] tracking-tight">
+          <h2 id="vision-heading" className="mt-4 max-w-3xl font-display text-[clamp(1.6rem,1rem+2.4vw,3rem)] font-extrabold uppercase leading-[1.05] tracking-tight">
             {VISION.map((part, pi) =>
               part.split(" ").map((w, wi) => (
                 <span key={pi + "-" + wi} className={pi === 1 ? "text-white/55" : ""}>
@@ -137,7 +137,7 @@ export default function AboutPage() {
               )),
             )}
           </h2>
-          <p data-reveal="up" className="mt-10 max-w-md border-l-2 border-white/60 pl-5 text-lg leading-snug text-white/80">“Customer goodwill and quality assurance are the backbone of this company.”</p>
+          <p data-reveal="up" className="mt-7 max-w-md border-l-2 border-white/60 pl-4 text-base leading-snug text-white/80">“Customer goodwill and quality assurance are the backbone of this company.”</p>
         </div>
       </section>
 
@@ -183,7 +183,8 @@ export default function AboutPage() {
               <li key={name} className="ab-fan" style={{ ["--k" as string]: ri - 1 }}>
                 <Link href={href} className="group flex h-full flex-col overflow-hidden rounded-3xl bg-white ring-1 ring-line transition-shadow duration-500 hover:shadow-[0_24px_50px_-28px_rgb(18_22_76/0.35)]">
                   <div className="relative aspect-[4/3] overflow-hidden bg-[#22231f] md:aspect-[4/5]">
-                    <Image src={src} alt="" fill sizes="(min-width:768px) 30vw, 90vw" className="hz object-cover" style={{ objectPosition: pos }} />
+                    {/* unoptimized: these are already-sized HD crops; the optimiser would re-encode them at quality 75. */}
+                    <Image src={src} alt="" fill unoptimized sizes="(min-width:768px) 36vw, 90vw" className="hz object-cover" style={{ objectPosition: pos }} />
                   </div>
                   <div className="flex items-end justify-between gap-4 p-6">
                     <div>
