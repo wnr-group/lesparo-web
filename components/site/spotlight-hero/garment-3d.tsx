@@ -14,10 +14,10 @@ export type Part = { src: string; height: number; top: number };
 
 /** A numbered point on the garment. It is placed by firing a ray at the model from `side`, `u` across and `v` up its bounding box. */
 export type Point3D = { key: string; label: string; side: "front" | "back" | "left" | "right"; u: number; v: number };
-type Hit = { key: string; label: string; pos: Vector3; normal: Vector3 };
+export type Hit = { key: string; label: string; pos: Vector3; normal: Vector3 };
 
 /** Finds where each point lands on the real surface of the model, so a point always sits on the cloth. */
-function useHits(scene: Object3D, points: Point3D[]): Hit[] {
+export function useHits(scene: Object3D, points: Point3D[]): Hit[] {
   return useMemo(() => {
     scene.updateMatrixWorld(true);
     const box = new Box3().setFromObject(scene);
@@ -55,7 +55,7 @@ function useHits(scene: Object3D, points: Point3D[]): Hit[] {
 }
 
 /** One numbered pin. It fades out when the garment turns its back on the camera, and can be pressed while it faces it. */
-function Marker({ hit, n, active, onPick, onZoom }: { hit: Hit; n: number; active: boolean; onPick: (key: string) => void; onZoom: (hit: Hit) => void }) {
+export function Marker({ hit, n, active, onPick, onZoom }: { hit: Hit; n: number; active: boolean; onPick: (key: string) => void; onZoom: (hit: Hit) => void }) {
   const btn = useRef<HTMLButtonElement>(null);
   const dir = useRef(new Vector3());
   useFrame(({ camera }) => {

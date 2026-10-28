@@ -7,7 +7,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import "./spotlight.css";
 
 // three.js is only fetched when a product has a .glb in public/models.
-const Garment3D = dynamic(() => import("./garment-3d"), { ssr: false });
+// The premium viewer is the default; add ?viewer=classic to the address to see the earlier orbit-controls one.
+const Garment3D = dynamic(() => import("./garment-3d-premium"), { ssr: false });
+const GarmentClassic = dynamic(() => import("./garment-3d"), { ssr: false });
 import type { Part, Point3D } from "./garment-3d";
 
 /**
@@ -155,6 +157,14 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       ? { id, label: LABELS[id], frames: real.frames, spots: real.spots, spin: true, keyLabels: SPIN_KEYS }
       : { id, label: LABELS[id], frames: STAND_IN[id].frames, spots: STAND_IN[id].spots, spin: false, keyLabels: STAND_IN[id].keys };
   });
+
+  const [classic, setClassic] = useState(false);
+  useEffect(() => {
+    // The address is only readable in the browser, after hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setClassic(new URLSearchParams(window.location.search).get("viewer") === "classic");
+  }, []);
+  const Viewer = classic ? GarmentClassic : Garment3D;
 
   const [pi, setPi] = useState(0);
   const [frame, setFrame] = useState(0);
@@ -438,7 +448,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       <div className="sp-leave-figure relative z-10 my-6 flex justify-center px-5 lg:absolute lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[6.25rem] lg:my-0 lg:px-0">
         {model ? (
           <div className="sp-product relative w-full max-w-[22rem] overflow-hidden lg:h-full lg:w-auto lg:max-w-none" style={{ aspectRatio: "2 / 3" }}>
-            <Garment3D key={model} src={model === "/models/look" ? LOOK_PARTS : model} label={product.label} poster={product.frames[0]} points={points3d} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} view={view3d} onGrab={() => setView3d(null)} />
+            <Viewer key={`${model}-${classic}`} src={model === "/models/look" ? LOOK_PARTS : model} label={product.label} poster={product.frames[0]} points={points3d} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} view={view3d} onGrab={() => setView3d(null)} />
           </div>
         ) : (
         <div
