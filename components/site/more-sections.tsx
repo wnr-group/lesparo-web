@@ -9,7 +9,7 @@ export function DetailPanels() {
   const panels = [
     { src: "/spotlight/waist.jpg", pos: "50% 25%", title: "Drawcord waistband", text: "A soft elasticated waist with a woven drawcord, set into a fine textured knit." },
     { src: "/spotlight/tee-detail.jpg", pos: "50% 55%", title: "Textured jacquard knit", text: "A raised, crinkled surface knitted into the cloth, with the LESPARO bird on the chest." },
-    { src: "/collections/range.jpg", pos: "50% 25%", title: "Contrast collar and cuffs", text: "A brown honeycomb knit polo, trimmed in cream at the collar and sleeves." },
+    { src: "/collections/garments.jpg", pos: "50% 25%", title: "Contrast collar and cuffs", text: "A brown honeycomb knit polo, trimmed in cream at the collar and sleeves." },
   ];
   return (
     <section aria-labelledby="details" className="bg-[#efece3] py-16 lg:py-24">

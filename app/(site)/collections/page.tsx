@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { SplitWords } from "@/components/site/split-words";
 import { CollectionBanner } from "@/components/site/collection-banner";
+import { RANGE_TILES } from "@/components/site/home-photos";
 import { ShopByRange } from "@/components/site/home-sections";
 import { getCategoryTree } from "@/lib/catalogue/queries";
 
@@ -15,7 +16,6 @@ export const metadata: Metadata = {
 
 export default async function CollectionsPage() {
   const tree = await getCategoryTree();
-  const all = tree.flatMap((t) => t.children);
   return (
     <>
       <CollectionBanner>
@@ -34,7 +34,7 @@ export default async function CollectionsPage() {
         </div>
       </CollectionBanner>
 
-      <ShopByRange items={all} />
+      <ShopByRange items={RANGE_TILES} />
 
 
       <div className="mx-auto mt-16 max-w-page space-y-16 px-4 pb-20 sm:px-6 lg:px-10">

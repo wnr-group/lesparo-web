@@ -65,7 +65,7 @@ export function BrandStory() {
 /** Follow strip: real studio photographs linking to the brand's Instagram profile. */
 export function FollowStrip() {
   const insta = BUSINESS.social.find((s) => s.label === "Instagram");
-  const shots = ["gents", "tracks", "shorts", "three-quarter", "kavi"];
+  const shots = ["back-polo", "pattern-tee", "crossbody-tee", "pants-front", "pants-side"];
   if (!insta) return null;
   return (
     <section aria-labelledby="follow" className="py-14 lg:py-20">
@@ -82,7 +82,7 @@ export function FollowStrip() {
           {shots.map((s, i) => (
             <li key={s} className={i > 3 ? "hidden lg:block" : i > 2 ? "hidden sm:block lg:block" : ""}>
               <a href={insta.href} target="_blank" rel="noopener noreferrer" aria-label="LESPARO on Instagram" className="group relative block aspect-[4/5] overflow-hidden bg-[#22231f]">
-                <Image src={`/collections/${s}.jpg`} alt="" fill sizes="(min-width:1024px) 20vw, 33vw" className="object-cover transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.07]" />
+                <Image src={`/looks/${s}.jpg`} alt="" fill sizes="(min-width:1024px) 20vw, 33vw" className="object-cover transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.07]" />
                 <span aria-hidden className="absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/25" />
               </a>
             </li>

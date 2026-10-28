@@ -5,6 +5,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BrandFilm } from "@/components/site/brand-film";
 import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
+import { CIRCLE_TILES, RANGE_TILES } from "@/components/site/home-photos";
 import { NewLaunches, ShopByRange, TopCollections } from "@/components/site/home-sections";
 import { BrandStatement, BrandStory, FollowStrip } from "@/components/site/brand-sections";
 import { BuyerFaq, DetailPanels, StudioLooks } from "@/components/site/more-sections";
@@ -71,34 +72,11 @@ function turntable(id: string): TurntableSet | undefined {
   return { frames: files.map((f) => `/turntable/${id}/${f}`), spots };
 }
 
-/** A photograph of a catalogue model, used by the quality section. */
-type LineupModel = { id: string; slug: string; name: string; image: string; kid?: boolean };
-
 export default async function HomePage() {
   const [content, tree] = await Promise.all([getHomepageContent(), getCategoryTree()]);
   const fabrics = tree.find((t) => t.slug !== "garments");
-  const featuredCategories = tree.flatMap((t) => t.children).filter((c) => content.featuredCategorySlugs.includes(c.slug));
   const { sections } = content;
-  const showcase = (featuredCategories.length ? featuredCategories : tree.flatMap((t) => t.children)).slice(0, 4);
-  // Hero line-up: full-length model photos from the catalogue, kids drawn smaller (falls back to any garment photos).
-  const { products: catalogue } = await listProducts({ pageSize: 200 });
-  const bySlug = new Map(catalogue.map((p) => [p.slug, p]));
-  const pick = (slug: string, kid = false): LineupModel[] => {
-    const p = bySlug.get(slug);
-    return p?.images[0] ? [{ id: p.id, slug: p.slug, name: p.name, image: p.images[0].url, kid }] : [];
-  };
-  const shortcuts = tree
-    .flatMap((t) => t.children.flatMap((c) => (c.children.length ? c.children.map((g) => ({ ...g, name: `${c.name} ${g.name.toLowerCase()}` })) : [c])))
-    .filter((c) => c.coverUrl)
-    .slice(0, 6);
   const { products: newest } = await listProducts({ sort: "newest", pageSize: 8 });
-  const lineup: LineupModel[] = [
-    ...pick("loom-kids", true),
-    ...pick("fine-comfort-34-th"),
-    ...pick("loom-don-track-with-rib"),
-    ...pick("fine-comfort-track"),
-    ...pick("new-york-kids-track", true),
-  ];
 
   return (
     <>
@@ -111,8 +89,8 @@ export default async function HomePage() {
       {/* ---------------------------------------------------------- categories */}
       {sections.categories && (
         <>
-          <TopCollections items={shortcuts} />
-          <ShopByRange items={showcase} />
+          <TopCollections items={CIRCLE_TILES} />
+          <ShopByRange items={RANGE_TILES} />
           <NewLaunches products={newest} />
         </>
       )}
@@ -163,18 +141,9 @@ export default async function HomePage() {
               </div>
 
               {/* One calm panel: the range standing together. */}
-              <div data-reveal="clip" className="relative min-h-[26rem] overflow-hidden rounded-[2rem] bg-[#eef0ff] lg:col-span-5 lg:min-h-[34rem]">
+              <div data-reveal="clip" className="relative min-h-[26rem] overflow-hidden rounded-[2rem] bg-[#22231f] lg:col-span-5 lg:min-h-[34rem]">
                 <p className="absolute left-6 top-6 z-10 rounded-full bg-white px-4 py-2 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-indigo shadow-sm">Abija Exports · Erode</p>
-                {lineup.find((l) => !l.kid) && (
-                  <div className="absolute bottom-0 right-[4%] h-[90%] w-[78%]">
-                    <Image src={lineup.find((l) => !l.kid)!.image} alt="" fill sizes="(min-width:1024px) 26vw, 70vw" className="cutout object-contain object-bottom" />
-                  </div>
-                )}
-                {lineup.find((l) => l.kid) && (
-                  <div className="absolute bottom-0 left-[2%] z-10 h-[56%] w-[40%] mix-blend-multiply">
-                    <Image src={lineup.find((l) => l.kid)!.image} alt="" fill sizes="(min-width:1024px) 14vw, 36vw" className="cutout object-contain object-bottom" />
-                  </div>
-                )}
+                <Image src="/collections/kavi.jpg" alt="A LESPARO polo in brown knit" fill sizes="(min-width:1024px) 40vw, 100vw" className="object-cover" style={{ objectPosition: "50% 30%" }} />
               </div>
             </div>
           </Container>
