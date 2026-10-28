@@ -31,7 +31,7 @@ export default async function WholesalePage(props: PageProps<"/wholesale">) {
   const tree = await getCategoryTree();
   return (
     <>
-      <CollectionBanner>
+      <CollectionBanner slug="wholesale">
         <p className="text-sm text-white/60">Wholesale &amp; bulk supply</p>
         <h1 className="mt-3 font-display text-[clamp(2rem,1.2rem+2.6vw,3.4rem)] font-extrabold uppercase leading-[0.98] tracking-tight">
           <SplitWords onLoad>Request a quotation</SplitWords>

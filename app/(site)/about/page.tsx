@@ -73,7 +73,7 @@ export default function AboutPage() {
   return (
     <>
       {/* ============================================================ hero */}
-      <CollectionBanner>
+      <CollectionBanner slug="about">
         <p className="eyebrow !text-white/60">About LESPARO</p>
         <h1 id="about-heading" className="mt-4 font-display text-[clamp(2.4rem,1.4rem+4.4vw,5.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
           <SplitWords onLoad>Forty years of textiles</SplitWords> <SplitWords onLoad className="text-white/55">from Erode.</SplitWords>
