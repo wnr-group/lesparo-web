@@ -51,7 +51,8 @@ export function CollectionBanner({ slug, products, video, clip, children }: { sl
         {/* Artwork banners cover the whole panel; a soft gradient keeps the title readable over any crop. */}
         {cover && (
           <>
-            <Image src={cover.src} alt="" fill priority sizes="(min-width:1280px) 1280px, 100vw" className="-z-10 object-cover" style={{ objectPosition: cover.pos }} />
+            {/* unoptimized: the artwork is already HD, and the image optimiser would re-encode it at 1920px and quality 75, which visibly softens it. */}
+            <Image src={cover.src} alt="" fill priority unoptimized sizes="100vw" className="-z-10 object-cover" style={{ objectPosition: cover.pos }} />
             <span aria-hidden className="absolute inset-0 -z-[5] bg-gradient-to-r from-[#22231f]/80 via-[#22231f]/25 to-transparent" />
           </>
         )}
