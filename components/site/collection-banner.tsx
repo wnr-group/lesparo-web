@@ -17,6 +17,7 @@ const PHOTOS: Record<string, { src: string; pos: string }> = {
   kerchief: { src: "/collections/kerchief.jpg", pos: "50% 30%" },
   range: { src: "/collections/range.jpg", pos: "50% 35%" },
   about: { src: "/collections/about-hero.jpg", pos: "50% 0%" },
+  contact: { src: "/collections/contact-banner.jpg", pos: "50% 18%" },
 };
 
 /** Lifestyle banner artwork for the kids and fabric collections (public/collections/banner-*.jpg). The dark left side of each is left clear for the title. */
@@ -30,7 +31,7 @@ const COVERS: { match: string; src: string; pos: string }[] = [
 const coverFor = (slug?: string) => (slug ? COVERS.find((c) => slug.includes(c.match)) : undefined);
 
 /** Only the gents garment ranges have a model photograph from the shoot; every other collection shows its own products. */
-const PHOTO_SLUGS: Record<string, string> = { about: "about", garments: "garments", gents: "gents", "gents-tracks": "tracks", "gents-shorts": "shorts" };
+const PHOTO_SLUGS: Record<string, string> = { about: "about", contact: "contact", garments: "garments", gents: "gents", "gents-tracks": "tracks", "gents-shorts": "shorts" };
 export const hasPhoto = (slug?: string) => !slug || slug in PHOTO_SLUGS;
 
 /** Which photograph a collection slug gets (see hasPhoto). */
