@@ -8,7 +8,22 @@ export async function Footer() {
   const collections = tree.flatMap((t) => [t, ...t.children]);
 
   return (
-    <footer className="mt-auto bg-indigo-deep text-paper/80">
+    <footer className="mt-auto">
+      {/* Call-to-action band: one last route to buy before the page ends. */}
+      <div className="bg-gradient-to-r from-[#e9e8fb] via-[#fbeef2] to-[#ffeccd]">
+        <div className="mx-auto flex max-w-page flex-wrap items-center justify-between gap-5 px-4 py-10 sm:px-6 lg:px-10">
+          <p className="font-display text-[clamp(1.6rem,1rem+2vw,2.6rem)] font-extrabold uppercase leading-tight tracking-tight text-indigo-deep">Stocking a showroom? Get a quote.</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/wholesale#enquire" className="inline-flex h-12 items-center rounded-full bg-indigo px-7 text-sm font-bold text-white transition-colors hover:bg-indigo-deep">
+              Request a quote
+            </Link>
+            <a href={BUSINESS.phone.href} className="inline-flex h-12 items-center rounded-full bg-white px-7 text-sm font-bold text-ink shadow-sm hover:bg-sun">
+              Call {BUSINESS.phone.display}
+            </a>
+          </div>
+        </div>
+      </div>
+      <div className="overflow-hidden bg-indigo-deep text-paper/80">
       <div className="mx-auto grid max-w-page gap-12 px-4 py-16 sm:px-6 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:px-10">
         <div>
           <div className="inline-block rounded-2xl bg-white p-3">
@@ -26,7 +41,7 @@ export async function Footer() {
         </div>
 
         <div>
-          <h2 className="eyebrow !text-white">Collections</h2>
+          <h2 className="text-sm font-extrabold uppercase tracking-[0.12em] text-sun">Collections</h2>
           <ul className="mt-5 space-y-2.5 text-sm">
             {collections.map((c) => (
               <li key={c.id}>
@@ -39,7 +54,7 @@ export async function Footer() {
         </div>
 
         <div>
-          <h2 className="eyebrow !text-white">Company</h2>
+          <h2 className="text-sm font-extrabold uppercase tracking-[0.12em] text-sun">Company</h2>
           <ul className="mt-5 space-y-2.5 text-sm">
             {[
               ["About LESPARO", "/about"],
@@ -60,7 +75,7 @@ export async function Footer() {
         </div>
 
         <div>
-          <h2 className="eyebrow !text-white">Talk to us</h2>
+          <h2 className="text-sm font-extrabold uppercase tracking-[0.12em] text-sun">Talk to us</h2>
           <ul className="mt-5 space-y-3 text-sm">
             <li>
               <span className="block text-paper/50">Office</span>
@@ -92,8 +107,12 @@ export async function Footer() {
           </ul>
         </div>
       </div>
+      <p aria-hidden className="pointer-events-none -mb-[0.18em] select-none text-center font-display text-[clamp(4rem,2rem+17vw,17rem)] font-extrabold leading-none tracking-tight text-white/[0.05]">
+        LESPARO
+      </p>
       <div className="border-t border-paper/10">
         <p className="mx-auto max-w-page px-4 py-6 text-xs text-paper/50 sm:px-6 lg:px-10">LESPARO is a device trademark of Y. Sathish, trading as Abija Exports (Application 3620885, Class 25).</p>
+      </div>
       </div>
     </footer>
   );
