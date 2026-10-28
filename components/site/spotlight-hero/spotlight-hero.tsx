@@ -151,7 +151,7 @@ const ringDist = (a: number, b: number, n: number) => Math.min(Math.abs(a - b), 
  * turntable set (8 or more frames in public/turntable) spins smoothly; until then four real photographs stand in.
  */
 export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, turntables, models = {} }: { eyebrow: string; heading: string; subheading: string; cta: Cta; secondary: Cta; turntables: Partial<Record<string, TurntableSet>>; models?: Partial<Record<string, string>> }) {
-  const products: Product[] = ["pants", "tee", "look"].map((id) => {
+  const products: Product[] = ["tee", "pants", "look"].map((id) => {
     const real = turntables[id];
     return real
       ? { id, label: LABELS[id], frames: real.frames, spots: real.spots, spin: true, keyLabels: SPIN_KEYS }
