@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CatalogueBrowser, CatalogueSkeleton } from "@/components/site/catalogue-browser";
 import { SplitWords } from "@/components/site/split-words";
-import { CollectionBanner } from "@/components/site/collection-banner";
-import { getCategories, getCategoryBySlug } from "@/lib/catalogue/queries";
+import { CollectionBanner, hasPhoto } from "@/components/site/collection-banner";
+import { getCategories, getCategoryBySlug, listProducts } from "@/lib/catalogue/queries";
 
 export async function generateStaticParams() {
   return (await getCategories()).map((c) => ({ slug: c.slug }));
@@ -28,8 +28,11 @@ async function CollectionHeader({ params }: { params: Promise<{ slug: string }> 
   const found = await getCategoryBySlug(slug);
   if (!found) notFound();
   const { category, trail, children } = found;
+  // Collections without a shoot photograph show their own products instead.
+  const { products: own } = hasPhoto(slug) ? { products: [] } : await listProducts({ categoryIds: found.subtreeIds, pageSize: 3 });
+  const bannerProducts = own.filter((p) => p.images[0]).map((p) => ({ src: p.images[0].url, alt: p.name }));
   return (
-    <CollectionBanner slug={slug}>
+    <CollectionBanner slug={slug} products={bannerProducts}>
       <nav aria-label="Breadcrumb" className="text-sm text-white/60">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
