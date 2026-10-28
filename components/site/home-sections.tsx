@@ -41,9 +41,9 @@ export function ShopByRange({ items }: { items: PhotoTile[] }) {
           {items.slice(0, 4).map((c, i) => (
             <li key={c.name} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }} className={layout[i]}>
               <Link href={c.href} className={`group relative block h-full w-full overflow-clip bg-[#22231f] text-white ${i === 0 ? "scrub-mask" : ""}`}>
-                <Image src={c.src} alt="" fill sizes="(min-width:1024px) 50vw, 100vw" className="scrub-parallax object-cover" style={{ objectPosition: c.pos }} />
-                <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 sm:p-6">
+                <Image src={c.src} alt="" fill sizes="(min-width:1024px) 50vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: c.pos }} />
+                <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent transition-opacity duration-500 group-hover:from-black/85" />
+                <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:-translate-y-1.5 sm:p-6">
                   <span className="font-display text-[clamp(1.4rem,0.8rem+2vw,2.8rem)] font-extrabold uppercase leading-none tracking-tight">{c.name}</span>
                   <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-ink transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:rotate-45 sm:size-12">
                     <ArrowUpRight className="size-5" aria-hidden />

@@ -23,12 +23,12 @@ export function BrandStatement() {
               </li>
             ))}
           </ul>
-          <Link href="/shop" className="mt-10 inline-flex h-12 w-fit items-center gap-2 rounded-full bg-ink px-6 text-sm font-bold text-white transition-colors hover:bg-indigo-deep">
-            Shop the range <ArrowRight className="size-4" aria-hidden />
+          <Link href="/shop" className="group/btn mt-10 inline-flex h-12 w-fit items-center gap-2 rounded-full bg-ink px-6 text-sm font-bold text-white transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-indigo-deep">
+            Shop the range <ArrowRight className="size-4 transition-transform duration-300 group-hover/btn:translate-x-1" aria-hidden />
           </Link>
         </div>
-        <div className="relative min-h-80 overflow-clip lg:min-h-0">
-          <Image src="/looks/training.jpg" alt="" fill sizes="(min-width:1024px) 38vw, 100vw" className="scrub-parallax object-cover" style={{ objectPosition: "50% 30%" }} />
+        <div className="group relative min-h-80 overflow-clip lg:min-h-0">
+          <Image src="/looks/training.jpg" alt="" fill sizes="(min-width:1024px) 38vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: "50% 30%" }} />
         </div>
       </div>
     </section>
@@ -45,8 +45,8 @@ export function BrandStory() {
   return (
     <section aria-labelledby="brand-story" className="py-16 lg:py-24">
       <div className="mx-auto grid max-w-page items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20 lg:px-10">
-        <div data-reveal="clip" className="relative aspect-[4/5] overflow-clip rounded-[1.6rem] bg-[#22231f]">
-          <Image src="/collections/range.jpg" alt="A LESPARO polo in brown knit, worn in the studio" fill sizes="(min-width:1024px) 42vw, 100vw" className="scrub-parallax object-cover" style={{ objectPosition: "50% 30%" }} />
+        <div data-reveal="clip" className="group relative aspect-[4/5] overflow-clip rounded-[1.6rem] bg-[#22231f]">
+          <Image src="/collections/range.jpg" alt="A LESPARO polo in brown knit, worn in the studio" fill sizes="(min-width:1024px) 42vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: "50% 30%" }} />
         </div>
         <div>
           <p data-reveal="up" className="eyebrow">
@@ -66,8 +66,8 @@ export function BrandStory() {
               </div>
             ))}
           </dl>
-          <Link href="/about" className="mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-sm font-bold text-white transition-colors hover:bg-indigo-deep">
-            Read our story <ArrowRight className="size-4" aria-hidden />
+          <Link href="/about" className="group/btn mt-8 inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-sm font-bold text-white transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-indigo-deep">
+            Read our story <ArrowRight className="size-4 transition-transform duration-300 group-hover/btn:translate-x-1" aria-hidden />
           </Link>
         </div>
       </div>
@@ -95,8 +95,10 @@ export function FollowStrip() {
           {shots.map((s, i) => (
             <li key={s} className={i > 3 ? "hidden lg:block" : i > 2 ? "hidden sm:block lg:block" : ""}>
               <a href={insta.href} target="_blank" rel="noopener noreferrer" aria-label="LESPARO on Instagram" className="group relative block aspect-[4/5] overflow-hidden bg-[#22231f]">
-                <Image src={`/looks/${s}.jpg`} alt="" fill sizes="(min-width:1024px) 20vw, 33vw" className="object-cover transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.07]" />
-                <span aria-hidden className="absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/25" />
+                <Image src={`/looks/${s}.jpg`} alt="" fill sizes="(min-width:1024px) 20vw, 33vw" className="hz object-cover" />
+                <span aria-hidden className="absolute inset-0 grid place-items-center bg-ink/0 transition-colors duration-500 group-hover:bg-ink/35">
+                  <ArrowUpRight className="size-9 translate-y-3 text-white opacity-0 transition-all duration-500 ease-[var(--ease-out-soft)] group-hover:translate-y-0 group-hover:opacity-100" />
+                </span>
               </a>
             </li>
           ))}

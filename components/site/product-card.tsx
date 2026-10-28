@@ -10,7 +10,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
   const [primary, secondary] = product.images;
   const retail = product.retailEnabled && product.price !== null;
   return (
-    <article className="group relative flex flex-col">
+    <article className="group relative flex flex-col transition-transform duration-500 ease-[var(--ease-out-soft)] [@media(hover:hover)]:hover:-translate-y-1">
       {/* Grey plate: the photos are shot on white, so multiply drops the white and the product sits on the grey.
           Same view-transition name as the product page gallery, so the plate morphs across the navigation. */}
       <ViewTransition name={`product-${product.id}`} share="morph" default="none">

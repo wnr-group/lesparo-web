@@ -694,3 +694,28 @@
     animation-delay: calc(0.15s + var(--i, 0) * 90ms);
   }
 }
+
+/*
+ * Hover effects (pointer devices only). Put `group` on the link or card, then:
+ *   .hz     the photograph inside eases up to a gentle zoom (uses transform, so it stacks with the scroll-parallax scale)
+ *   .hline  a title gets an underline that draws in from the left
+ */
+.hz {
+  transition: transform 0.9s var(--ease-out-soft);
+}
+.hline {
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 2px;
+  transition: background-size 0.5s var(--ease-out-soft);
+  padding-bottom: 2px;
+}
+@media (hover: hover) {
+  .group:hover .hz,
+  .group:focus-visible .hz {
+    transform: scale(1.07);
+  }
+  .group:hover .hline,
+  .group:focus-visible .hline {
+    background-size: 100% 2px;
+  }
+}
+

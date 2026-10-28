@@ -25,10 +25,11 @@ export function DetailPanels() {
             <li key={p.title} data-reveal="up" style={{ ["--delay" as string]: `${i * 110}ms` }}>
               <figure className="group">
                 <div className="relative aspect-[4/5] overflow-clip bg-[#22231f]">
-                  <Image src={p.src} alt="" fill sizes="(min-width:768px) 32vw, 100vw" className="scrub-parallax object-cover" style={{ objectPosition: p.pos }} />
+                  <Image src={p.src} alt="" fill sizes="(min-width:768px) 32vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: p.pos }} />
+                  <span aria-hidden className="absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/15" />
                 </div>
-                <figcaption className="mt-4">
-                  <span className="font-display text-xl font-extrabold uppercase tracking-tight">{p.title}</span>
+                <figcaption className="mt-4 transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:translate-x-1.5">
+                  <span className="hline font-display text-xl font-extrabold uppercase tracking-tight">{p.title}</span>
                   <span className="mt-1.5 block max-w-sm text-sm leading-relaxed text-ink-soft">{p.text}</span>
                 </figcaption>
               </figure>
@@ -63,10 +64,10 @@ export function StudioLooks() {
           <li key={l.title} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }} className={i % 2 ? "md:mt-10" : ""}>
             <Link href={l.href} className="group block">
               <span className="relative block aspect-[3/4] overflow-clip bg-[#22231f]">
-                <Image src={l.src} alt="" fill sizes="(min-width:768px) 24vw, 48vw" className="scrub-parallax object-cover" style={{ objectPosition: l.pos }} />
+                <Image src={l.src} alt="" fill sizes="(min-width:768px) 24vw, 48vw" className="scrub-parallax hz object-cover" style={{ objectPosition: l.pos }} />
               </span>
               <span className="mt-3 flex items-center justify-between gap-3">
-                <span className="font-display text-lg font-extrabold uppercase tracking-tight">{l.title}</span>
+                <span className="hline font-display text-lg font-extrabold uppercase tracking-tight">{l.title}</span>
                 <span aria-hidden className="text-xl transition-transform duration-300 group-hover:translate-x-1">→</span>
               </span>
             </Link>
@@ -104,7 +105,7 @@ export function BuyerFaq() {
         <div data-reveal="up" className="divide-y divide-line border-y border-line">
           {FAQ.map(([q, a]) => (
             <details key={q} className="group py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-6 font-display text-lg font-bold sm:text-xl [&::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer transition-colors hover:text-indigo list-none items-center justify-between gap-6 font-display text-lg font-bold sm:text-xl [&::-webkit-details-marker]:hidden">
                 {q}
                 <Plus className="size-5 shrink-0 transition-transform duration-300 group-open:rotate-45" aria-hidden />
               </summary>
