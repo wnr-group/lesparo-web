@@ -3,9 +3,12 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { BrandFilm } from "@/components/site/brand-film";
+import { CollectionBanner } from "@/components/site/collection-banner";
+import { CountUp } from "@/components/site/count-up";
+import { Magnetic } from "@/components/site/pointer-fx";
+import { SplitWords } from "@/components/site/split-words";
 import { ButtonLink } from "@/components/ui/button";
 import { BUSINESS } from "@/lib/business";
-import { getCategoryTree, listProducts, type CategoryNode } from "@/lib/catalogue/queries";
 import "./about.css";
 
 export const metadata: Metadata = {
@@ -25,7 +28,7 @@ const HISTORY = [
     year: "1979",
     title: "R. Yuvaraj, Erode",
     body: "Mr. Yuvaraj founds R. Yuvaraj in Erode, a city known for textiles. The business begins by supplying lungis, dhoties and mull cloth to Kerala.",
-    range: "checked-lungi",
+    photo: { src: "/collections/banner-lungi.jpg", pos: "64% 40%" },
     label: "Lungi",
   },
   {
@@ -37,14 +40,14 @@ const HISTORY = [
     year: "2001",
     title: "Y. Sathish & Co.",
     body: "After about two years in the family business, he starts Y. Sathish & Co.: churidar materials, Kerala special dhoties and Kerala sarees, sold to showrooms, chain stores and wholesalers in Kerala and Tamil Nadu.",
-    range: "kavi-dhothy",
+    photo: { src: "/collections/banner-kavi.jpg", pos: "64% 50%" },
     label: "Kavi dhothy",
   },
   {
     year: "2017",
     title: "Abija Exports and LESPARO",
     body: "After his own market survey, he launches Abija Exports, the unit behind LESPARO: knitted and woven unisex and kids’ casual wear. Shorts, 3/4th pants and track suits for leisure, sports and ethnic wear.",
-    range: "gents-tracks",
+    photo: { src: "/collections/tracks.jpg", pos: "50% 70%" },
     label: "Gents tracks",
   },
 ];
@@ -52,81 +55,50 @@ const HISTORY = [
 /** Vision text as words, so each can pull into focus with scroll. */
 const VISION = ["To be India’s most customer-centric company of leisure wear", "for people who need comfort, perfect wear."];
 
-const flatten = (nodes: CategoryNode[]): CategoryNode[] => nodes.flatMap((n) => [n, ...flatten(n.children)]);
+/** The three ranges, each with a photograph from the studio shoot or the lifestyle artwork. */
+const RANGES = [
+  { name: "Gents", href: "/collections/gents", note: "Shorts, tracks, 3/4th and T-shirts for men.", src: "/collections/gents.jpg", pos: "50% 28%" },
+  { name: "Kids", href: "/collections/kids", note: "Shorts, tracks and 3/4th for kids.", src: "/collections/banner-kids.jpg", pos: "72% 40%" },
+  { name: "Fabric unstitched", href: "/collections/fabric-unstitched", note: "Lungi, kavi dhothy, towels and kerchiefs: the woven lines the family trade began with.", src: "/collections/banner-towels.jpg", pos: "75% 50%" },
+];
 
-export default async function AboutPage() {
-  const tree = await getCategoryTree();
-  const all = flatten(tree);
-  const cover = (slug: string) => all.find((c) => c.slug === slug)?.coverUrl ?? null;
-  const garments = tree.find((t) => t.slug === "garments")?.children ?? [];
-  const fabrics = tree.find((t) => t.slug !== "garments");
-
-  const { products } = await listProducts({ pageSize: 200 });
-  const photo = (slug: string) => products.find((p) => p.slug === slug)?.images[0]?.url ?? null;
-  const adult = photo("loom-don-track-with-rib");
-  const kid = photo("new-york-kids-track");
-
-  const ranges = [
-    { cat: garments.find((g) => /gent/i.test(g.slug)), note: "Shorts, tracks, 3/4th and T-shirts for men.", bg: "bg-[#eef0ff]", img: photo("fine-comfort-track") },
-    { cat: garments.find((g) => /kid/i.test(g.slug)), note: "Shorts, tracks and 3/4th for kids.", bg: "bg-[#f4f1ea]", img: photo("loom-kids") },
-    { cat: fabrics, note: "Lungi, kavi dhothy, towels and kerchiefs: the woven lines the family trade began with.", bg: "bg-[#eaf3f1]", img: null },
-  ];
-
+export default function AboutPage() {
   return (
     <>
       {/* ============================================================ hero */}
-      <section aria-labelledby="about-heading" className="bg-white">
-        <div className="mx-auto grid max-w-page items-center gap-12 px-4 py-14 sm:px-6 lg:grid-cols-12 lg:gap-14 lg:px-10 lg:py-24">
-          <div className="lg:col-span-7">
-            <p data-reveal="up" className="eyebrow">
-              About LESPARO
-            </p>
-            <h1 id="about-heading" data-reveal="mask" className="mt-5 font-display text-[clamp(2.8rem,1.4rem+6vw,7.5rem)] font-extrabold leading-[0.9] tracking-[-0.05em]">
-              Forty years of textiles <span className="text-indigo">from Erode.</span>
-            </h1>
-            <p data-reveal="up" className="mt-8 max-w-xl text-lg leading-relaxed text-ink-soft">
-              Built on four decades of hands-on textile experience, LESPARO today supplies textile showrooms across Tamil Nadu, Kerala and Karnataka, with the aim of taking the brand across India.
-            </p>
-            <dl data-reveal="stagger" className="mt-10 grid max-w-xl grid-cols-3 gap-4 border-t border-line pt-6">
-              {[
-                ["1979", "Family trade begins"],
-                ["3 states", "Tamil Nadu, Kerala, Karnataka"],
-                ["2017", "LESPARO launches"],
-              ].map(([v, l]) => (
-                <div key={v}>
-                  <dd className="font-display text-[clamp(1.5rem,1.1rem+1.6vw,2.4rem)] font-extrabold leading-none tracking-[-0.04em] text-indigo">{v}</dd>
-                  <dt className="mt-2 text-xs leading-snug text-muted">{l}</dt>
-                </div>
-              ))}
-            </dl>
-          </div>
-          <div data-reveal="clip" className="relative min-h-[24rem] overflow-hidden rounded-[2rem] bg-[#eef0ff] lg:col-span-5 lg:min-h-[34rem]">
-            <div aria-hidden className="ab-panel absolute inset-0 bg-[radial-gradient(60%_50%_at_60%_30%,#fff,transparent)]" />
-            <p className="absolute left-6 top-6 z-10 rounded-full bg-white px-4 py-2 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-indigo shadow-sm">Abija Exports · Erode</p>
-            {adult && (
-              <div className="ab-lag-a absolute bottom-0 right-[4%] h-[90%] w-[78%] mix-blend-multiply">
-                <Image src={adult} alt="LESPARO gents track pants and vest" fill priority sizes="(min-width:1024px) 26vw, 70vw" className="cutout object-contain object-bottom" />
-              </div>
-            )}
-            {kid && (
-              <div className="ab-lag-b absolute bottom-0 left-[2%] z-10 h-[56%] w-[40%] mix-blend-multiply">
-                <Image src={kid} alt="LESPARO kids track pants and t-shirt" fill sizes="(min-width:1024px) 14vw, 36vw" className="cutout object-contain object-bottom" />
-              </div>
-            )}
-          </div>
-        </div>
+      <CollectionBanner>
+        <p className="eyebrow !text-white/60">About LESPARO</p>
+        <h1 id="about-heading" className="mt-4 font-display text-[clamp(2.4rem,1.4rem+4.4vw,5.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
+          <SplitWords onLoad>Forty years of textiles</SplitWords> <SplitWords onLoad className="text-white/55">from Erode.</SplitWords>
+        </h1>
+        <p className="mt-5 max-w-lg text-white/70">Built on four decades of hands-on textile experience, LESPARO today supplies textile showrooms across Tamil Nadu, Kerala and Karnataka, with the aim of taking the brand across India.</p>
+      </CollectionBanner>
+
+      <section aria-label="LESPARO in numbers" className="py-10 lg:py-14">
+        <dl data-reveal="stagger" className="mx-auto grid max-w-page grid-cols-3 gap-4 px-4 sm:px-6 lg:px-10">
+          {[
+            ["1979", "Family trade begins"],
+            ["3 states", "Tamil Nadu, Kerala, Karnataka"],
+            ["2017", "LESPARO launches"],
+          ].map(([v, l]) => (
+            <div key={v} className="border-t-2 border-ink pt-4">
+              <dd className="font-display text-[clamp(1.8rem,1.1rem+3vw,3.6rem)] font-extrabold leading-none tabular-nums tracking-tight">{v === "3 states" ? <><CountUp value={3} /> states</> : v}</dd>
+              <dt className="mt-2 text-xs leading-snug text-muted sm:text-sm">{l}</dt>
+            </div>
+          ))}
+        </dl>
       </section>
 
       {/* The LESPARO film, straight after the introduction. */}
       <BrandFilm open src="/lesparo_video.mp4" title="The LESPARO film" />
 
       {/* ========================================================== vision */}
-      <section aria-labelledby="vision-heading" className="bg-[#f4f5ff] py-20 lg:py-28">
+      <section aria-labelledby="vision-heading" className="bg-[#f2f3f5] py-20 lg:py-28">
         <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
           <p data-reveal="up" className="eyebrow">
             Our vision
           </p>
-          <h2 id="vision-heading" data-reveal="mask" className="mt-5 max-w-5xl font-display text-[clamp(2rem,1.1rem+4vw,5rem)] font-extrabold leading-[1] tracking-[-0.045em]">
+          <h2 id="vision-heading" className="uppercase mt-5 max-w-5xl font-display text-[clamp(2rem,1.1rem+4vw,5rem)] font-extrabold leading-[1] tracking-tight">
             {VISION.map((part, pi) =>
               part.split(" ").map((w, wi) => (
                 <span key={pi + "-" + wi} className={pi === 1 ? "text-indigo" : ""}>
@@ -149,8 +121,8 @@ export default async function AboutPage() {
               <p data-reveal="up" className="eyebrow">
                 Company history
               </p>
-              <h2 id="history-heading" data-reveal="mask" className="mt-4 font-display text-[clamp(2.2rem,1.2rem+4vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.045em]">
-                One family, four chapters.
+              <h2 id="history-heading" className="uppercase mt-4 font-display text-[clamp(2.2rem,1.2rem+4vw,5rem)] font-extrabold leading-[0.95] tracking-tight">
+                <SplitWords>One family, four chapters.</SplitWords>
               </h2>
             </div>
             <p data-reveal="up" className="max-w-md leading-relaxed text-ink-soft lg:col-span-5 lg:justify-self-end">
@@ -162,7 +134,6 @@ export default async function AboutPage() {
             <span aria-hidden className="absolute bottom-0 left-[5px] top-2 w-px bg-line lg:left-1/2" />
             <span aria-hidden className="timeline-fill absolute bottom-0 left-[5px] top-2 w-px origin-top bg-indigo lg:left-1/2" />
             {HISTORY.map((h, i) => {
-              const img = h.range ? cover(h.range) : null;
               const flip = i % 2 === 1;
               return (
                 <li key={h.year} className="relative grid gap-6 pb-14 pl-10 last:pb-0 lg:grid-cols-2 lg:gap-24 lg:pb-24 lg:pl-0">
@@ -172,14 +143,15 @@ export default async function AboutPage() {
                     <h3 className="mt-5 font-display text-2xl font-bold tracking-tight sm:text-3xl">{h.title}</h3>
                     <p className="mt-3 max-w-prose text-lg leading-relaxed text-ink-soft">{h.body}</p>
                   </div>
-                  <div className={`ab-zoom relative aspect-[4/3] w-full max-w-md self-center overflow-hidden rounded-2xl bg-[#f4f5ff] ${flip ? "lg:order-1 lg:justify-self-end" : ""}`}>
-                    {img ? (
+                  <div className={`ab-zoom group relative aspect-[4/3] w-full max-w-md self-center overflow-hidden rounded-2xl bg-[#22231f] ${flip ? "lg:order-1 lg:justify-self-end" : ""}`}>
+                    {h.photo ? (
                       <>
-                        <Image src={img} alt={`${h.label}, from today’s LESPARO range`} fill sizes="(min-width:1024px) 28rem, 90vw" className="cutout object-contain p-6 pb-12" />
-                        <p className="absolute inset-x-0 bottom-0 px-5 py-3 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-indigo">From today’s range · {h.label}</p>
+                        <Image src={h.photo.src} alt={`${h.label}, from today’s LESPARO range`} fill sizes="(min-width:1024px) 28rem, 90vw" className="hz object-cover" style={{ objectPosition: h.photo.pos }} />
+                        <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+                        <p className="absolute inset-x-0 bottom-0 px-5 py-4 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-white">From today’s range · {h.label}</p>
                       </>
                     ) : (
-                      <p aria-hidden className="absolute inset-0 grid place-items-center font-display text-[7rem] font-extrabold tracking-[-0.06em] text-indigo/25">
+                      <p aria-hidden className="absolute inset-0 grid place-items-center font-display text-[7rem] font-extrabold tracking-[-0.06em] text-white/20">
                         {h.year.slice(2)}
                       </p>
                     )}
@@ -192,43 +164,31 @@ export default async function AboutPage() {
       </section>
 
       {/* =========================================================== range */}
-      <section aria-labelledby="range-heading" className="overflow-x-clip bg-[#f4f5ff] py-20 lg:py-28">
+      <section aria-labelledby="range-heading" className="overflow-x-clip bg-[#f2f3f5] py-20 lg:py-28">
         <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
           <p data-reveal="up" className="eyebrow">
             What we make
           </p>
-          <h2 id="range-heading" data-reveal="mask" className="mt-4 max-w-4xl font-display text-[clamp(2.2rem,1.2rem+4vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.045em]">
-            Garments, and the cloth behind them.
+          <h2 id="range-heading" className="uppercase mt-4 max-w-4xl font-display text-[clamp(2.2rem,1.2rem+4vw,5rem)] font-extrabold leading-[0.95] tracking-tight">
+            <SplitWords>Garments, and the cloth behind them.</SplitWords>
           </h2>
           <ul className="mt-12 grid gap-4 md:grid-cols-3 md:gap-6 lg:mt-16">
-            {ranges.map(({ cat, note, bg, img }, ri) =>
-              cat ? (
-                <li key={cat.id} className="ab-fan" style={{ ["--k" as string]: ri - 1 }}>
-                  <Link href={`/collections/${cat.slug}`} className="group flex h-full flex-col overflow-hidden rounded-3xl bg-white ring-1 ring-line transition-shadow duration-500 hover:shadow-[0_24px_50px_-28px_rgb(18_22_76/0.35)]">
-                    <div className={`relative aspect-[4/3] md:aspect-[4/5] ${bg}`}>
-                      {fabrics && cat.id === fabrics.id ? (
-                        <div className="absolute inset-0 grid grid-cols-2 gap-2 p-5">
-                          {cat.children.slice(0, 4).map((c) => (
-                            <div key={c.id} className="relative">
-                              {c.coverUrl && <Image src={c.coverUrl} alt="" fill sizes="(min-width:768px) 14vw, 40vw" className="cutout object-contain" />}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        (img ?? cat.coverUrl) && <Image src={(img ?? cat.coverUrl)!} alt="" fill sizes="(min-width:768px) 30vw, 90vw" className="cutout object-contain object-bottom p-5" />
-                      )}
+            {RANGES.map(({ name, href, note, src, pos }, ri) => (
+              <li key={name} className="ab-fan" style={{ ["--k" as string]: ri - 1 }}>
+                <Link href={href} className="group flex h-full flex-col overflow-hidden rounded-3xl bg-white ring-1 ring-line transition-shadow duration-500 hover:shadow-[0_24px_50px_-28px_rgb(18_22_76/0.35)]">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-[#22231f] md:aspect-[4/5]">
+                    <Image src={src} alt="" fill sizes="(min-width:768px) 30vw, 90vw" className="hz object-cover" style={{ objectPosition: pos }} />
+                  </div>
+                  <div className="flex items-end justify-between gap-4 p-6">
+                    <div>
+                      <p className="font-display text-2xl font-extrabold uppercase tracking-tight">{name}</p>
+                      <p className="mt-2 max-w-[22rem] text-sm leading-relaxed text-ink-soft">{note}</p>
                     </div>
-                    <div className="flex items-end justify-between gap-4 p-6">
-                      <div>
-                        <p className="font-display text-2xl font-extrabold tracking-[-0.03em]">{cat.name}</p>
-                        <p className="mt-2 max-w-[22rem] text-sm leading-relaxed text-ink-soft">{note}</p>
-                      </div>
-                      <ArrowUpRight className="size-6 shrink-0 text-indigo transition-transform duration-500 group-hover:rotate-45" aria-hidden />
-                    </div>
-                  </Link>
-                </li>
-              ) : null,
-            )}
+                    <ArrowUpRight className="size-6 shrink-0 text-ink transition-transform duration-500 group-hover:rotate-45" aria-hidden />
+                  </div>
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       </section>
@@ -240,8 +200,8 @@ export default async function AboutPage() {
             <p data-reveal="up" className="eyebrow">
               Quality promise
             </p>
-            <h2 id="quality-heading" data-reveal="mask" className="mt-4 font-display text-[clamp(2.2rem,1.2rem+3.6vw,4.5rem)] font-extrabold leading-[0.95] tracking-[-0.045em]">
-              Made to be worn, <span className="text-indigo">and trusted.</span>
+            <h2 id="quality-heading" className="uppercase mt-4 font-display text-[clamp(2.2rem,1.2rem+3.6vw,4.5rem)] font-extrabold leading-[0.95] tracking-tight">
+              <SplitWords>Made to be worn,</SplitWords> <SplitWords className="text-indigo">and trusted.</SplitWords>
             </h2>
             <p data-reveal="up" className="mt-6 max-w-sm text-sm leading-relaxed text-ink-soft">Abija Exports’ published policies, as set out on the original LESPARO website.</p>
           </div>
@@ -265,13 +225,13 @@ export default async function AboutPage() {
       </section>
 
       {/* ======================================================= channels */}
-      <section aria-labelledby="channels-heading" className="bg-[#f4f5ff] py-20 lg:py-28">
+      <section aria-labelledby="channels-heading" className="bg-[#f2f3f5] py-20 lg:py-28">
         <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
           <p data-reveal="up" className="eyebrow">
             How to buy
           </p>
-          <h2 id="channels-heading" data-reveal="mask" className="mt-4 max-w-4xl font-display text-[clamp(2.2rem,1.2rem+4vw,5rem)] font-extrabold leading-[0.95] tracking-[-0.045em]">
-            For shoppers, and for showrooms.
+          <h2 id="channels-heading" className="uppercase mt-4 max-w-4xl font-display text-[clamp(2.2rem,1.2rem+4vw,5rem)] font-extrabold leading-[0.95] tracking-tight">
+            <SplitWords>For shoppers, and for showrooms.</SplitWords>
           </h2>
           <div className="mt-12 grid gap-4 md:gap-6 lg:mt-16 lg:grid-cols-2">
             <div data-reveal="up" className="flex flex-col justify-between rounded-3xl bg-white p-8 ring-1 ring-line lg:p-10">
@@ -341,19 +301,21 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className="overflow-hidden bg-[#f4f5ff] pt-14 lg:pt-16">
+      <section className="overflow-hidden bg-[#f2f3f5] pt-14 lg:pt-16">
         <div className="mx-auto flex max-w-page flex-col items-start justify-between gap-6 px-4 sm:px-6 md:flex-row md:items-center lg:px-10">
           <p className="font-display text-[clamp(1.6rem,1.1rem+1.8vw,2.6rem)] font-extrabold leading-tight tracking-[-0.03em]">Sourcing for your store?</p>
           <div className="flex flex-wrap gap-3">
-            <ButtonLink href="/wholesale#enquire" size="lg">
-              Wholesale enquiries <ArrowRight className="size-4" aria-hidden />
-            </ButtonLink>
+            <Magnetic>
+              <ButtonLink href="/wholesale#enquire" size="lg">
+                Wholesale enquiries <ArrowRight className="size-4" aria-hidden />
+              </ButtonLink>
+            </Magnetic>
             <ButtonLink href="/contact" variant="secondary" size="lg">
               Contact us
             </ButtonLink>
           </div>
         </div>
-        <p aria-hidden className="ab-wordmark mt-10 select-none whitespace-nowrap text-center font-display text-[clamp(4.5rem,22vw,28rem)] font-extrabold leading-[0.74] tracking-[-0.06em] text-indigo/[0.09]">
+        <p aria-hidden className="ab-wordmark mt-10 select-none whitespace-nowrap text-center font-display text-[clamp(4.5rem,22vw,28rem)] font-extrabold leading-[0.74] tracking-[-0.06em] text-ink/[0.05]">
           LESPARO
         </p>
       </section>
