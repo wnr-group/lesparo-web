@@ -18,6 +18,16 @@ const PHOTOS: Record<string, { src: string; pos: string }> = {
   range: { src: "/collections/range.jpg", pos: "50% 35%" },
 };
 
+/** Lifestyle banner artwork for the kids and fabric collections (public/collections/banner-*.jpg). The dark left side of each is left clear for the title. */
+const COVERS: { match: string; src: string; pos: string }[] = [
+  { match: "kerchief", src: "/collections/banner-kerchief.jpg", pos: "50% 35%" },
+  { match: "towel", src: "/collections/banner-towels.jpg", pos: "50% 55%" },
+  { match: "kavi", src: "/collections/banner-kavi.jpg", pos: "88% 50%" },
+  { match: "lungi", src: "/collections/banner-lungi.jpg", pos: "50% 40%" },
+  { match: "kids", src: "/collections/banner-kids.jpg", pos: "50% 35%" },
+];
+const coverFor = (slug?: string) => (slug ? COVERS.find((c) => slug.includes(c.match)) : undefined);
+
 /** Only the gents garment ranges have a model photograph from the shoot; every other collection shows its own products. */
 const PHOTO_SLUGS: Record<string, string> = { garments: "garments", gents: "gents", "gents-tracks": "tracks", "gents-shorts": "shorts" };
 export const hasPhoto = (slug?: string) => !slug || slug in PHOTO_SLUGS;
@@ -33,10 +43,18 @@ export function photoFor(slug?: string) {
  */
 export function CollectionBanner({ slug, products, video, clip, children }: { slug?: string; products?: { src: string; alt: string }[]; video?: string; clip?: [number, number]; children: ReactNode }) {
   const photo = photoFor(slug);
-  const own = !hasPhoto(slug) && products && products.length > 0 ? products.slice(0, 3) : null;
+  const cover = !video ? coverFor(slug) : undefined;
+  const own = !video && !cover && !hasPhoto(slug) && products && products.length > 0 ? products.slice(0, 3) : null;
   return (
     <section className="mx-auto max-w-page px-4 pt-6 sm:px-6 lg:px-10 lg:pt-8">
-      <div className={`relative isolate grid overflow-clip rounded-[1.6rem] bg-[#22231f] text-white lg:min-h-[26rem] ${video ? "" : "lg:grid-cols-[1fr_1.1fr]"}`}>
+      <div className={`relative isolate grid overflow-clip rounded-[1.6rem] bg-[#22231f] text-white lg:min-h-[26rem] ${video || cover ? "" : "lg:grid-cols-[1fr_1.1fr]"}`}>
+        {/* Artwork banners cover the whole panel; a soft gradient keeps the title readable over any crop. */}
+        {cover && (
+          <>
+            <Image src={cover.src} alt="" fill priority sizes="(min-width:1280px) 1280px, 100vw" className="-z-10 object-cover" style={{ objectPosition: cover.pos }} />
+            <span aria-hidden className="absolute inset-0 -z-[5] bg-gradient-to-r from-[#22231f]/80 via-[#22231f]/25 to-transparent" />
+          </>
+        )}
         {/* A promo film covers the whole banner; a gradient keeps the text on the left readable. Reduced motion keeps the photograph. */}
         {video && (
           <>
@@ -50,7 +68,7 @@ export function CollectionBanner({ slug, products, video, clip, children }: { sl
           </>
         )}
         <div className="relative z-10 flex flex-col justify-center px-6 py-10 sm:px-12 lg:px-16 lg:py-14">{children}</div>
-        {video ? null : own ? (
+        {video || cover ? null : own ? (
           <div className="relative flex min-h-64 items-end justify-center gap-2 overflow-clip bg-[#e4e0d3] px-4 pt-8 sm:gap-4 lg:min-h-0 lg:px-8">
             {own.map((p, i) => (
               <div key={p.src} className={`relative h-[16rem] min-w-0 flex-1 sm:h-[20rem] lg:h-[24rem] ${i === 1 ? "lg:h-[26rem]" : ""}`}>
