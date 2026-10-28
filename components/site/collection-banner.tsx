@@ -20,11 +20,11 @@ const PHOTOS: Record<string, { src: string; pos: string }> = {
 
 /** Lifestyle banner artwork for the kids and fabric collections (public/collections/banner-*.jpg). The dark left side of each is left clear for the title. */
 const COVERS: { match: string; src: string; pos: string }[] = [
-  { match: "kerchief", src: "/collections/banner-kerchief.jpg", pos: "50% 35%" },
-  { match: "towel", src: "/collections/banner-towels.jpg", pos: "50% 55%" },
-  { match: "kavi", src: "/collections/banner-kavi.jpg", pos: "88% 50%" },
-  { match: "lungi", src: "/collections/banner-lungi.jpg", pos: "50% 40%" },
-  { match: "kids", src: "/collections/banner-kids.jpg", pos: "50% 35%" },
+  { match: "kerchief", src: "/collections/banner-kerchief.jpg", pos: "64% 40%" },
+  { match: "towel", src: "/collections/banner-towels.jpg", pos: "75% 50%" },
+  { match: "kavi", src: "/collections/banner-kavi.jpg", pos: "64% 50%" },
+  { match: "lungi", src: "/collections/banner-lungi.jpg", pos: "64% 40%" },
+  { match: "kids", src: "/collections/banner-kids.jpg", pos: "72% 40%" },
 ];
 const coverFor = (slug?: string) => (slug ? COVERS.find((c) => slug.includes(c.match)) : undefined);
 
