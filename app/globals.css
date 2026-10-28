@@ -629,7 +629,6 @@
  *   data-reveal="words"  each word rises from behind a mask, staggered by --i (played once, like the other reveals)
  *   .scrub-mask          opens from an inset rounded window to full size, tied to scroll position (reversible)
  *   .scrub-parallax      a photo drifts against its frame while the frame passes through the viewport
- *   .marquee-row         large type slides sideways with scroll; .marquee-rev travels the other way
  * Static where scroll timelines are unsupported or motion is reduced.
  */
 .sw-mask {
@@ -667,22 +666,6 @@
     translate: 0 7%;
   }
 }
-@keyframes marquee-slide {
-  from {
-    translate: 6% 0;
-  }
-  to {
-    translate: -34% 0;
-  }
-}
-@keyframes marquee-slide-rev {
-  from {
-    translate: -34% 0;
-  }
-  to {
-    translate: 6% 0;
-  }
-}
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .scrub-mask {
@@ -695,14 +678,6 @@
       animation: scrub-parallax linear both;
       animation-timeline: view();
       animation-range: cover 0% cover 100%;
-    }
-    .marquee-row {
-      animation: marquee-slide linear both;
-      animation-timeline: view();
-      animation-range: cover 0% cover 100%;
-    }
-    .marquee-rev {
-      animation-name: marquee-slide-rev;
     }
   }
 }

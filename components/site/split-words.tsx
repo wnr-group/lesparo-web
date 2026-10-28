@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from "react";
+import { Fragment } from "react";
 
 /**
  * Splits a heading into words that rise one after another from behind a mask once it scrolls into view
@@ -20,18 +20,5 @@ export function SplitWords({ children, className = "", as: Tag = "span", onLoad 
         </Fragment>
       ))}
     </Tag>
-  );
-}
-
-/** Large solid words that slide sideways as the page scrolls; adjacent rows travel in opposite directions. */
-export function ScrollMarquee({ rows }: { rows: string[] }): ReactNode {
-  return (
-    <section aria-hidden className="overflow-clip py-6 lg:py-10">
-      {rows.map((text, i) => (
-        <p key={text} className={`marquee-row ${i % 2 ? "marquee-rev" : ""} whitespace-nowrap font-display text-[clamp(3.5rem,2rem+9vw,10rem)] font-extrabold uppercase leading-[0.95] tracking-tight ${i % 2 ? "text-[#d9d2c1]" : "text-ink"}`}>
-          {text}
-        </p>
-      ))}
-    </section>
   );
 }

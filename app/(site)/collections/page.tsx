@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ScrollMarquee, SplitWords } from "@/components/site/split-words";
+import { SplitWords } from "@/components/site/split-words";
 import { CollectionBanner } from "@/components/site/collection-banner";
 import { ShopByRange } from "@/components/site/home-sections";
 import { getCategoryTree } from "@/lib/catalogue/queries";
@@ -36,7 +36,6 @@ export default async function CollectionsPage() {
 
       <ShopByRange items={all} />
 
-      <ScrollMarquee rows={[all.map((c) => c.name).join(" · "), "Accomplish great things · LESPARO"]} />
 
       <div className="mx-auto mt-16 max-w-page space-y-16 px-4 pb-20 sm:px-6 lg:px-10">
         {tree.map((top) => (

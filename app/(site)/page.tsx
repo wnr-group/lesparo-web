@@ -5,7 +5,6 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BrandFilm } from "@/components/site/brand-film";
 import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
-import { ScrollMarquee } from "@/components/site/split-words";
 import { NewLaunches, ShopByRange, TopCollections } from "@/components/site/home-sections";
 import { ErodeRoute } from "@/components/site/erode-route";
 import { ButtonLink } from "@/components/ui/button";
@@ -112,7 +111,6 @@ export default async function HomePage() {
         <>
           <TopCollections items={shortcuts} />
           <ShopByRange items={showcase} />
-          <ScrollMarquee rows={[showcase.map((c) => c.name).join(" · "), "Accomplish great things · LESPARO"]} />
           <NewLaunches products={newest} />
         </>
       )}
