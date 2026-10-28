@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -12,10 +14,13 @@ export const metadata: Metadata = {
   alternates: { canonical: "/shop" },
 };
 
+/** The shop promo film, if one has been added at public/videos/shop-banner.mp4. Without it the banner keeps its photograph. */
+const SHOP_VIDEO = existsSync(join(process.cwd(), "public", "videos", "shop-banner.mp4")) ? "/videos/shop-banner.mp4" : undefined;
+
 export default function ShopPage(props: PageProps<"/shop">) {
   return (
     <>
-      <CollectionBanner>
+      <CollectionBanner video={SHOP_VIDEO}>
         <p className="eyebrow !text-white/60">Catalogue</p>
         <h1 className="mt-3 font-display text-[clamp(2.4rem,1.4rem+4vw,5rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
           <SplitWords onLoad>All</SplitWords> <SplitWords onLoad className="text-white/55">products</SplitWords>

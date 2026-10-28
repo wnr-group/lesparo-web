@@ -30,7 +30,7 @@ export function photoFor(slug?: string) {
  * A wide banner: text on a warm charcoal panel, and on the right either a studio photograph (the gents garment ranges)
  * or the collection's own product images standing on a stone panel (kids, 3/4ths, lungi, kavi, towels, kerchiefs).
  */
-export function CollectionBanner({ slug, products, children }: { slug?: string; products?: { src: string; alt: string }[]; children: ReactNode }) {
+export function CollectionBanner({ slug, products, video, children }: { slug?: string; products?: { src: string; alt: string }[]; video?: string; children: ReactNode }) {
   const photo = photoFor(slug);
   const own = !hasPhoto(slug) && products && products.length > 0 ? products.slice(0, 3) : null;
   return (
@@ -48,6 +48,8 @@ export function CollectionBanner({ slug, products, children }: { slug?: string; 
         ) : (
           <div className="relative min-h-64 overflow-clip lg:min-h-0">
             <Image src={photo.src} alt="" fill priority sizes="(min-width:1024px) 55vw, 100vw" className="scrub-parallax object-cover" style={{ objectPosition: photo.pos }} />
+            {/* An optional promo film: silent, looping, and hidden for reduced motion, where the photograph stays. */}
+            {video && <video src={video} poster={photo.src} autoPlay muted loop playsInline preload="metadata" aria-hidden className="absolute inset-0 size-full object-cover motion-reduce:hidden" />}
             {/* Fades the photograph into the text panel so there is no hard seam. */}
             <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#22231f] via-transparent to-transparent lg:bg-gradient-to-r" />
           </div>
