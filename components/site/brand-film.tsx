@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import "./film.css";
 
 /** The LESPARO film: plays silently on a loop, with a visible pause button. `open` adds the scroll-linked opening, used once, straight after the hero. */
-export function BrandFilm({ src, title, open = false, compact = false }: { src: string; title: string; open?: boolean; compact?: boolean }) {
+export function BrandFilm({ src, title, open = false }: { src: string; title: string; open?: boolean }) {
   const video = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(true);
 
@@ -17,8 +17,8 @@ export function BrandFilm({ src, title, open = false, compact = false }: { src: 
   };
 
   return (
-    <section aria-label={title} className={compact ? "mx-auto max-w-page px-4 sm:px-6 lg:px-10" : "bg-white"}>
-      <div className={`relative ${open ? "film-open" : ""} ${compact ? "overflow-hidden rounded-[1.6rem]" : ""}`}>
+    <section aria-label={title} className="bg-white">
+      <div className={`relative ${open ? "film-open" : ""}`}>
         <video
           ref={video}
           src={src}
@@ -30,7 +30,7 @@ export function BrandFilm({ src, title, open = false, compact = false }: { src: 
           preload="metadata"
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
-          className={compact ? "block aspect-[16/9] w-full object-cover lg:aspect-[21/9]" : "block aspect-video w-full"}
+          className="block aspect-video w-full"
         />
         <button
           type="button"

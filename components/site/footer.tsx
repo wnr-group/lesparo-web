@@ -10,11 +10,11 @@ export async function Footer() {
   return (
     <footer className="mt-auto">
       {/* Call-to-action band: one last route to buy before the page ends. */}
-      <div className="bg-gradient-to-r from-[#e9e8fb] via-[#fbeef2] to-[#ffeccd]">
+      <div className="bg-sun">
         <div className="mx-auto flex max-w-page flex-wrap items-center justify-between gap-5 px-4 py-10 sm:px-6 lg:px-10">
-          <p className="font-display text-[clamp(1.6rem,1rem+2vw,2.6rem)] font-extrabold uppercase leading-tight tracking-tight text-indigo-deep">Stocking a showroom? Get a quote.</p>
+          <p className="font-display text-[clamp(1.6rem,1rem+2vw,2.6rem)] font-extrabold uppercase leading-tight tracking-tight text-ink">Stocking a showroom? Get a quote.</p>
           <div className="flex flex-wrap gap-3">
-            <Link href="/wholesale#enquire" className="inline-flex h-12 items-center rounded-full bg-indigo px-7 text-sm font-bold text-white transition-colors hover:bg-indigo-deep">
+            <Link href="/wholesale#enquire" className="inline-flex h-12 items-center rounded-full bg-ink px-7 text-sm font-bold text-white transition-colors hover:bg-indigo-deep">
               Request a quote
             </Link>
             <a href={BUSINESS.phone.href} className="inline-flex h-12 items-center rounded-full bg-white px-7 text-sm font-bold text-ink shadow-sm hover:bg-sun">
