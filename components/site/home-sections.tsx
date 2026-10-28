@@ -62,7 +62,7 @@ export function ShopByRange({ items }: { items: PhotoTile[] }) {
 export function NewLaunches({ products }: { products: Product[] }) {
   if (!products.length) return null;
   return (
-    <section aria-labelledby="new-launches" className="bg-[#efe8da] py-12 lg:py-16">
+    <section aria-labelledby="new-launches" className="bg-[#f2f3f5] py-12 lg:py-16">
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">

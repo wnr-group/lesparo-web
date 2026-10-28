@@ -70,7 +70,7 @@ export function CollectionBanner({ slug, products, video, clip, children }: { sl
         )}
         <div className="relative z-10 flex flex-col justify-center px-6 py-10 sm:px-12 lg:px-16 lg:py-14">{children}</div>
         {video || cover ? null : own ? (
-          <div className="relative flex min-h-64 items-end justify-center gap-2 overflow-clip bg-[#e4e0d3] px-4 pt-8 sm:gap-4 lg:min-h-0 lg:px-8">
+          <div className="relative flex min-h-64 items-end justify-center gap-2 overflow-clip bg-[#f2f3f5] px-4 pt-8 sm:gap-4 lg:min-h-0 lg:px-8">
             {own.map((p, i) => (
               <div key={p.src} className={`relative h-[16rem] min-w-0 flex-1 sm:h-[20rem] lg:h-[24rem] ${i === 1 ? "lg:h-[26rem]" : ""}`}>
                 <Image src={p.src} alt={p.alt} fill priority={i === 0} sizes="(min-width:1024px) 18vw, 30vw" className="cutout object-contain object-bottom" />

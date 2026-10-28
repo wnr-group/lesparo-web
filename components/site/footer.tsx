@@ -10,7 +10,7 @@ export async function Footer() {
   return (
     <footer className="mt-auto">
       {/* Call-to-action band: one last route to buy before the page ends. */}
-      <div className="bg-[#e9e5da]">
+      <div className="bg-[#f2f3f5]">
         <div className="mx-auto flex max-w-page flex-wrap items-center justify-between gap-5 px-4 py-10 sm:px-6 lg:px-10">
           <p className="font-display text-[clamp(1.6rem,1rem+2vw,2.6rem)] font-extrabold uppercase leading-tight tracking-tight text-ink">Stocking a showroom? Get a quote.</p>
           <div className="flex flex-wrap gap-3">

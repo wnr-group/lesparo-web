@@ -27,7 +27,7 @@ export function ProductGallery({ images, name, productId }: { images: ProductIma
                 aria-label={`Show image ${i + 1} of ${images.length}`}
                 aria-current={i === active}
                 className={clsx(
-                  "relative block aspect-[513/655] w-16 overflow-hidden rounded-xl bg-[#f1efe9] ring-1 transition md:w-20",
+                  "relative block aspect-[513/655] w-16 overflow-hidden rounded-xl bg-[#f3f4f8] ring-1 transition md:w-20",
                   i === active ? "ring-2 ring-ink" : "ring-line opacity-70 hover:opacity-100",
                 )}
               >
@@ -38,7 +38,7 @@ export function ProductGallery({ images, name, productId }: { images: ProductIma
         </ul>
       )}
       <ViewTransition name={`product-${productId}`} share="morph" default="none">
-        <div className="relative aspect-[513/655] flex-1 overflow-hidden rounded-[1.6rem] bg-[#f1efe9]">
+        <div className="relative aspect-[513/655] flex-1 overflow-hidden rounded-[1.6rem] bg-[#f3f4f8]">
           <Image
             key={current.url}
             src={current.url}

@@ -13,7 +13,7 @@ export function DetailPanels() {
     { src: "/collections/garments.jpg", pos: "50% 25%", title: "Contrast collar and cuffs", text: "A brown honeycomb knit polo, trimmed in cream at the collar and sleeves." },
   ];
   return (
-    <section aria-labelledby="details" className="bg-[#efece3] py-16 lg:py-24">
+    <section aria-labelledby="details" className="bg-white py-16 lg:py-24">
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
         <p data-reveal="up" className="eyebrow">
           In the detail
@@ -60,7 +60,7 @@ export function StudioLooks() {
           <h2 id="looks" className="edit-title font-display text-[clamp(1.8rem,1.2rem+2.4vw,3.2rem)] font-extrabold uppercase tracking-tight">
             <SplitWords>The studio edit</SplitWords>
           </h2>
-          <Link href="/shop" className="inline-flex h-11 items-center rounded-full bg-[#e4e0d3] px-5 text-sm font-semibold transition-colors hover:bg-ink hover:text-white">
+          <Link href="/shop" className="inline-flex h-11 items-center rounded-full bg-[#f2f3f5] px-5 text-sm font-semibold transition-colors hover:bg-ink hover:text-white">
             Shop everything
           </Link>
         </div>

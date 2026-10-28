@@ -11,7 +11,7 @@ export function BrandStatement() {
   const points = ["Gents and kids wear", "Woven fabrics from the family trade", "Made in Erode, supplied across three states"];
   return (
     <section aria-labelledby="brand-line" className="mx-auto max-w-page px-4 py-6 sm:px-6 lg:px-10">
-      <div className="grid overflow-clip rounded-[1.6rem] bg-[#efe8da] lg:min-h-[32rem] lg:grid-cols-[1.15fr_0.85fr]">
+      <div className="grid overflow-clip rounded-[1.6rem] bg-[#f2f3f5] lg:min-h-[32rem] lg:grid-cols-[1.15fr_0.85fr]">
         <div className="flex flex-col justify-center px-6 py-12 sm:px-12 lg:px-16 lg:py-16">
           <p className="eyebrow">The LESPARO promise</p>
           <h2 id="brand-line" className="mt-5 font-display text-[clamp(2.4rem,1.2rem+4.6vw,5.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
@@ -93,7 +93,7 @@ export function FollowStrip() {
           <h2 id="follow" className="font-display text-[clamp(1.8rem,1.2rem+2vw,2.8rem)] font-extrabold uppercase tracking-tight">
             <SplitWords>Follow @lesparofashions</SplitWords>
           </h2>
-          <a href={insta.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[#e4e0d3] px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-ink hover:text-white">
+          <a href={insta.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[#f2f3f5] px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-ink hover:text-white">
             Instagram <ArrowUpRight className="size-4" aria-hidden />
           </a>
         </div>

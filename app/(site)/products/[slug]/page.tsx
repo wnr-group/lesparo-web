@@ -92,7 +92,7 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
               <p className="eyebrow !text-[0.65rem]">Available sizes</p>
               <ul className="mt-3 flex flex-wrap gap-2">
                 {p.sizes.map((s) => (
-                  <li key={s} className="flex h-10 min-w-12 items-center justify-center rounded-full border border-sand bg-[#efe8da] px-4 text-sm font-semibold">
+                  <li key={s} className="flex h-10 min-w-12 items-center justify-center rounded-full border border-sand bg-[#f2f3f5] px-4 text-sm font-semibold">
                     {s}
                   </li>
                 ))}
@@ -116,7 +116,7 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
           )}
 
           {p.quoteEnabled && (
-            <section aria-labelledby="wholesale-heading" className="mt-4 rounded-[1.4rem] bg-[#efe8da] p-5 sm:p-6">
+            <section aria-labelledby="wholesale-heading" className="mt-4 rounded-[1.4rem] bg-[#f2f3f5] p-5 sm:p-6">
               <h2 id="wholesale-heading" className="eyebrow">
                 Buying in bulk · Wholesale
               </h2>
@@ -165,7 +165,7 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
       </div>
 
       {related.length > 0 && (
-        <section className="mt-24 rounded-[1.6rem] bg-[#efe8da] px-5 py-12 sm:px-8 lg:px-10" aria-labelledby="related">
+        <section className="mt-24 rounded-[1.6rem] bg-[#f2f3f5] px-5 py-12 sm:px-8 lg:px-10" aria-labelledby="related">
           <h2 id="related" className="font-display text-[clamp(1.6rem,1.1rem+2vw,2.6rem)] font-extrabold uppercase tracking-tight">
             More from {p.category?.name}
           </h2>

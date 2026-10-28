@@ -17,7 +17,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
           circular arrow top right. The photos are shot on white, so multiply drops the white and the product sits in the light.
           Same view-transition name as the product page gallery, so the plate morphs across the navigation. */}
       <ViewTransition name={`product-${product.id}`} share="morph" default="none">
-        <Tilt className="relative aspect-[4/5] overflow-hidden rounded-[1.25rem] bg-[radial-gradient(120%_90%_at_50%_0%,#faf9f5_0%,#efece3_60%,#e6e2d6_100%)] ring-1 ring-ink/[0.06] transition-[box-shadow,--tw-ring-color] duration-500 group-hover:shadow-[0_28px_50px_-28px_rgb(18_20_58/0.35)] group-hover:ring-ink/15">
+        <Tilt className="relative aspect-[4/5] overflow-hidden rounded-[1.25rem] bg-[radial-gradient(120%_90%_at_50%_0%,#fbfbfd_0%,#f0f1f6_60%,#e6e8f0_100%)] ring-1 ring-ink/[0.06] transition-[box-shadow,--tw-ring-color] duration-500 group-hover:shadow-[0_28px_50px_-28px_rgb(18_20_58/0.35)] group-hover:ring-ink/15">
           {primary ? (
             <>
               {/* Contact shadow under the product. */}
