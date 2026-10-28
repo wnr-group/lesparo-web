@@ -4,10 +4,13 @@ import { Bounds, ContactShadows, Environment, Html, Lightformer, OrbitControls, 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { RotateCcw } from "lucide-react";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Box3, MathUtils, Raycaster, Vector3, type Group, type Mesh, type Object3D } from "three";
+import { Box3, Group, MathUtils, Raycaster, Vector3, type Mesh, type Object3D } from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
 type Api = { reset: () => void };
+
+/** One garment of an outfit: scaled to `height` and hung so its top edge sits at `top`. */
+export type Part = { src: string; height: number; top: number };
 
 /** A numbered point on the garment. It is placed by firing a ray at the model from `side`, `u` across and `v` up its bounding box. */
 export type Point3D = { key: string; label: string; side: "front" | "back" | "left" | "right"; u: number; v: number };
@@ -93,8 +96,24 @@ type Meta = { centerX: number; centerY: number; centerZ: number; height: number;
  * The garment and its points. It floats a hair up and down and leans a few degrees toward the pointer, so it feels
  * suspended in the light rather than pinned to the page.
  */
-function Model({ src, points, activeKey, onPick, onZoom, metaRef, motion }: { src: string; points: Point3D[]; activeKey: string | null; onPick: (key: string) => void; onZoom: (hit: Hit) => void; metaRef: React.RefObject<Meta | null>; motion: boolean }) {
-  const { scene } = useGLTF(src);
+function Model({ src, points, activeKey, onPick, onZoom, metaRef, motion }: { src: string | Part[]; points: Point3D[]; activeKey: string | null; onPick: (key: string) => void; onZoom: (hit: Hit) => void; metaRef: React.RefObject<Meta | null>; motion: boolean }) {
+  const loaded = useGLTF(typeof src === "string" ? [src] : src.map((p) => p.src));
+  const scene = useMemo(() => {
+    if (typeof src === "string") return loaded[0].scene;
+    // An outfit: each garment is scaled to its own height and hung from its own top edge.
+    const outfit = new Group();
+    src.forEach((part, i) => {
+      const piece = loaded[i].scene.clone(true);
+      const box = new Box3().setFromObject(piece);
+      const k = part.height / (box.max.y - box.min.y);
+      piece.scale.multiplyScalar(k);
+      piece.updateMatrixWorld(true);
+      const fitted = new Box3().setFromObject(piece);
+      piece.position.set(-(fitted.min.x + fitted.max.x) / 2, part.top - fitted.max.y, -(fitted.min.z + fitted.max.z) / 2);
+      outfit.add(piece);
+    });
+    return outfit;
+  }, [loaded, src]);
   const hits = useHits(scene, points);
   const group = useRef<Group>(null);
   const size = useMemo(() => new Box3().setFromObject(scene), [scene]);
@@ -214,7 +233,7 @@ export default function Garment3D({
   view = null,
   onGrab = () => {},
 }: {
-  src: string;
+  src: string | Part[];
   label: string;
   poster: string;
   points?: Point3D[];

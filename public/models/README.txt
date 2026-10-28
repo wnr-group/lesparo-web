@@ -3,5 +3,7 @@ Drop real 3D garments here and the homepage hero switches to an interactive 3D v
   pants.glb   the track pants
   tee.glb     the T-shirt
 
+When both exist, a "Full look" tab shows the T-shirt over the pants in one scene.
+
 Export as binary glTF (.glb), Draco or Meshopt compressed, ideally under 5 MB, with the garment upright and
 roughly centred (it is auto-fitted and centred). Without a file the hero keeps the photo viewer.

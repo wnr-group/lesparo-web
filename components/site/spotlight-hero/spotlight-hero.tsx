@@ -8,7 +8,7 @@ import "./spotlight.css";
 
 // three.js is only fetched when a product has a .glb in public/models.
 const Garment3D = dynamic(() => import("./garment-3d"), { ssr: false });
-import type { Point3D } from "./garment-3d";
+import type { Part, Point3D } from "./garment-3d";
 
 /**
  * Where each named point sits on a real 3D model: a ray is fired at the model from that side, across and up its
@@ -28,12 +28,25 @@ const VIEWS_3D: Record<string, View3DDef[]> = {
     { id: "waist", label: "Waistband", az: 0, zoom: 0.5, aimY: 0.36, point: "Drawstring waistband" },
   ],
   tee: [
-    { id: "front", label: "Front", az: 0, zoom: 1, aimY: 0, point: "LESPARO bird mark" },
-    { id: "side", label: "Side", az: Math.PI / 2, zoom: 1, aimY: 0, point: "Short sleeve" },
-    { id: "back", label: "Back", az: Math.PI, zoom: 1, aimY: 0, point: "Textured fabric" },
-    { id: "neck", label: "Neckline", az: 0, zoom: 0.45, aimY: 0.27, point: "Crew neckline" },
+    { id: "front", label: "Front", az: 0, zoom: 1, aimY: 0, point: "Textured knit" },
+    { id: "side", label: "Side", az: Math.PI / 2, zoom: 1, aimY: 0, point: "Contrast cuff" },
+    { id: "back", label: "Back", az: Math.PI, zoom: 1, aimY: 0, point: "Textured knit" },
+    { id: "neck", label: "Collar", az: 0, zoom: 0.45, aimY: 0.33, point: "Polo collar" },
+  ],
+  look: [
+    { id: "front", label: "Front", az: 0, zoom: 1, aimY: 0, point: "" },
+    { id: "side", label: "Side", az: Math.PI / 2, zoom: 1, aimY: 0, point: "" },
+    { id: "back", label: "Back", az: Math.PI, zoom: 1, aimY: 0, point: "" },
+    { id: "top", label: "T-shirt", az: 0, zoom: 0.6, aimY: 0.3, point: "" },
+    { id: "pants", label: "Pants", az: 0, zoom: 0.6, aimY: -0.3, point: "" },
   ],
 };
+
+/** The full look: the T-shirt over the track pants, each scaled to its real proportion (the shirt overlaps the waistband). */
+const LOOK_PARTS: Part[] = [
+  { src: "/models/pants.glb", height: 1, top: 0 },
+  { src: "/models/tee.glb", height: 0.8, top: 0.68 },
+];
 
 const POINTS_3D: Record<string, { label: string; side: Point3D["side"]; u: number; v: number }[]> = {
   pants: [
@@ -43,10 +56,10 @@ const POINTS_3D: Record<string, { label: string; side: Point3D["side"]; u: numbe
     { label: "Back pocket", side: "back", u: 0.42, v: 0.88 },
   ],
   tee: [
-    { label: "Crew neckline", side: "front", u: 0.5, v: 0.76 },
-    { label: "LESPARO bird mark", side: "front", u: 0.72, v: 0.66 },
-    { label: "Textured fabric", side: "front", u: 0.45, v: 0.55 },
-    { label: "Short sleeve", side: "right", u: 0.5, v: 0.68 },
+    { label: "Polo collar", side: "front", u: 0.64, v: 0.9 },
+    { label: "Textured knit", side: "front", u: 0.4, v: 0.55 },
+    { label: "Contrast cuff", side: "right", u: 0.5, v: 0.62 },
+    { label: "Cream hem", side: "front", u: 0.5, v: 0.06 },
   ],
 };
 
@@ -79,26 +92,22 @@ const STAND_IN: Record<string, { frames: string[]; spots: Spot[]; keys: string[]
     ],
   },
   tee: {
-    frames: ["/spotlight/tee-front.webp", "/spotlight/tee-three-quarter.webp", "/spotlight/tee-detail.webp", "/spotlight/tee-back.webp"],
-    keys: ["Front", "Three-quarter", "On model", "Back"],
+    frames: ["/spotlight/polo-front.jpg"],
+    keys: ["Front"],
     spots: [
-      { frame: 0, x: 0.5, y: 0.295, label: "Crew neckline" },
-      { frame: 0, x: 0.626, y: 0.435, label: "LESPARO bird mark" },
-      { frame: 0, x: 0.45, y: 0.625, label: "Textured fabric" },
-      { frame: 0, x: 0.77, y: 0.525, label: "Short sleeve" },
-      { frame: 1, x: 0.44, y: 0.295, label: "Crew neckline" },
-      { frame: 1, x: 0.6, y: 0.37, label: "LESPARO bird mark" },
-      { frame: 1, x: 0.525, y: 0.525, label: "Textured fabric" },
-      { frame: 2, x: 0.55, y: 0.285, label: "Crew neckline" },
-      { frame: 2, x: 0.64, y: 0.39, label: "LESPARO bird mark" },
-      { frame: 2, x: 0.525, y: 0.55, label: "Textured fabric" },
-      { frame: 3, x: 0.44, y: 0.27, label: "Back neckline" },
-      { frame: 3, x: 0.45, y: 0.55, label: "Textured fabric" },
-      { frame: 3, x: 0.45, y: 0.88, label: "Stitched hem" },
+      { frame: 0, x: 0.5, y: 0.09, label: "Polo collar" },
+      { frame: 0, x: 0.52, y: 0.5, label: "Textured knit" },
+      { frame: 0, x: 0.87, y: 0.49, label: "Contrast cuff" },
+      { frame: 0, x: 0.52, y: 0.95, label: "Cream hem" },
     ],
   },
+  look: {
+    frames: ["/spotlight/model.webp"],
+    keys: ["On model"],
+    spots: [],
+  },
 };
-const LABELS: Record<string, string> = { pants: "Track pants", tee: "T-shirts" };
+const LABELS: Record<string, string> = { pants: "Track pants", tee: "T-shirts", look: "Full look" };
 /** Plain-language notes for each point. They only describe what the photograph shows. */
 const DETAILS: Record<string, string> = {
   "Drawstring waistband": "A drawstring at the waist lets you adjust the fit.",
@@ -109,10 +118,10 @@ const DETAILS: Record<string, string> = {
   "Back pocket": "A pocket on the back, finished with neat stitching.",
   "Textured fabric": "A fine, even texture that shows in the cloth up close.",
   "LESPARO bird mark": "The LESPARO bird mark, the brand's sign on the garment.",
-  "Crew neckline": "A round crew neckline with a finished edge.",
-  "Back neckline": "The back of the neckline, with a finished edge.",
-  "Short sleeve": "A short sleeve with a clean, stitched edge.",
-  "Stitched hem": "A stitched hem keeps the bottom edge neat.",
+  "Polo collar": "An open polo collar in cream, set against the brown body.",
+  "Textured knit": "A raised, woven-look knit that gives the cloth depth.",
+  "Contrast cuff": "A cream cuff on each short sleeve, in contrast to the body.",
+  "Cream hem": "A cream band at the hem finishes the bottom edge.",
 };
 const SPIN_KEYS = ["Front", "Right", "Back", "Left"];
 
@@ -124,10 +133,6 @@ const detailSrc = (src: string) => (src.startsWith("/spotlight/") ? src.replace(
 const FADE: Record<string, "top" | "bottom"> = {
   "/spotlight/front.webp": "top",
   "/spotlight/side.webp": "top",
-  "/spotlight/tee-front.webp": "bottom",
-  "/spotlight/tee-three-quarter.webp": "bottom",
-  "/spotlight/tee-detail.webp": "bottom",
-  "/spotlight/tee-back.webp": "bottom",
 };
 const FADE_MASK = {
   top: "linear-gradient(to bottom, transparent 0, #000 9%)",
@@ -144,7 +149,7 @@ const ringDist = (a: number, b: number, n: number) => Math.min(Math.abs(a - b), 
  * turntable set (8 or more frames in public/turntable) spins smoothly; until then four real photographs stand in.
  */
 export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, turntables, models = {} }: { eyebrow: string; heading: string; subheading: string; cta: Cta; secondary: Cta; turntables: Partial<Record<string, TurntableSet>>; models?: Partial<Record<string, string>> }) {
-  const products: Product[] = ["pants", "tee"].map((id) => {
+  const products: Product[] = ["pants", "tee", "look"].map((id) => {
     const real = turntables[id];
     return real
       ? { id, label: LABELS[id], frames: real.frames, spots: real.spots, spin: true, keyLabels: SPIN_KEYS }
@@ -407,7 +412,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
 
       {/* Category selector, top right. */}
       <div role="group" aria-label="Choose a product" className="sp-copy relative z-30 px-5 pt-5 sm:px-8 lg:absolute lg:right-8 lg:top-10 lg:p-0 xl:right-12">
-        <ul className="grid grid-cols-2 gap-2.5 lg:w-[19rem]">
+        <ul className="grid grid-cols-3 gap-2 sm:gap-2.5 lg:w-[30rem]">
           {products.map((p, i) => {
             const on = pi === i;
             return (
@@ -416,7 +421,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
                   type="button"
                   aria-pressed={on}
                   onClick={() => choose(i)}
-                  className={`flex h-12 w-full items-center justify-center gap-2 border px-3 text-[0.8rem] font-bold uppercase tracking-[0.14em] transition-[background-color,color,border-color] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c] ${
+                  className={`flex h-12 w-full items-center justify-center gap-2 border px-1.5 text-[0.68rem] font-bold uppercase tracking-[0.08em] sm:px-3 sm:text-[0.8rem] sm:tracking-[0.14em] transition-[background-color,color,border-color] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c] ${
                     on ? "border-white bg-white text-[#0e1b4f]" : "border-white/40 bg-[#0e1b4f]/70 text-white hover:border-white hover:bg-white/10"
                   }`}
                 >
@@ -433,7 +438,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       <div className="sp-leave-figure relative z-10 my-6 flex justify-center px-5 lg:absolute lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[6.25rem] lg:my-0 lg:px-0">
         {model ? (
           <div className="sp-product relative w-full max-w-[22rem] overflow-hidden lg:h-full lg:w-auto lg:max-w-none" style={{ aspectRatio: "2 / 3" }}>
-            <Garment3D key={model} src={model} label={product.label} poster={product.frames[0]} points={points3d} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} view={view3d} onGrab={() => setView3d(null)} />
+            <Garment3D key={model} src={product.id === "look" ? LOOK_PARTS : model} label={product.label} poster={product.frames[0]} points={points3d} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} view={view3d} onGrab={() => setView3d(null)} />
           </div>
         ) : (
         <div
@@ -573,7 +578,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
           <div className="bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm">
             <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#ffc82c]">Product detail</p>
             <h2 className="mt-1 font-display text-[1.2rem] font-bold leading-tight tracking-tight">{product.label}</h2>
-            <p className="mt-2 text-[0.92rem] leading-relaxed text-white/85">{model ? "Select a numbered point on the garment to see it close up." : zoom > 1 ? "Zoom out to see the marked points on the garment." : "Turn the garment to a view with marked points, then select one to see it close up."}</p>
+            <p className="mt-2 text-[0.92rem] leading-relaxed text-white/85">{model ? (points3d.length ? "Select a numbered point on the garment to see it close up." : "Drag to turn the full look, or choose a view below.") : zoom > 1 ? "Zoom out to see the marked points on the garment." : "Turn the garment to a view with marked points, then select one to see it close up."}</p>
           </div>
         )}
       </div>
