@@ -42,7 +42,7 @@ const VIEWS_3D: Record<string, View3DDef[]> = {
   ],
 };
 
-/** The full look: the T-shirt over the track pants, each scaled to its real proportion (the shirt overlaps the waistband). */
+/** The full look when there is no look.glb: the T-shirt over the track pants, each scaled to its real proportion (the shirt overlaps the waistband). */
 const LOOK_PARTS: Part[] = [
   { src: "/models/pants.glb", height: 1, top: 0 },
   { src: "/models/tee.glb", height: 0.8, top: 0.68 },
@@ -438,7 +438,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       <div className="sp-leave-figure relative z-10 my-6 flex justify-center px-5 lg:absolute lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[6.25rem] lg:my-0 lg:px-0">
         {model ? (
           <div className="sp-product relative w-full max-w-[22rem] overflow-hidden lg:h-full lg:w-auto lg:max-w-none" style={{ aspectRatio: "2 / 3" }}>
-            <Garment3D key={model} src={product.id === "look" ? LOOK_PARTS : model} label={product.label} poster={product.frames[0]} points={points3d} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} view={view3d} onGrab={() => setView3d(null)} />
+            <Garment3D key={model} src={model === "/models/look" ? LOOK_PARTS : model} label={product.label} poster={product.frames[0]} points={points3d} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} view={view3d} onGrab={() => setView3d(null)} />
           </div>
         ) : (
         <div
