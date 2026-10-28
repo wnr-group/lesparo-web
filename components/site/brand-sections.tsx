@@ -4,19 +4,32 @@ import Link from "next/link";
 import { SplitWords } from "@/components/site/split-words";
 import { BUSINESS } from "@/lib/business";
 
-/** A dark statement band: the brand line, large, over the logo bird. */
+/** The brand line, large, on a light panel beside a studio photograph. */
 export function BrandStatement() {
+  const points = ["Gents and kids wear", "Woven fabrics from the family trade", "Made in Erode, supplied across three states"];
   return (
     <section aria-labelledby="brand-line" className="mx-auto max-w-page px-4 py-6 sm:px-6 lg:px-10">
-      <div className="relative isolate overflow-clip rounded-[1.6rem] bg-[#22231f] px-6 py-16 text-white sm:px-12 lg:px-20 lg:py-28">
-        <Image src="/lesparo-bird.png" alt="" width={700} height={700} aria-hidden className="pointer-events-none absolute -right-16 top-1/2 -z-10 h-[150%] w-auto -translate-y-1/2 opacity-[0.07]" />
-        <p className="eyebrow !text-white/55">The LESPARO promise</p>
-        <h2 id="brand-line" className="mt-5 max-w-4xl font-display text-[clamp(2.4rem,1.2rem+5vw,6rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
-          <SplitWords>{BUSINESS.tagline}</SplitWords>
-        </h2>
-        <p data-reveal="up" className="mt-8 max-w-xl text-lg leading-relaxed text-white/70">
-          Gents and kids wear, and the woven cloth behind it, made in Erode and supplied to showrooms across Tamil Nadu, Kerala and Karnataka.
-        </p>
+      <div className="grid overflow-clip rounded-[1.6rem] bg-[#efe8da] lg:min-h-[32rem] lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="flex flex-col justify-center px-6 py-12 sm:px-12 lg:px-16 lg:py-16">
+          <p className="eyebrow">The LESPARO promise</p>
+          <h2 id="brand-line" className="mt-5 font-display text-[clamp(2.4rem,1.2rem+4.6vw,5.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
+            <SplitWords>{BUSINESS.tagline}</SplitWords>
+          </h2>
+          <ul data-reveal="stagger" className="mt-10 space-y-3">
+            {points.map((t) => (
+              <li key={t} className="flex items-center gap-3 border-t border-ink/15 pt-3 text-lg text-ink-soft">
+                <span aria-hidden className="size-2 rounded-full bg-ink" />
+                {t}
+              </li>
+            ))}
+          </ul>
+          <Link href="/shop" className="mt-10 inline-flex h-12 w-fit items-center gap-2 rounded-full bg-ink px-6 text-sm font-bold text-white transition-colors hover:bg-indigo-deep">
+            Shop the range <ArrowRight className="size-4" aria-hidden />
+          </Link>
+        </div>
+        <div className="relative min-h-80 overflow-clip lg:min-h-0">
+          <Image src="/looks/training.jpg" alt="" fill sizes="(min-width:1024px) 38vw, 100vw" className="scrub-parallax object-cover" style={{ objectPosition: "50% 30%" }} />
+        </div>
       </div>
     </section>
   );
