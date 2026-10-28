@@ -536,8 +536,9 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
 
       {/* View tabs, bottom centre. */}
       {model && (
-        <div role="group" aria-label="View" className="sp-copy relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
-          <ul className="flex w-full max-w-[24rem] border border-white/30 bg-[#0e1b4f]/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
+        // The row spans the hero, so it lets clicks and drags through to the 3D stage (and its reset button) beneath; only the tabs themselves take them.
+        <div role="group" aria-label="View" className="sp-copy pointer-events-none relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
+          <ul className="pointer-events-auto flex w-full max-w-[24rem] border border-white/30 bg-[#0e1b4f]/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
             {(VIEWS_3D[product.id] ?? []).map((v) => {
               const on = view3d?.id === v.id;
               return (
