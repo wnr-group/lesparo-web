@@ -94,10 +94,11 @@ export default async function HomePage() {
 
       <BrandStatement />
       <BrandStory />
-      <DetailPanels />
 
       {/* ------------------------------------------------------------ lookbook film */}
       <BrandFilm src="/lesparo-video-1.mp4" title="The LESPARO lookbook" />
+
+      <DetailPanels />
 
 
       {/* ------------------------------------------------------- quality promise */}

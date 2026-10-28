@@ -31,7 +31,7 @@ export function BrandFilm({ src, title, open = false }: { src: string; title: st
           preload="metadata"
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
-          className="mx-auto block aspect-video max-h-[min(60vh,42rem)] w-full object-cover object-[50%_28%]"
+          className="mx-auto block aspect-video max-h-[min(72vh,48rem)] w-full object-cover object-[50%_28%]"
         />
         <button
           type="button"
