@@ -29,27 +29,33 @@ const HISTORY = [
     year: "1979",
     title: "R. Yuvaraj, Erode",
     body: "Mr. Yuvaraj founds R. Yuvaraj in Erode, a city known for textiles. The business begins by supplying lungis, dhoties and mull cloth to Kerala.",
-    photo: { src: "/collections/banner-lungi.jpg", pos: "64% 40%" },
-    label: "Lungi",
+    photo: { src: "/history/1979.jpg", pos: "50% 55%" },
+    caption: "A weaver at a hand loom",
+    range: { src: "/history/today-lungi.jpg", pos: "50% 50%", label: "Lungi", href: "/collections/lungi" },
   },
   {
     year: "1999",
     title: "The next generation",
     body: "His son, Y. Sathish, joins as a trainee after a business administration degree, and soon takes a leading role in the company’s growth and expansion.",
+    photo: { src: "/history/1999-loom.jpg", pos: "50% 50%" },
+    caption: "A handloom and its striped cloth",
+    range: { src: "/history/today-gents.jpg", pos: "50% 50%", label: "Gents wear", href: "/collections/gents" },
   },
   {
     year: "2001",
     title: "Y. Sathish & Co.",
     body: "After about two years in the family business, he starts Y. Sathish & Co.: churidar materials, Kerala special dhoties and Kerala sarees, sold to showrooms, chain stores and wholesalers in Kerala and Tamil Nadu.",
-    photo: { src: "/collections/banner-kavi.jpg", pos: "64% 50%" },
-    label: "Kavi dhothy",
+    photo: { src: "/history/2001.jpg", pos: "50% 50%" },
+    caption: "Rolls of cloth, ready for showrooms",
+    range: { src: "/history/today-kavi.jpg", pos: "50% 50%", label: "Kavi dhothy", href: "/collections/kavi" },
   },
   {
     year: "2017",
     title: "Abija Exports and LESPARO",
     body: "After his own market survey, he launches Abija Exports, the unit behind LESPARO: knitted and woven unisex and kids’ casual wear. Shorts, 3/4th pants and track suits for leisure, sports and ethnic wear.",
-    photo: { src: "/collections/tracks.jpg", pos: "50% 70%" },
-    label: "Gents tracks",
+    photo: { src: "/history/2017.jpg", pos: "50% 38%" },
+    caption: "Yarn cones on a mill rack",
+    range: { src: "/history/today-tracks.jpg", pos: "50% 50%", label: "Gents tracks", href: "/collections/gents-tracks" },
   },
 ];
 
@@ -127,11 +133,11 @@ export default function AboutPage() {
               </h2>
             </div>
             <p data-reveal="up" className="max-w-md leading-relaxed text-ink-soft lg:col-span-5 lg:justify-self-end">
-              Choose a year. Photographs show products from today’s LESPARO range that match what the business made in each era.
+              Choose a year, or let it turn by itself. The large photograph is illustrative of each era; the small one is where that story continues today, in the LESPARO range.
             </p>
           </div>
           <div className="mt-12 lg:mt-16">
-            <HistoryTabs items={HISTORY.map((h) => ({ year: h.year, title: h.title, body: h.body, photo: "photo" in h ? h.photo : undefined, label: "label" in h ? h.label : undefined }))} />
+            <HistoryTabs items={HISTORY.map((h) => ({ year: h.year, title: h.title, body: h.body, photo: h.photo, caption: h.caption, range: h.range }))} />
           </div>
         </div>
       </section>
