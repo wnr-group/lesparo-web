@@ -15,13 +15,13 @@ export default function ShopPage(props: PageProps<"/shop">) {
   return (
     <>
       <CollectionBanner>
-        <p className="eyebrow !text-sun">Catalogue</p>
+        <p className="eyebrow !text-white/60">Catalogue</p>
         <h1 className="mt-3 font-display text-[clamp(2.4rem,1.4rem+4vw,5rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
-          All <span className="text-sun">products</span>
+          All <span className="text-white/55">products</span>
         </h1>
         <p className="mt-5 max-w-md text-white/70">The full LESPARO range. Filter by fabric or size, or send us a wholesale enquiry for bulk pricing.</p>
         <div className="mt-8">
-          <Link href="/wholesale#enquire" className="inline-flex h-12 items-center gap-2 rounded-full bg-sun px-6 text-sm font-bold text-ink transition-transform hover:-translate-y-0.5">
+          <Link href="/wholesale#enquire" className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-bold text-ink transition-transform hover:-translate-y-0.5">
             Wholesale enquiry <ArrowRight className="size-4" aria-hidden />
           </Link>
         </div>

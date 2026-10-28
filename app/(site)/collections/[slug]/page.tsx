@@ -48,14 +48,14 @@ async function CollectionHeader({ params }: { params: Promise<{ slug: string }> 
       </nav>
       <h1 className="mt-4 font-display text-[clamp(2.4rem,1.4rem+4vw,5rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
         {category.name}
-        {trail.length > 2 && <span className="text-sun"> · {trail[trail.length - 2].name}</span>}
+        {trail.length > 2 && <span className="text-white/55"> · {trail[trail.length - 2].name}</span>}
       </h1>
       {category.description && <p className="mt-4 max-w-prose text-white/70">{category.description}</p>}
       {children.length > 0 && (
         <ul className="mt-7 flex flex-wrap gap-2">
           {children.map((c) => (
             <li key={c.id}>
-              <Link href={`/collections/${c.slug}`} className="inline-flex h-10 items-center rounded-full border border-white/35 px-5 text-sm font-semibold transition-colors hover:border-sun hover:bg-sun hover:text-ink">
+              <Link href={`/collections/${c.slug}`} className="inline-flex h-10 items-center rounded-full border border-white/35 px-5 text-sm font-semibold transition-colors hover:border-white hover:bg-white hover:text-ink">
                 {c.name}
               </Link>
             </li>

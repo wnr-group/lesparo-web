@@ -18,13 +18,13 @@ export default async function CollectionsPage() {
   return (
     <>
       <CollectionBanner>
-        <p className="eyebrow !text-sun">Collections</p>
+        <p className="eyebrow !text-white/60">Collections</p>
         <h1 className="mt-3 max-w-xl font-display text-[clamp(2.4rem,1.4rem+4vw,5rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
-          Shop the <span className="text-sun">whole range</span>
+          Shop the <span className="text-white/55">whole range</span>
         </h1>
         <p className="mt-5 max-w-md text-white/70">Gents and kids garments, and woven fabrics from Erode: pick a range, or send us a wholesale enquiry.</p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/shop" className="inline-flex h-12 items-center gap-2 rounded-full bg-sun px-6 text-sm font-bold text-ink transition-transform hover:-translate-y-0.5">
+          <Link href="/shop" className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-bold text-ink transition-transform hover:-translate-y-0.5">
             Shop all <ArrowRight className="size-4" aria-hidden />
           </Link>
           <Link href="/wholesale#enquire" className="inline-flex h-12 items-center rounded-full border border-white/40 px-6 text-sm font-semibold hover:bg-white hover:text-ink">

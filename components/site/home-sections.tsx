@@ -1,6 +1,7 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { photoFor } from "@/components/site/collection-banner";
 import { ProductCard } from "@/components/site/product-card";
 import type { CategoryNode, ProductCard as Product } from "@/lib/catalogue/queries";
 
@@ -29,29 +30,41 @@ export function TopCollections({ items }: { items: CategoryNode[] }) {
   );
 }
 
-/** Four garment hang-tags: square-cornered cards with a punched hole, a number, the product on a plain plate and a name bar that turns yellow on hover. */
+/**
+ * A bento grid: one large photo card and three smaller ones. Garment ranges use the studio photographs full-bleed;
+ * fabric ranges (no model photo) show the product on a solid colour. Titles sit over the image, no borders or tints.
+ */
 export function ShopByRange({ items }: { items: CategoryNode[] }) {
+  const solid = ["bg-[#e4e0d3] text-ink", "bg-[#d3d9cf] text-ink", "bg-[#ddd2c4] text-ink"];
+  let solidIndex = 0;
+  const layout = ["col-span-2 aspect-[4/3] lg:row-span-2 lg:aspect-auto", "col-span-2 aspect-[16/9] lg:aspect-auto", "aspect-square lg:aspect-auto", "aspect-square lg:aspect-auto"];
   return (
     <section aria-label="Shop by range" className="py-12 lg:py-20">
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
-        <ul className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
-          {items.slice(0, 4).map((c, i) => (
-            <li key={c.id} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }}>
-              <Link href={`/collections/${c.slug}`} className="group flex h-full flex-col border-2 border-ink bg-white transition-transform duration-500 ease-[var(--ease-out-soft)] hover:-translate-y-1.5">
-                <span className="flex items-center justify-between px-4 pt-3.5">
-                  <span aria-hidden className="size-3.5 rounded-full border-2 border-ink" />
-                  <span className="font-display text-sm font-bold tabular-nums tracking-widest text-ink/60">NO. {String(i + 1).padStart(2, "0")}</span>
-                </span>
-                <span className="relative mt-2 aspect-[4/5] bg-[#f1efe9]">
-                  {c.coverUrl && <Image src={c.coverUrl} alt="" fill sizes="(min-width:1024px) 22vw, 46vw" className="cutout object-contain p-[9%] transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.06]" />}
-                </span>
-                <span className="mt-auto flex items-center justify-between gap-3 border-t-2 border-ink bg-white px-4 py-3.5 transition-colors duration-300 group-hover:bg-sun">
-                  <span className="font-display text-lg font-extrabold uppercase tracking-tight sm:text-xl">{c.name}</span>
-                  <ArrowUpRight className="size-5 shrink-0 transition-transform duration-300 group-hover:rotate-45" aria-hidden />
-                </span>
-              </Link>
-            </li>
-          ))}
+        <ul className="grid grid-cols-2 gap-3 lg:h-[min(46rem,82vh)] lg:grid-cols-4 lg:grid-rows-2 lg:gap-4">
+          {items.slice(0, 4).map((c, i) => {
+            const garment = /gents|garments/.test(c.slug);
+            const photo = photoFor(c.slug);
+            const tone = garment ? "bg-[#22231f] text-white" : solid[solidIndex++ % solid.length];
+            return (
+              <li key={c.id} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }} className={layout[i]}>
+                <Link href={`/collections/${c.slug}`} className={`group relative block h-full w-full overflow-hidden ${tone}`}>
+                  {garment ? (
+                    <Image src={photo.src} alt="" fill sizes={i === 0 ? "(min-width:1024px) 50vw, 100vw" : "(min-width:1024px) 50vw, 100vw"} className="object-cover transition-transform duration-[900ms] ease-[var(--ease-out-soft)] group-hover:scale-[1.05]" style={{ objectPosition: photo.pos }} />
+                  ) : (
+                    c.coverUrl && <Image src={c.coverUrl} alt="" fill sizes="(min-width:1024px) 25vw, 50vw" className={`cutout object-contain transition-transform ${i === 1 ? "p-[3%] pb-[18%]" : "p-[14%] pb-[26%]"}  duration-[900ms] ease-[var(--ease-out-soft)] group-hover:scale-[1.07]`} />
+                  )}
+                  {garment && <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />}
+                  <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 sm:p-6">
+                    <span className="font-display text-[clamp(1.4rem,0.8rem+2vw,2.8rem)] font-extrabold uppercase leading-none tracking-tight">{c.name}</span>
+                    <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-ink transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:rotate-45 group-hover:bg-[#d9d2c1] sm:size-12">
+                      <ArrowUpRight className="size-5" aria-hidden />
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>
@@ -66,7 +79,7 @@ export function NewLaunches({ products }: { products: Product[] }) {
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <span className="rotate-[-8deg] rounded-md bg-ink px-3 py-1.5 text-[0.7rem] font-extrabold uppercase leading-tight tracking-wider text-sun shadow-md">New arrival</span>
+            <span className="rotate-[-8deg] rounded-md bg-ink px-3 py-1.5 text-[0.7rem] font-extrabold uppercase leading-tight tracking-wider text-white shadow-md">New arrival</span>
             <h2 id="new-launches" className="font-display text-[clamp(1.8rem,1.2rem+2.4vw,3.2rem)] font-extrabold uppercase tracking-tight text-ink">
               Our new launches
             </h2>
