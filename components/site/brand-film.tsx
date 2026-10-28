@@ -18,8 +18,8 @@ export function BrandFilm({ src, title, open = false }: { src: string; title: st
 
   return (
     <section aria-label={title} className="bg-white">
-      {/* The footage is 16:9 and the whole person has to stay in frame, so a short section is letterboxed (never cropped): on wide screens the dark side bars frame it like a cinema screen. */}
-      <div className={`relative bg-[#22231f] ${open ? "film-open" : ""}`}>
+      {/* Full width at a capped height: the 16:9 footage is cropped top and bottom, keeping the upper part of the frame (head and torso). */}
+      <div className={`relative ${open ? "film-open" : ""}`}>
         <video
           ref={video}
           src={src}
@@ -31,7 +31,7 @@ export function BrandFilm({ src, title, open = false }: { src: string; title: st
           preload="metadata"
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
-          className="mx-auto block aspect-video max-h-[min(60vh,42rem)] w-full object-contain"
+          className="mx-auto block aspect-video max-h-[min(60vh,42rem)] w-full object-cover object-[50%_28%]"
         />
         <button
           type="button"
