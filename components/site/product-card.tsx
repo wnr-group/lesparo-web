@@ -12,7 +12,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
   const [primary, secondary] = product.images;
   const retail = product.retailEnabled && product.price !== null;
   return (
-    <article className="group relative flex flex-col">
+    <article className="group relative flex h-full flex-col">
       {/* The plate: a soft studio-light gradient, the product standing on a contact shadow, a category tag top left and a
           circular arrow top right. The photos are shot on white, so multiply drops the white and the product sits in the light.
           Same view-transition name as the product page gallery, so the plate morphs across the navigation. */}
@@ -78,7 +78,8 @@ export function ProductCard({ product, priority = false }: { product: Product; p
             {product.sizes.length > 5 && <li className="px-1 py-0.5 text-[0.66rem] font-semibold leading-none text-muted">+{product.sizes.length - 5}</li>}
           </ul>
         )}
-        <p className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+        {/* Pinned to the bottom of the card, so prices line up across a row whatever the fabric and size lines above them hold. */}
+        <p className="mt-auto flex flex-wrap items-center gap-x-2.5 gap-y-1.5 pt-3">
           {retail && <span className="font-display text-xl font-extrabold tabular-nums tracking-tight">{formatPrice(product.price!, product.currency)}</span>}
           {product.quoteEnabled && (
             <span className="rounded-full bg-ink/[0.06] px-2.5 py-1 text-[0.68rem] font-semibold text-ink-soft">{retail ? "Bulk on enquiry" : "Wholesale price on enquiry"}</span>
