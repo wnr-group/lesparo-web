@@ -355,10 +355,12 @@ function Stage({ src, points, onHits, floatRef, fitRef, motion }: { src: string 
     <>
       <Garment src={src} points={points} onFit={onFit} onHits={onHits} floatRef={floatRef} motion={motion} />
       {/* Restrained studio light: a soft key from the upper left, a cool fill, and a rim from behind to lift the edge off the navy. */}
-      <ambientLight intensity={0.9} />
+      <ambientLight intensity={1.1} />
       <directionalLight position={[-2.2, 3.5, 3.5]} intensity={1.5} color="#fff3e4" />
       <directionalLight position={[3.2, 1.2, 2]} intensity={0.5} color="#b9c8ff" />
       <directionalLight position={[0.6, 2.5, -4]} intensity={1.3} color="#dbe6ff" />
+      {/* A soft key for the back too, so the garment reads as well from behind as from the front. */}
+      <directionalLight position={[-2.2, 3, -3.5]} intensity={1.1} color="#fff3e4" />
       <Environment resolution={128} environmentIntensity={0.5}>
         <Lightformer form="rect" intensity={1.6} position={[0, 4, 3]} scale={[8, 3, 1]} />
         <Lightformer form="rect" intensity={0.8} position={[-5, 1, 2]} scale={[3, 6, 1]} color="#9fb4ff" />
