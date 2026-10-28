@@ -71,7 +71,7 @@ export function NewLaunches({ products }: { products: Product[] }) {
               <SplitWords>Our new launches</SplitWords>
             </h2>
           </div>
-          <Link href="/shop?sort=newest" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold shadow-sm transition-colors hover:bg-ink hover:text-white">
+          <Link href="/collections/kids?sort=newest" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold shadow-sm transition-colors hover:bg-ink hover:text-white">
             View all <ArrowRight className="size-4" aria-hidden />
           </Link>
         </div>

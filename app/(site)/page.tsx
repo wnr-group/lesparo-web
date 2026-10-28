@@ -12,7 +12,7 @@ import { BuyerFaq, DetailPanels, StudioLooks } from "@/components/site/more-sect
 import { ButtonLink } from "@/components/ui/button";
 import { Container, SectionHeading } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
-import { getCategoryTree, getHomepageContent, listProducts, type CategoryNode } from "@/lib/catalogue/queries";
+import { getCategoryBySlug, getCategoryTree, getHomepageContent, listProducts, type CategoryNode } from "@/lib/catalogue/queries";
 
 const STEPS = [
   ["Browse", "Add products to your enquiry list as you explore the catalogue."],
@@ -75,7 +75,9 @@ export default async function HomePage() {
   const [content, tree] = await Promise.all([getHomepageContent(), getCategoryTree()]);
   const fabrics = tree.find((t) => t.slug !== "garments");
   const { sections } = content;
-  const { products: newest } = await listProducts({ sort: "newest", pageSize: 8 });
+  // New launches shows the kids range (newest first); with no kids category it falls back to the newest products overall.
+  const kids = await getCategoryBySlug("kids");
+  const { products: newest } = await listProducts({ sort: "newest", pageSize: 8, ...(kids ? { categoryIds: kids.subtreeIds } : {}) });
 
   return (
     <>
