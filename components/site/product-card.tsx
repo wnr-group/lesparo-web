@@ -14,7 +14,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
       {/* Grey plate: the photos are shot on white, so multiply drops the white and the product sits on the grey.
           Same view-transition name as the product page gallery, so the plate morphs across the navigation. */}
       <ViewTransition name={`product-${product.id}`} share="morph" default="none">
-        <div className="relative aspect-[513/655] overflow-hidden rounded-2xl bg-mist transition-colors duration-500 group-hover:bg-[#e8eaf2]">
+        <div className="relative aspect-[513/655] overflow-hidden rounded-2xl bg-[#f1efe9] transition-colors duration-500 group-hover:bg-[#e9e5da]">
           {primary ? (
             <>
               <Image
@@ -51,7 +51,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
         </div>
       </ViewTransition>
       <div className="mt-3.5 flex flex-1 flex-col px-0.5">
-        {product.category && <p className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-indigo">{product.category.name}</p>}
+        {product.category && <p className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-brass">{product.category.name}</p>}
         <h3 className="mt-1 text-[1.02rem] font-semibold leading-snug tracking-[-0.01em]">
           <Link href={`/products/${product.slug}`} className="after:absolute after:inset-0 after:content-['']">
             {product.name}

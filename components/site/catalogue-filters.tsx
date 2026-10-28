@@ -94,11 +94,11 @@ export function CatalogueFilters({ basePath, q, fabric, size, sort, fabrics, siz
             ))}
           </select>
         </div>
-        <button type="submit" className="h-10 bg-ink px-4 text-sm text-paper sm:hidden">
+        <button type="submit" className="h-10 rounded-full bg-ink px-5 text-sm font-semibold text-paper sm:hidden">
           Apply
         </button>
         <noscript>
-          <button type="submit" className="h-10 bg-ink px-4 text-sm text-paper">
+          <button type="submit" className="h-10 rounded-full bg-ink px-5 text-sm font-semibold text-paper">
             Apply
           </button>
         </noscript>
@@ -112,7 +112,7 @@ export function CatalogueFilters({ basePath, q, fabric, size, sort, fabrics, siz
             if (size && a.k !== "size") params.set("size", size);
             if (sort !== "featured") params.set("sort", sort);
             return (
-              <Link key={a.k} href={`${basePath}${params.size ? `?${params}` : ""}`} scroll={false} className="inline-flex items-center gap-1.5 border border-sand bg-paper px-2.5 py-1 hover:border-ink" aria-label={`Remove filter ${a.label}`}>
+              <Link key={a.k} href={`${basePath}${params.size ? `?${params}` : ""}`} scroll={false} className="inline-flex items-center gap-1.5 rounded-full border border-sand bg-[#efe8da] px-3 py-1 font-semibold hover:border-ink" aria-label={`Remove filter ${a.label}`}>
                 {a.label}
                 <X className="size-3.5" aria-hidden />
               </Link>

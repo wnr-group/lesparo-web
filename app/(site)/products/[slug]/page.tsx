@@ -84,7 +84,7 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
 
         <div className="lg:sticky lg:top-28 lg:self-start">
           {p.category && <p className="eyebrow">{p.category.name}</p>}
-          <h1 className="mt-3 font-display text-headline font-bold">{p.name}</h1>
+          <h1 className="mt-3 font-display text-[clamp(1.9rem,1.2rem+2.4vw,3.2rem)] font-extrabold uppercase leading-[1.02] tracking-tight">{p.name}</h1>
           {p.description && <p className="mt-5 leading-relaxed text-ink-soft">{p.description}</p>}
 
           {p.sizes.length > 0 && !retail && (
@@ -92,7 +92,7 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
               <p className="eyebrow !text-[0.65rem]">Available sizes</p>
               <ul className="mt-3 flex flex-wrap gap-2">
                 {p.sizes.map((s) => (
-                  <li key={s} className="flex h-10 min-w-12 items-center justify-center border border-sand bg-paper px-3 text-sm">
+                  <li key={s} className="flex h-10 min-w-12 items-center justify-center rounded-full border border-sand bg-[#efe8da] px-4 text-sm font-semibold">
                     {s}
                   </li>
                 ))}
@@ -101,7 +101,7 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
           )}
 
           {retail && (
-            <section aria-labelledby="retail-heading" className="mt-8 border border-indigo/25 bg-white p-5 sm:p-6">
+            <section aria-labelledby="retail-heading" className="mt-8 rounded-[1.4rem] border-2 border-ink bg-white p-5 sm:p-6">
               <div className="flex items-baseline justify-between gap-4">
                 <h2 id="retail-heading" className="eyebrow">
                   Buy online · Retail
@@ -116,7 +116,7 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
           )}
 
           {p.quoteEnabled && (
-            <section aria-labelledby="wholesale-heading" className="mt-4 border border-line bg-paper p-5 sm:p-6">
+            <section aria-labelledby="wholesale-heading" className="mt-4 rounded-[1.4rem] bg-[#efe8da] p-5 sm:p-6">
               <h2 id="wholesale-heading" className="eyebrow">
                 Buying in bulk · Wholesale
               </h2>
@@ -165,8 +165,8 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
       </div>
 
       {related.length > 0 && (
-        <section className="mt-24 border-t border-line pt-14" aria-labelledby="related">
-          <h2 id="related" className="font-display font-semibold text-title">
+        <section className="mt-24 rounded-[1.6rem] bg-[#efe8da] px-5 py-12 sm:px-8 lg:px-10" aria-labelledby="related">
+          <h2 id="related" className="font-display text-[clamp(1.6rem,1.1rem+2vw,2.6rem)] font-extrabold uppercase tracking-tight">
             More from {p.category?.name}
           </h2>
           <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 md:gap-x-6">
