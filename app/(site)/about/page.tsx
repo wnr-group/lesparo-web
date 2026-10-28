@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, Phone, RefreshCw, ShieldCheck } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -6,7 +6,8 @@ import { BrandFilm } from "@/components/site/brand-film";
 import { CollectionBanner } from "@/components/site/collection-banner";
 import { CountUp } from "@/components/site/count-up";
 import { HistoryTabs } from "@/components/site/history-tabs";
-import { Magnetic } from "@/components/site/pointer-fx";
+import { LoopVideo } from "@/components/site/loop-video";
+import { Magnetic, Tilt } from "@/components/site/pointer-fx";
 import { SplitWords } from "@/components/site/split-words";
 import { ButtonLink } from "@/components/ui/button";
 import { BUSINESS } from "@/lib/business";
@@ -14,15 +15,19 @@ import "./about.css";
 
 export const metadata: Metadata = {
   title: "About LESPARO",
-  description: "From R. Yuvaraj in 1979 to Abija Exports and LESPARO in 2017: four decades of textiles from Erode, Tamil Nadu. Our vision, history, range and quality policy.",
+  description: "From R. Yuvaraj in 1979 to Abija Exports and LESPARO in 2017: four decades of textiles from Erode, Tamil Nadu. Our vision, history, trademark and quality policy.",
   alternates: { canonical: "/about" },
 };
 
 /*
- * Content source: lesparo.com (Company History, Vision, Quality Policy, Trademark, Contact; read 2026-10-27).
- * Vision and Quality Policy are images on the old site; their wording is transcribed from them. The old
- * About Us text says "established in 1988", which contradicts its own history page (1979), so that
- * claim is deliberately not used.
+ * Content source: lesparo.com (About Us, Company History, Trademark, Vision, Quality Policy, Contact; read 2026-10-27).
+ * Vision and Quality Policy are images on the old site; their wording is transcribed from them. The old About Us text says
+ * "established in 1988", which contradicts its own Company History page (1979), so that claim is deliberately not used here;
+ * confirm with the business which date is right. There are no certificates or test reports on the old site or in this project,
+ * so none are shown.
+ *
+ * The page, top to bottom: the introduction and brand film, the vision, the company history (a film, then the year rail),
+ * the three ranges, the quality policy (a film and four short lines), the trademark, and where to find us.
  */
 const HISTORY = [
   {
@@ -69,10 +74,26 @@ const RANGES = [
   { name: "Fabric unstitched", href: "/collections/fabric-unstitched", note: "Lungi, kavi dhothy, towels and kerchiefs: the woven lines the family trade began with.", src: "/collections/banner-towels.jpg", pos: "75% 50%" },
 ];
 
+/** The quality policy in four short lines; the full wording is one click away, unchanged. */
+const QUALITY = [
+  "Good-quality wearables, to the agreed requirement, details and price.",
+  "An unforgettable wearing experience.",
+  "Customer satisfaction, through quality procedures that meet or exceed international standards.",
+  "A replacement policy that stands behind it: maximum effort, a high standard of quality parameters.",
+];
+
+const TRADEMARK: [string, string][] = [
+  ["Application ID", "3620885"],
+  ["Class", "25 (clothing)"],
+  ["Filed", "26 August 2017, Chennai IP office"],
+  ["Registered to", "Y. Sathish, trading as Abija Exports"],
+  ["Status (as listed)", "Accepted & advertised"],
+];
+
 export default function AboutPage() {
   return (
     <>
-      {/* ============================================================ hero */}
+      {/* ============================================================ introduction */}
       <CollectionBanner slug="about">
         <p className="eyebrow !text-white/60">About LESPARO</p>
         <h1 id="about-heading" className="mt-4 font-display text-[clamp(2.4rem,1.4rem+4.4vw,5.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
@@ -96,27 +117,27 @@ export default function AboutPage() {
         </dl>
       </section>
 
-      {/* The LESPARO film, straight after the introduction. */}
-      <BrandFilm open src="/lesparo_video.mp4" title="The LESPARO film" />
+      {/* The brand film: a loom, a tailor, a runner at a temple, a family, and the line "40 Years in Every Thread". */}
+      <BrandFilm open src="/videos/brand-film.mp4" title="LESPARO: 40 years in every thread" />
 
       {/* ========================================================== vision */}
-      <section aria-labelledby="vision-heading" className="bg-[#f2f3f5] py-20 lg:py-28">
+      <section aria-labelledby="vision-heading" className="relative isolate overflow-clip bg-[#1c1d1a] py-24 text-white lg:py-36">
+        <Image src="/collections/banner-kids.jpg" alt="" fill sizes="100vw" className="scrub-parallax -z-10 object-cover opacity-45" style={{ objectPosition: "70% 40%" }} />
+        <span aria-hidden className="absolute inset-0 -z-[5] bg-gradient-to-r from-black/85 via-black/55 to-black/25" />
         <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
-          <p data-reveal="up" className="eyebrow">
+          <p data-reveal="up" className="eyebrow !text-white/60">
             Our vision
           </p>
-          <h2 id="vision-heading" className="uppercase mt-5 max-w-5xl font-display text-[clamp(2rem,1.1rem+4vw,5rem)] font-extrabold leading-[1] tracking-tight">
+          <h2 id="vision-heading" className="mt-5 max-w-5xl font-display text-[clamp(2.2rem,1.1rem+4.8vw,6rem)] font-extrabold uppercase leading-[0.98] tracking-tight">
             {VISION.map((part, pi) =>
               part.split(" ").map((w, wi) => (
-                <span key={pi + "-" + wi} className={pi === 1 ? "text-indigo" : ""}>
+                <span key={pi + "-" + wi} className={pi === 1 ? "text-white/55" : ""}>
                   <span className="ab-focus inline-block">{w}</span>{" "}
                 </span>
               )),
             )}
           </h2>
-          <blockquote data-reveal="up" className="mt-12 max-w-2xl border-l-2 border-indigo/30 pl-6">
-            <p className="font-display text-[clamp(1.2rem,1rem+0.9vw,1.6rem)] font-semibold leading-snug text-indigo-deep/90">“Customer goodwill and quality assurance are the backbone of this company.”</p>
-          </blockquote>
+          <p data-reveal="up" className="mt-10 max-w-md border-l-2 border-white/60 pl-5 text-lg leading-snug text-white/80">“Customer goodwill and quality assurance are the backbone of this company.”</p>
         </div>
       </section>
 
@@ -136,7 +157,13 @@ export default function AboutPage() {
               Choose a year, or let it turn by itself. The large photograph is illustrative of each era; the small one is where that story continues today, in the LESPARO range.
             </p>
           </div>
-          <div className="mt-12 lg:mt-16">
+
+          {/* The journey, in ten seconds: Erode at sunrise, the loom, father and son, the workshop, and the line "40 Years of Textile Heritage. Erode, Since 1979." */}
+          <div data-reveal="clip" className="mt-12 lg:mt-16">
+            <LoopVideo src="/videos/textile-journey.mp4" label="LESPARO's textile journey: Erode, since 1979" className="aspect-[16/9] lg:aspect-[21/9]" />
+          </div>
+
+          <div className="mt-14 lg:mt-20">
             <HistoryTabs items={HISTORY.map((h) => ({ year: h.year, title: h.title, body: h.body, photo: h.photo, caption: h.caption, range: h.range }))} />
           </div>
         </div>
@@ -148,7 +175,7 @@ export default function AboutPage() {
           <p data-reveal="up" className="eyebrow">
             What we make
           </p>
-          <h2 id="range-heading" className="uppercase mt-4 max-w-4xl font-display text-[clamp(2.2rem,1.2rem+4vw,5rem)] font-extrabold leading-[0.95] tracking-tight">
+          <h2 id="range-heading" className="mt-4 max-w-4xl font-display text-[clamp(2.2rem,1.2rem+4vw,5rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
             <SplitWords>Garments, and the cloth behind them.</SplitWords>
           </h2>
           <ul className="mt-12 grid gap-4 md:grid-cols-3 md:gap-6 lg:mt-16">
@@ -174,102 +201,90 @@ export default function AboutPage() {
 
       {/* ======================================================== quality */}
       <section aria-labelledby="quality-heading" className="bg-white py-20 lg:py-28">
-        <div className="mx-auto grid max-w-page gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:gap-16 lg:px-10">
-          <div className="lg:col-span-5">
+        <div className="mx-auto grid max-w-page gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:items-center lg:gap-16 lg:px-10">
+          <div data-reveal="clip" className="lg:col-span-6">
+            {/* Cotton, the loom, a waistband, folded garments, a boy at play, and the line "Crafted in Erode. Made for You." */}
+            <LoopVideo src="/videos/making-of.mp4" label="How LESPARO is made: crafted in Erode" className="aspect-[4/3] lg:aspect-[5/4]" />
+          </div>
+          <div className="lg:col-span-6">
             <p data-reveal="up" className="eyebrow">
-              Quality promise
+              Quality policy
             </p>
-            <h2 id="quality-heading" className="uppercase mt-4 font-display text-[clamp(2.2rem,1.2rem+3.6vw,4.5rem)] font-extrabold leading-[0.95] tracking-tight">
-              <SplitWords>Made to be worn,</SplitWords> <SplitWords className="text-indigo">and trusted.</SplitWords>
+            <h2 id="quality-heading" className="mt-4 font-display text-[clamp(2rem,1.2rem+3.4vw,4.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
+              <SplitWords>Made to be worn,</SplitWords> <SplitWords className="text-ink/45">and trusted.</SplitWords>
             </h2>
-            <p data-reveal="up" className="mt-6 max-w-sm text-sm leading-relaxed text-ink-soft">Abija Exports’ published policies, as set out on the original LESPARO website.</p>
+            <ul data-reveal="stagger" className="mt-8 divide-y divide-ink/15 border-y border-ink/15">
+              {QUALITY.map((q, i) => (
+                <li key={q} className="flex gap-4 py-4">
+                  <span className="font-display text-sm font-bold tabular-nums text-muted">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="leading-snug">{q}</span>
+                </li>
+              ))}
+            </ul>
+            <details className="group mt-5 text-sm">
+              <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 font-semibold [&::-webkit-details-marker]:hidden">
+                <span className="hline">Read the policy in full</span>
+                <ArrowRight className="size-4 transition-transform duration-300 group-open:rotate-90" aria-hidden />
+              </summary>
+              <div className="mt-3 max-w-prose space-y-3 leading-relaxed text-ink-soft">
+                <p>To provide the customer with good-quality wearables and an unforgettable wearing experience, to the agreed requirement, in accordance with the details and price. The company is committed to achieving customer satisfaction through quality procedures operated to meet or exceed the requirements of international standards.</p>
+                <p>Our replacement policy speaks to our quality assurance: we are trying to meet international quality with maximum effort and a high standard of quality parameters.</p>
+              </div>
+            </details>
           </div>
-          <ul data-reveal="stagger" className="divide-y divide-line border-y border-line lg:col-span-7">
-            {[
-              { icon: ShieldCheck, title: "Quality policy", text: "To provide the customer with good-quality wearables and an unforgettable wearing experience, to the agreed requirement, in accordance with the details and price. The company is committed to achieving customer satisfaction through quality procedures operated to meet or exceed the requirements of international standards." },
-              { icon: RefreshCw, title: "Replacement policy", text: "Our replacement policy speaks to our quality assurance: we are trying to meet international quality with maximum effort and a high standard of quality parameters." },
-            ].map(({ icon: Icon, title, text }) => (
-              <li key={title} className="flex gap-5 py-7">
-                <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-indigo-soft">
-                  <Icon className="size-5 text-indigo" aria-hidden />
-                </span>
-                <div>
-                  <h3 className="font-display text-xl font-bold tracking-tight">{title}</h3>
-                  <p className="mt-2 max-w-xl leading-relaxed text-ink-soft">{text}</p>
+        </div>
+      </section>
+
+      {/* ===================================================== trademark */}
+      <section id="trademark" aria-labelledby="trademark-heading" className="scroll-mt-24 bg-[#f2f3f5] py-20 lg:py-28">
+        <div className="mx-auto grid max-w-page gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:items-center lg:gap-16 lg:px-10">
+          <div className="lg:col-span-6">
+            {/* The registered device mark, unaltered, on a plate that tilts a few degrees toward the pointer. */}
+            <Tilt className="relative grid aspect-[4/3] place-items-center overflow-clip bg-white ring-1 ring-line" max={4}>
+              <Image src="/lesparo-bird.png" alt="" aria-hidden width={700} height={700} className="pointer-events-none absolute -right-10 top-1/2 h-[130%] w-auto -translate-y-1/2 opacity-[0.06]" />
+              <Image src="/lesparo-logo-v2.png" alt="The LESPARO registered device mark" width={900} height={484} sizes="(min-width:1024px) 40vw, 80vw" className="relative w-[70%] max-w-md" />
+            </Tilt>
+          </div>
+          <div className="lg:col-span-6">
+            <p data-reveal="up" className="eyebrow">
+              Trademark
+            </p>
+            <h2 id="trademark-heading" className="mt-4 font-display text-[clamp(2rem,1.2rem+3.4vw,4.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
+              <SplitWords>The mark is registered.</SplitWords>
+            </h2>
+            <dl data-reveal="stagger" className="mt-8 divide-y divide-ink/15 border-y border-ink/15">
+              {TRADEMARK.map(([k, v]) => (
+                <div key={k} className="grid grid-cols-[9rem_1fr] gap-4 py-3 text-[0.95rem]">
+                  <dt className="text-muted">{k}</dt>
+                  <dd className="font-semibold">{v}</dd>
                 </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* ======================================================= channels */}
-      <section aria-labelledby="channels-heading" className="bg-[#f2f3f5] py-20 lg:py-28">
-        <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
-          <p data-reveal="up" className="eyebrow">
-            How to buy
-          </p>
-          <h2 id="channels-heading" className="uppercase mt-4 max-w-4xl font-display text-[clamp(2.2rem,1.2rem+4vw,5rem)] font-extrabold leading-[0.95] tracking-tight">
-            <SplitWords>For shoppers, and for showrooms.</SplitWords>
-          </h2>
-          <div className="mt-12 grid gap-4 md:gap-6 lg:mt-16 lg:grid-cols-2">
-            <div data-reveal="up" className="flex flex-col justify-between rounded-3xl bg-white p-8 ring-1 ring-line lg:p-10">
-              <div>
-                <p className="eyebrow">Retail · Buy online</p>
-                <p className="mt-4 font-display text-3xl font-extrabold leading-none tracking-[-0.035em] lg:text-4xl">Shop LESPARO direct.</p>
-                <p className="mt-4 max-w-md leading-relaxed text-ink-soft">Browse gents and kids wear and woven cloth, see the price, and order by the piece with Add to cart or Buy now.</p>
-              </div>
-              <ButtonLink href="/shop" size="lg" className="mt-8 self-start">
-                Shop the range <ArrowRight className="size-4" aria-hidden />
-              </ButtonLink>
-            </div>
-            <div data-reveal="up" style={{ ["--delay" as string]: "120ms" }} className="flex flex-col justify-between rounded-3xl bg-white p-8 ring-1 ring-line lg:p-10">
-              <div>
-                <p className="eyebrow">Wholesale · Enquire now</p>
-                <p className="mt-4 font-display text-3xl font-extrabold leading-none tracking-[-0.035em] lg:text-4xl">Supply your showroom.</p>
-                <p className="mt-4 max-w-md leading-relaxed text-ink-soft">We supply textile showrooms, chain stores and wholesalers across Tamil Nadu, Kerala and Karnataka. Tell us what you need and our sales team will send a quotation.</p>
-              </div>
-              <ButtonLink href="/wholesale#enquire" variant="secondary" size="lg" className="mt-8 self-start">
-                Enquire now <ArrowRight className="size-4" aria-hidden />
-              </ButtonLink>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===================================================== trademark + visit */}
-      <section id="trademark" className="scroll-mt-24 bg-white py-20 lg:py-28">
-        <div className="mx-auto grid max-w-page gap-px bg-line px-0 lg:grid-cols-2">
-          <div className="bg-white px-4 py-10 sm:px-6 lg:px-10 lg:py-12">
-            <p className="eyebrow">Trademark</p>
-            <p className="mt-5 max-w-md leading-relaxed text-ink-soft">LESPARO is a device trademark filed on 26 August 2017 through the Chennai IP office, registered to Y. Sathish, trading as Abija Exports.</p>
-            <dl className="mt-6 grid grid-cols-[10rem_1fr] gap-y-2 text-sm">
-              <dt className="text-muted">Application ID</dt>
-              <dd>3620885</dd>
-              <dt className="text-muted">Class</dt>
-              <dd>25 (clothing)</dd>
-              <dt className="text-muted">Status (as listed)</dt>
-              <dd>Accepted &amp; advertised</dd>
+              ))}
             </dl>
           </div>
-          <div className="bg-white px-4 py-10 sm:px-6 lg:px-10 lg:py-12">
+        </div>
+      </section>
+
+      {/* ===================================================== visit + close */}
+      <section aria-label="Visit or call" className="bg-white py-16 lg:py-24">
+        <div className="mx-auto grid max-w-page gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:items-end lg:gap-16 lg:px-10">
+          <div className="lg:col-span-7">
             <p className="eyebrow">Visit or call</p>
             <address className="mt-5 not-italic leading-relaxed text-ink-soft">
-              {BUSINESS.displayName}
+              <span className="font-semibold text-ink">{BUSINESS.displayName}</span>
               <br />
               {BUSINESS.address.lines.join(", ")}
               <br />
               {BUSINESS.address.city} – {BUSINESS.address.postcode}, {BUSINESS.address.region}
             </address>
-            <p className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold">
+            <p className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold">
               <a href={BUSINESS.phone.href} className="inline-flex items-center gap-2 hover:underline">
-                <Phone className="size-4 text-indigo" aria-hidden /> {BUSINESS.phone.display}
+                <Phone className="size-4" aria-hidden /> {BUSINESS.phone.display}
               </a>
               <a href={`mailto:${BUSINESS.email}`} className="hover:underline">
                 {BUSINESS.email}
               </a>
             </p>
-            <p className="mt-3 text-sm text-muted">
+            <p className="mt-2 text-sm text-muted">
               Customer care:{" "}
               <a href={BUSINESS.customerCare.href} className="font-semibold text-ink hover:underline">
                 {BUSINESS.customerCare.display}
@@ -277,26 +292,17 @@ export default function AboutPage() {
               ({BUSINESS.customerCare.hours})
             </p>
           </div>
-        </div>
-      </section>
-
-      <section className="overflow-hidden bg-[#f2f3f5] pt-14 lg:pt-16">
-        <div className="mx-auto flex max-w-page flex-col items-start justify-between gap-6 px-4 sm:px-6 md:flex-row md:items-center lg:px-10">
-          <p className="font-display text-[clamp(1.6rem,1.1rem+1.8vw,2.6rem)] font-extrabold leading-tight tracking-[-0.03em]">Sourcing for your store?</p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 lg:col-span-5 lg:justify-end">
             <Magnetic>
-              <ButtonLink href="/wholesale#enquire" size="lg">
-                Wholesale enquiries <ArrowRight className="size-4" aria-hidden />
+              <ButtonLink href="/shop" size="lg">
+                Shop the range <ArrowRight className="size-4" aria-hidden />
               </ButtonLink>
             </Magnetic>
-            <ButtonLink href="/contact" variant="secondary" size="lg">
-              Contact us
+            <ButtonLink href="/wholesale#enquire" size="lg" variant="secondary">
+              Wholesale enquiries
             </ButtonLink>
           </div>
         </div>
-        <p aria-hidden className="ab-wordmark mt-10 select-none whitespace-nowrap text-center font-display text-[clamp(4.5rem,22vw,28rem)] font-extrabold leading-[0.74] tracking-[-0.06em] text-ink/[0.05]">
-          LESPARO
-        </p>
       </section>
     </>
   );
