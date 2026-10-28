@@ -1,33 +1,90 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, ArrowUpRight, Pause, Play } from "lucide-react";
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
-import { useReducedMotion } from "./use-pin-progress";
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 
 export type HistoryItem = { year: string; title: string; body: string; photo?: { src: string; pos: string; fit?: "contain" }; caption?: string; range?: { src: string; pos: string; label: string; href: string } };
 
 /**
- * The company history as a rail of years. It turns to the next chapter by itself every few seconds while it is on screen, and
- * stops while the pointer or keyboard focus is inside it, after a Pause, and for visitors who asked for reduced motion.
- * Or choose a year (click, tap, arrow keys, or the previous/next buttons) and the panel below turns to that chapter. A line along the rail fills up to the chosen year. Proper tabs for assistive tech: one
- * tablist, one tabpanel, arrow keys and Home/End move between years.
+ * The company history as a rail of years. It turns to the next chapter by itself every few seconds while it is on screen (the
+ * last loops to the first), with a Pause button. Choosing a year (click, tap, arrow keys, Earlier/Later) turns to it at once and
+ * restarts the timer; it keeps going afterwards. Each change plays together: the year rolls from the old number to the new, the
+ * rail fills, a thin bar counts down on the active year, and the photograph, text and inset arrive in sequence.
+ * Proper tabs for assistive tech: one tablist, one tabpanel, arrow keys and Home/End move between years.
  */
 const STEP_MS = 6500;
+
+/** The big year: it rolls from the previous year to the new one, so a change is felt, not just swapped. The real text is always the final year. */
+function RollingYear({ year, className }: { year: string; className?: string }) {
+  const target = Number(year);
+  const [shown, setShown] = useState(target);
+  const from = useRef(target);
+  useEffect(() => {
+    const start = from.current;
+    if (start === target || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      from.current = target;
+      return;
+    }
+    let raf = 0;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const k = Math.min(1, (now - t0) / 650);
+      const eased = 1 - Math.pow(1 - k, 4);
+      setShown(Math.round(start + (target - start) * eased));
+      if (k < 1) raf = requestAnimationFrame(tick);
+      else from.current = target;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      from.current = target;
+    };
+  }, [target]);
+  return (
+    <p className={className} aria-label={year}>
+      <span aria-hidden className="tabular-nums">
+        {shown}
+      </span>
+    </p>
+  );
+}
 
 export function HistoryTabs({ items }: { items: HistoryItem[] }) {
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [visible, setVisible] = useState(false);
-  const [engaged, setEngaged] = useState(false); // pointer or focus inside
-  const reduced = useReducedMotion();
   const root = useRef<HTMLDivElement>(null);
   const uid = useId();
   const last = items.length - 1;
   const go = (n: number) => setI(Math.max(0, Math.min(last, n)));
 
-  // Reduced motion: no automatic changes. Otherwise it only runs while the section is on screen.
+  // Fetch every chapter's photographs once the section is within reach of the viewport, so each year opens at once instead of waiting on its image.
+  useEffect(() => {
+    const el = root.current;
+    if (!el || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        for (const it of items) {
+          if (it.photo) {
+            const { props } = getImageProps({ src: it.photo.src, alt: "", fill: true, quality: 90, sizes: "(min-width:1024px) 55vw, 100vw" });
+            const im = new window.Image();
+            im.sizes = props.sizes ?? "";
+            if (props.srcSet) im.srcset = props.srcSet;
+            im.src = props.src;
+          }
+          if (it.range) new window.Image().src = it.range.src;
+        }
+      },
+      { rootMargin: "900px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [items]);
+  // It only runs while the section is on screen.
   useEffect(() => {
     const el = root.current;
     if (!el || !("IntersectionObserver" in window)) return;
@@ -37,10 +94,10 @@ export function HistoryTabs({ items }: { items: HistoryItem[] }) {
   }, []);
   // One timer per chapter: choosing a year by hand restarts it, and the last chapter loops to the first.
   useEffect(() => {
-    if (!playing || reduced || !visible || engaged) return;
+    if (!playing || !visible) return;
     const t = window.setTimeout(() => setI((n) => (n >= last ? 0 : n + 1)), STEP_MS);
     return () => window.clearTimeout(t);
-  }, [i, playing, reduced, visible, engaged, last]);
+  }, [i, playing, visible, last]);
 
   const onKey = (e: KeyboardEvent<HTMLButtonElement>) => {
     const next = e.key === "ArrowRight" || e.key === "ArrowDown" ? i + 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? last : null;
@@ -53,7 +110,7 @@ export function HistoryTabs({ items }: { items: HistoryItem[] }) {
 
   const cur = items[i];
   return (
-    <div ref={root} onPointerEnter={() => setEngaged(true)} onPointerLeave={() => setEngaged(false)} onFocus={() => setEngaged(true)} onBlur={() => setEngaged(false)}>
+    <div ref={root}>
       {/* The rail. */}
       <div className="relative">
         <span aria-hidden className="absolute left-0 right-0 top-[1.05rem] h-px bg-line" />
@@ -78,6 +135,10 @@ export function HistoryTabs({ items }: { items: HistoryItem[] }) {
                   <span className={`size-2.5 rounded-full transition-transform duration-500 ${on ? "scale-100 bg-ink" : n < i ? "scale-75 bg-ink" : "scale-0 bg-ink"}`} />
                 </span>
                 <span className={`font-display text-lg font-extrabold tabular-nums tracking-tight transition-colors duration-300 sm:text-2xl ${on ? "text-ink" : "text-ink/35 group-hover:text-ink/70"}`}>{h.year}</span>
+                {/* A thin bar counts down the time left on the chosen year. */}
+                <span aria-hidden className="block h-[3px] w-full min-w-10 overflow-hidden bg-transparent">
+                  {on && <span key={i} className="hist-progress block h-full origin-left bg-ink" style={{ ["--step" as string]: `${STEP_MS}ms`, animationPlayState: playing && visible ? "running" : "paused" }} />}
+                </span>
               </button>
             );
           })}
@@ -85,13 +146,14 @@ export function HistoryTabs({ items }: { items: HistoryItem[] }) {
       </div>
 
       {/* The chapter. Re-mounted per year, so each arrives with its own entrance. */}
-      <div key={i} id={`${uid}-panel`} role="tabpanel" aria-labelledby={`${uid}-tab-${i}`} tabIndex={0} className="hist-panel mt-12 grid gap-8 outline-none lg:mt-16 lg:grid-cols-12 lg:items-center lg:gap-14">
+      <div id={`${uid}-panel`} role="tabpanel" aria-labelledby={`${uid}-tab-${i}`} tabIndex={0} className="mt-12 grid gap-8 outline-none lg:mt-16 lg:grid-cols-12 lg:items-center lg:gap-14">
         <div className="lg:col-span-5">
-          <p className="hist-year font-display text-[clamp(5.5rem,3rem+10vw,12rem)] font-extrabold leading-[0.8] tracking-[-0.06em]">{cur.year}</p>
-          <h3 className="mt-6 font-display text-2xl font-bold uppercase tracking-tight sm:text-3xl">{cur.title}</h3>
-          <p className="mt-3 max-w-prose text-lg leading-relaxed text-ink-soft">{cur.body}</p>
+          {/* The year stays mounted so it can roll from the last number; the words and photograph below are re-created per chapter so they replay their entrances. */}
+          <RollingYear year={cur.year} className="hist-year font-display text-[clamp(5.5rem,3rem+10vw,12rem)] font-extrabold leading-[0.8] tracking-[-0.06em]" />
+          <h3 key={`t${i}`} className="hist-line mt-6 font-display text-2xl font-bold uppercase tracking-tight sm:text-3xl" style={{ ["--d" as string]: "0.15s" }}>{cur.title}</h3>
+          <p key={`b${i}`} className="hist-line mt-3 max-w-prose text-lg leading-relaxed text-ink-soft" style={{ ["--d" as string]: "0.25s" }}>{cur.body}</p>
         </div>
-        <figure className="pb-10 lg:col-span-7">
+        <figure key={`f${i}`} className="pb-10 lg:col-span-7">
           <div className="relative">
             <div className={`hist-photo relative aspect-[4/3] overflow-clip ${cur.photo?.fit === "contain" ? "bg-[#f2f3f5]" : "bg-[#22231f]"}`}>
               {cur.photo ? (
@@ -132,11 +194,9 @@ export function HistoryTabs({ items }: { items: HistoryItem[] }) {
           <p aria-live={playing ? "off" : "polite"} className="font-display text-sm font-bold tabular-nums text-muted">
             {String(i + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
           </p>
-          {!reduced && (
           <button type="button" onClick={() => setPlaying((v) => !v)} aria-label={playing ? "Pause automatic changes" : "Play automatic changes"} className="grid size-9 place-items-center rounded-full border border-ink/20 transition-colors hover:bg-ink hover:text-white">
             {playing ? <Pause className="size-3.5" aria-hidden /> : <Play className="size-3.5" aria-hidden />}
           </button>
-          )}
         </div>
         <button type="button" onClick={() => go(i + 1)} disabled={i === last} className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-sm font-semibold text-white transition-colors hover:bg-indigo-deep disabled:pointer-events-none disabled:opacity-30">
           Later <ArrowRight className="size-4" aria-hidden />

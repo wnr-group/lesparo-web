@@ -109,6 +109,56 @@
     animation: hist-in 0.6s var(--ease-out-soft) both;
   }
   .hist-photo {
-    animation: hist-wipe 0.9s var(--ease-out-soft) 0.1s both;
+    animation: hist-wipe 0.6s var(--ease-out-soft) 0.05s both;
+  }
+}
+
+/* History: the countdown bar, the slow push-in on each photograph, and text and inset arriving in sequence. */
+@keyframes hist-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes hist-kenburns {
+  from {
+    scale: 1;
+  }
+  to {
+    scale: 1.09;
+  }
+}
+@keyframes hist-line-in {
+  from {
+    opacity: 0;
+    translate: 0 0.9rem;
+  }
+}
+@keyframes hist-inset-in {
+  from {
+    opacity: 0;
+    translate: 0 1.6rem;
+  }
+}
+.hist-progress {
+  animation: hist-progress var(--step, 6500ms) linear both;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hist-photo img {
+    animation: hist-kenburns 8s ease-out both;
+  }
+  .hist-line {
+    animation: hist-line-in 0.5s var(--ease-out-soft) var(--d, 0s) both;
+  }
+  .hist-inset {
+    animation: hist-inset-in 0.55s var(--ease-out-soft) 0.3s both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hist-progress {
+    animation: none;
+    transform: scaleX(0);
   }
 }
