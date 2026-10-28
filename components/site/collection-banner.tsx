@@ -16,7 +16,7 @@ const PHOTOS: Record<string, { src: string; pos: string }> = {
   towels: { src: "/collections/towels.jpg", pos: "50% 35%" },
   kerchief: { src: "/collections/kerchief.jpg", pos: "50% 30%" },
   range: { src: "/collections/range.jpg", pos: "50% 35%" },
-  about: { src: "/collections/about-banner.jpg", pos: "50% 4%" },
+  about: { src: "/collections/about-hero.jpg", pos: "50% 0%" },
 };
 
 /** Lifestyle banner artwork for the kids and fabric collections (public/collections/banner-*.jpg). The dark left side of each is left clear for the title. */
