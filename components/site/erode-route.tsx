@@ -2,8 +2,15 @@
 
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import { easeOut, range, useReducedMotion, usePinProgress } from "./use-pin-progress";
+
+const WIDE = "(min-width: 1024px)";
+const subscribeWide = (cb: () => void) => {
+  const mq = window.matchMedia(WIDE);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+};
 
 const ORIGIN = { x: 560, y: 330 };
 const LEGS = [
@@ -17,7 +24,10 @@ const LEGS = [
  * with a marker riding the one being drawn. It is a schematic, not a map, and says so.
  */
 export function ErodeRoute() {
-  const reduced = useReducedMotion();
+  // The pinned, scroll-drawn version needs room: phones and tablets get the finished map, as with reduced motion.
+  const noMotion = useReducedMotion();
+  const wide = useSyncExternalStore(subscribeWide, () => window.matchMedia(WIDE).matches, () => true);
+  const reduced = noMotion || !wide;
   const root = useRef<HTMLElement>(null);
   const paths = useRef<SVGPathElement[]>([]);
   const marker = useRef<SVGGElement>(null);
@@ -44,28 +54,32 @@ export function ErodeRoute() {
   }, []);
   usePinProgress(root, onProgress, !reduced);
 
-  const active = LEGS[leg];
-
   const art = (
     <svg viewBox="140 60 920 500" className="h-auto max-h-full w-full" role="img" aria-label="A schematic of routes from Erode to Karnataka, Kerala and Tamil Nadu.">
+      <defs>
+        <filter id="route-glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="5" />
+        </filter>
+      </defs>
       {LEGS.map((l) => (
-        <path key={`g-${l.state}`} d={l.d} fill="none" stroke="#262e86" strokeOpacity="0.14" strokeWidth="2" strokeDasharray="3 8" />
+        <path key={`g-${l.state}`} d={l.d} fill="none" stroke="#fff" strokeOpacity="0.2" strokeWidth="2" strokeDasharray="3 9" strokeLinecap="round" />
       ))}
       {LEGS.map((l, i) => (
-        <path
-          key={l.state}
-          ref={(el) => {
-            if (el) paths.current[i] = el;
-          }}
-          d={l.d}
-          pathLength={1}
-          fill="none"
-          stroke="#262e86"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeDasharray="1 1"
-          strokeDashoffset={reduced ? 0 : 1}
-        />
+        <g key={l.state}>
+          <path
+            d={l.d}
+            ref={(el) => {
+              if (el) paths.current[i] = el;
+            }}
+            pathLength={1}
+            fill="none"
+            stroke="#fff"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            strokeDasharray="1 1"
+            strokeDashoffset={reduced ? 0 : 1}
+          />
+        </g>
       ))}
       {LEGS.map((l, i) => (
         <g
@@ -75,68 +89,61 @@ export function ErodeRoute() {
           }}
           style={{ opacity: reduced ? 1 : 0 }}
         >
-          <circle cx={l.to.x} cy={l.to.y} r="16" fill="#ffc82c" />
-          <circle cx={l.to.x} cy={l.to.y} r="6" fill="#0c0f2e" />
-          <text x={l.to.x} y={l.to.y + 48} textAnchor="middle" fontSize="24" fontWeight="700" fill="#0c0f2e">
+          <circle cx={l.to.x} cy={l.to.y} r="26" fill="#fff" opacity="0.12" />
+          <circle cx={l.to.x} cy={l.to.y} r="12" fill="#efe8da" />
+          <circle cx={l.to.x} cy={l.to.y} r="4.5" fill="#22231f" />
+          <text x={l.to.x} y={l.to.y + 50} textAnchor="middle" fontSize="24" fontWeight="700" fill="#fff">
             {l.state}
           </text>
         </g>
       ))}
-      <circle cx={ORIGIN.x} cy={ORIGIN.y} r="22" fill="#262e86" />
-      <circle cx={ORIGIN.x} cy={ORIGIN.y} r="8" fill="#ffc82c" />
-      <text x={ORIGIN.x} y={ORIGIN.y - 38} textAnchor="middle" fontSize="26" fontWeight="800" fill="#0c0f2e">
-        Erode
+      <circle cx={ORIGIN.x} cy={ORIGIN.y} r="40" fill="#fff" opacity="0.1" />
+      <circle cx={ORIGIN.x} cy={ORIGIN.y} r="20" fill="#fff" />
+      <circle cx={ORIGIN.x} cy={ORIGIN.y} r="7" fill="#22231f" />
+      <text x={ORIGIN.x} y={ORIGIN.y - 44} textAnchor="middle" fontSize="28" fontWeight="800" fill="#fff" letterSpacing="2">
+        ERODE
       </text>
       {!reduced && (
         <g ref={marker} transform={`translate(${ORIGIN.x} ${ORIGIN.y})`}>
-          <circle r="14" fill="#ffc82c" opacity="0.35" />
-          <circle r="6" fill="#ffc82c" stroke="#0c0f2e" strokeWidth="2" />
+          <circle r="16" fill="#fff" opacity="0.5" filter="url(#route-glow)" />
+          <circle r="6.5" fill="#fff" stroke="#22231f" strokeWidth="2" />
         </g>
       )}
     </svg>
   );
 
-  const copy = (
-    <div className="grid gap-4 border-t border-line pt-5 md:grid-cols-[1fr_auto] md:items-end md:gap-10">
-      <div>
-        <p className="eyebrow">{reduced ? "Where we supply" : `Route ${leg + 1} of ${LEGS.length}`}</p>
-        <div key={leg} className="mt-2" aria-live="polite">
-          <h3 className="font-display text-2xl font-bold tracking-tight">{reduced ? "Tamil Nadu, Kerala and Karnataka" : active.state}</h3>
-          <p className="mt-1 max-w-xl text-ink-soft">{reduced ? "Gents and kids casual wear, lungis, kavi dhothies, towels and kerchiefs, supplied to showrooms in all three states." : active.note}</p>
-        </div>
-      </div>
-      <div className="flex flex-wrap items-center gap-4">
-        <Link href="/wholesale#enquire" className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white transition-colors hover:bg-indigo">
-          Wholesale enquiry <ArrowRight className="size-3.5" aria-hidden />
-        </Link>
-        <span className="text-xs text-muted">Schematic, not to scale.</span>
-      </div>
-    </div>
-  );
-
-  const head = (
-    <div>
-      <p className="eyebrow mb-3">Where we supply</p>
-      <h2 className="max-w-[22ch] font-display text-headline font-bold">From Erode to showrooms across three states</h2>
-    </div>
-  );
-
-  if (reduced) {
-    return (
-      <section aria-labelledby="route-title" className="bg-paper px-5 py-20 sm:px-8 lg:px-[max(2rem,6vw)] lg:py-28">
-        <div id="route-title">{head}</div>
-        <div className="mt-10">{art}</div>
-        <div className="mt-6">{copy}</div>
-      </section>
-    );
-  }
-
   return (
-    <section ref={root} aria-label="Where we supply" className="relative bg-paper" style={{ height: "240svh" }}>
-      <div className="sticky top-0 flex h-svh flex-col overflow-hidden px-5 pt-24 pb-8 sm:px-8 lg:px-[max(2rem,6vw)]">
-        {head}
-        <div className="relative flex min-h-0 flex-1 items-center">{art}</div>
-        {copy}
+    <section ref={reduced ? undefined : root} aria-labelledby="route-title" className="relative bg-[#efe8da]" style={reduced ? undefined : { height: "240svh" }}>
+      <div className={`flex flex-col justify-center gap-8 px-4 py-16 sm:px-6 lg:grid lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-14 lg:px-10 ${reduced ? "" : "sticky top-[var(--hdr)] h-[calc(100svh-var(--hdr))] overflow-clip lg:py-0"} mx-auto max-w-page`}>
+        <div>
+          <p className="eyebrow mb-4">Where we supply</p>
+          <h2 id="route-title" className="font-display text-[clamp(2rem,1.2rem+3.2vw,4rem)] font-extrabold uppercase leading-[0.98] tracking-tight">
+            From Erode to showrooms across three states
+          </h2>
+          <ol className="mt-8 divide-y divide-ink/15 border-y border-ink/15">
+            {LEGS.map((l, i) => {
+              const on = reduced || i === leg;
+              return (
+                <li key={l.state} className={`flex items-baseline gap-4 py-3.5 transition-opacity duration-500 ${on ? "opacity-100" : "opacity-35"}`}>
+                  <span className="w-7 font-display text-sm font-bold tabular-nums text-ink/60">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="min-w-0">
+                    <span className="block font-display text-xl font-extrabold uppercase tracking-tight sm:text-2xl">{l.state}</span>
+                    <span className={`block overflow-hidden text-sm text-ink-soft transition-[max-height,opacity] duration-500 ${on ? "max-h-12 opacity-100" : "max-h-0 opacity-0"}`}>{l.note}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+          <div className="mt-7 flex flex-wrap items-center gap-4">
+            <Link href="/wholesale#enquire" className="group/btn inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-sm font-bold text-white transition-[background-color,transform] hover:-translate-y-0.5 hover:bg-indigo-deep">
+              Wholesale enquiry <ArrowRight className="size-4 transition-transform duration-300 group-hover/btn:translate-x-1" aria-hidden />
+            </Link>
+            <span className="text-xs text-muted">Schematic, not to scale.</span>
+          </div>
+        </div>
+        <div className="relative isolate flex min-h-0 items-center justify-center overflow-clip rounded-[1.6rem] bg-[#22231f] p-4 sm:p-8 lg:h-[min(36rem,100%)]" style={{ backgroundImage: "radial-gradient(rgb(255 255 255 / 0.09) 1px, transparent 1.5px)", backgroundSize: "26px 26px" }}>
+          {art}
+        </div>
       </div>
     </section>
   );
