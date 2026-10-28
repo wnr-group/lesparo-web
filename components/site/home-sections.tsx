@@ -1,16 +1,8 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ProductCard } from "@/components/site/product-card";
 import type { CategoryNode, ProductCard as Product } from "@/lib/catalogue/queries";
-
-/** Soft tints for the big category tiles, one per tile in order (the heading colour is the same hue, deeper). */
-const TINTS = [
-  { bg: "bg-[#efe8da]", word: "text-[#d8cba9]" },
-  { bg: "bg-[#e4e8dc]", word: "text-[#c3ccb2]" },
-  { bg: "bg-[#f1ddd1]", word: "text-[#e0bba5]" },
-  { bg: "bg-[#e6e5df]", word: "text-[#c8c7bc]" },
-];
 
 /** A row of small round shortcuts, the way a sports store opens its page: quick routes before the big tiles. */
 export function TopCollections({ items }: { items: CategoryNode[] }) {
@@ -37,35 +29,29 @@ export function TopCollections({ items }: { items: CategoryNode[] }) {
   );
 }
 
-/** Four tall tinted tiles: a big faded word, the product standing in front of it, and a Shop Now pill. */
+/** Four garment hang-tags: square-cornered cards with a punched hole, a number, the product on a plain plate and a name bar that turns yellow on hover. */
 export function ShopByRange({ items }: { items: CategoryNode[] }) {
   return (
     <section aria-label="Shop by range" className="py-12 lg:py-20">
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
-        <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">
-          {items.slice(0, 4).map((c, i) => {
-            const tint = TINTS[i % TINTS.length];
-            return (
-              <li key={c.id} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }}>
-                <Link href={`/collections/${c.slug}`} className={`group relative flex aspect-[3/4] flex-col overflow-hidden rounded-[1.6rem] ${tint.bg}`}>
-                  <span className={`relative z-0 px-4 pt-4 font-display text-[clamp(1.3rem,0.7rem+2.2vw,2.6rem)] font-extrabold uppercase leading-none tracking-tight sm:px-6 sm:pt-6 ${tint.word}`}>{c.name}</span>
-                  {c.coverUrl && (
-                    <Image
-                      src={c.coverUrl}
-                      alt=""
-                      fill
-                      sizes="(min-width:1024px) 22vw, 46vw"
-                      className="cutout z-10 object-contain object-bottom px-[8%] pb-[18%] pt-[22%] transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.06]"
-                    />
-                  )}
-                  <span aria-hidden className="absolute inset-x-0 bottom-0 z-10 h-1/3 bg-gradient-to-t from-black/20 to-transparent" />
-                  <span className="absolute inset-x-0 bottom-4 z-20 mx-auto w-fit rounded-full bg-white px-5 py-2 text-sm font-semibold text-ink shadow-sm transition-colors duration-300 group-hover:bg-ink group-hover:text-white">
-                    Shop now
-                  </span>
-                </Link>
-              </li>
-            );
-          })}
+        <ul className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
+          {items.slice(0, 4).map((c, i) => (
+            <li key={c.id} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }}>
+              <Link href={`/collections/${c.slug}`} className="group flex h-full flex-col border-2 border-ink bg-white transition-transform duration-500 ease-[var(--ease-out-soft)] hover:-translate-y-1.5">
+                <span className="flex items-center justify-between px-4 pt-3.5">
+                  <span aria-hidden className="size-3.5 rounded-full border-2 border-ink" />
+                  <span className="font-display text-sm font-bold tabular-nums tracking-widest text-ink/60">NO. {String(i + 1).padStart(2, "0")}</span>
+                </span>
+                <span className="relative mt-2 aspect-[4/5] bg-[#f1efe9]">
+                  {c.coverUrl && <Image src={c.coverUrl} alt="" fill sizes="(min-width:1024px) 22vw, 46vw" className="cutout object-contain p-[9%] transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.06]" />}
+                </span>
+                <span className="mt-auto flex items-center justify-between gap-3 border-t-2 border-ink bg-white px-4 py-3.5 transition-colors duration-300 group-hover:bg-sun">
+                  <span className="font-display text-lg font-extrabold uppercase tracking-tight sm:text-xl">{c.name}</span>
+                  <ArrowUpRight className="size-5 shrink-0 transition-transform duration-300 group-hover:rotate-45" aria-hidden />
+                </span>
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
     </section>
