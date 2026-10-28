@@ -30,7 +30,7 @@ export function BrandFilm({ src, title, open = false }: { src: string; title: st
           preload="metadata"
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
-          className="block aspect-video w-full"
+          className="block h-[40vh] max-h-[42rem] min-h-[15rem] w-full object-cover object-center sm:h-[52vh] lg:h-[60vh]"
         />
         <button
           type="button"
