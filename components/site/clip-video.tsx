@@ -21,12 +21,17 @@ export function ClipVideo({ src, poster, start, end, className }: { src: string;
       if (v.currentTime >= stop()) v.currentTime = start;
       raf = requestAnimationFrame(tick);
     };
+    // A backstop for when animation frames are throttled (a background tab): timeupdate still fires, a few times a second.
+    const onTime = () => {
+      if (v.currentTime >= stop()) v.currentTime = start;
+    };
     const onPlay = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(tick);
     };
     const onPause = () => cancelAnimationFrame(raf);
     v.addEventListener("loadedmetadata", seekToStart);
+    v.addEventListener("timeupdate", onTime);
     v.addEventListener("play", onPlay);
     v.addEventListener("pause", onPause);
     if (v.readyState >= 1) seekToStart();
@@ -34,6 +39,7 @@ export function ClipVideo({ src, poster, start, end, className }: { src: string;
     return () => {
       cancelAnimationFrame(raf);
       v.removeEventListener("loadedmetadata", seekToStart);
+      v.removeEventListener("timeupdate", onTime);
       v.removeEventListener("play", onPlay);
       v.removeEventListener("pause", onPause);
     };

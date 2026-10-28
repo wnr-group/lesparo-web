@@ -25,6 +25,9 @@ export async function generateMetadata(props: PageProps<"/collections/[slug]">):
   };
 }
 
+/** The stretch of the film that plays: 0:00 to 0:06:12 (6 seconds and 12 frames at the file's 24 fps, which is 6.5 s), then it loops. */
+const GENTS_CLIP: [number, number] = [0, 6 + 12 / 24];
+
 /** A promo film for a collection, if public/videos/<slug>_video.mp4 exists (gents_video.mp4 for Gents). */
 function filmFor(slug: string) {
   const name = `${slug}_video.mp4`;
@@ -40,7 +43,7 @@ async function CollectionHeader({ params }: { params: Promise<{ slug: string }> 
   const { products: own } = hasPhoto(slug) ? { products: [] } : await listProducts({ categoryIds: found.subtreeIds, pageSize: 3 });
   const bannerProducts = own.filter((p) => p.images[0]).map((p) => ({ src: p.images[0].url, alt: p.name }));
   return (
-    <CollectionBanner slug={slug} products={bannerProducts} video={filmFor(slug)} clip={filmFor(slug) ? [6, 12] : undefined}>
+    <CollectionBanner slug={slug} products={bannerProducts} video={filmFor(slug)} clip={filmFor(slug) ? GENTS_CLIP : undefined}>
       <nav aria-label="Breadcrumb" className="text-sm text-white/60">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
