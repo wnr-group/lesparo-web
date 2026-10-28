@@ -9,7 +9,6 @@ import { CIRCLE_TILES, RANGE_TILES } from "@/components/site/home-photos";
 import { NewLaunches, ShopByRange, TopCollections } from "@/components/site/home-sections";
 import { BrandStatement, BrandStory, FollowStrip } from "@/components/site/brand-sections";
 import { BuyerFaq, DetailPanels, StudioLooks } from "@/components/site/more-sections";
-import { ErodeRoute } from "@/components/site/erode-route";
 import { ButtonLink } from "@/components/ui/button";
 import { Container, SectionHeading } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
@@ -102,8 +101,6 @@ export default async function HomePage() {
       {/* ------------------------------------------------------------ lookbook film */}
       <BrandFilm src="/lesparo-video-1.mp4" title="The LESPARO lookbook" />
 
-      {/* ----------------------------------------------------- where we supply */}
-      <ErodeRoute />
 
       {/* ------------------------------------------------------- quality promise */}
       {sections.story && (
