@@ -2,7 +2,7 @@
 
 import { CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useSyncExternalStore } from "react";
 import type { CheckoutState } from "@/app/(site)/checkout/actions";
 import { ButtonLink } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
@@ -29,10 +29,16 @@ const PAYMENTS = [
   ["online_pending", "Pay online", "We will send you a secure payment link after confirming your order."],
 ];
 
+// The order's idempotency key. A random value during prerender is unstable (the build rejects it), so the server
+// snapshot is empty and the browser makes one key per page load, the same for every render.
+let pageKey = "";
+const clientKey = () => (pageKey ||= crypto.randomUUID());
+const noSubscribe = () => () => {};
+
 export function CheckoutForm({ action }: { action: (s: CheckoutState, fd: FormData) => Promise<CheckoutState> }) {
   const [state, formAction, pending] = useActionState(action, { status: "idle" } as CheckoutState);
   const cart = useCart();
-  const [key] = useState(() => crypto.randomUUID());
+  const key = useSyncExternalStore(noSubscribe, clientKey, () => "");
   const statusRef = useRef<HTMLDivElement>(null);
   const cleared = useRef(false);
   const f = state.status === "error" ? state.fields : {};
@@ -165,7 +171,7 @@ export function CheckoutForm({ action }: { action: (s: CheckoutState, fd: FormDa
           <span className="tabular-nums">{formatPrice(cart.subtotal, currency)}</span>
         </p>
         <p className="mt-2 text-xs text-muted">Final prices are confirmed from our current price list when your order is placed.</p>
-        <button type="submit" disabled={pending} className="mt-6 inline-flex h-13 w-full items-center justify-center gap-2 rounded-full bg-indigo font-semibold text-white transition-colors hover:bg-indigo-deep disabled:opacity-60">
+        <button type="submit" disabled={pending || !key} className="mt-6 inline-flex h-13 w-full items-center justify-center gap-2 rounded-full bg-indigo font-semibold text-white transition-colors hover:bg-indigo-deep disabled:opacity-60">
           {pending && <Loader2 className="size-4 animate-spin" aria-hidden />}
           {pending ? "Placing order…" : "Place order"}
         </button>
