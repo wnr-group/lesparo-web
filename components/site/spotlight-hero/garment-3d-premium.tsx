@@ -5,7 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { RotateCcw } from "lucide-react";
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Box3, BufferAttribute, Group, MathUtils, Vector3, type BufferGeometry, type Mesh, type MeshStandardMaterial, type Object3D, type PerspectiveCamera } from "three";
-import { Marker, useHits, type Hit, type Part, type Point3D, type View3D } from "./garment-3d";
+import { useHits, type Hit, type Part, type Point3D, type View3D } from "./garment-3d";
 
 /**
  * The premium viewer. It shows the same TRELLIS models as ./garment-3d, with three differences:
@@ -17,6 +17,8 @@ import { Marker, useHits, type Hit, type Part, type Point3D, type View3D } from 
  */
 
 const TAU = Math.PI * 2;
+const SCRATCH_V = new Vector3();
+const SCRATCH_DIR = new Vector3();
 const wrapPi = (a: number) => a - TAU * Math.round(a / TAU);
 
 /** Size and centre of the garment in world units. */
@@ -99,7 +101,7 @@ function repair(scene: Object3D) {
 }
 
 /** The garment (or an outfit of several), its numbered points and a hair of float. */
-function Garment({ src, points, activeKey, onPick, onZoom, onFit, motion }: { src: string | Part[]; points: Point3D[]; activeKey: string | null; onPick: (key: string) => void; onZoom: (hit: Hit) => void; onFit: (f: Fit) => void; motion: boolean }) {
+function Garment({ src, points, onFit, onHits, floatRef, motion }: { src: string | Part[]; points: Point3D[]; onFit: (f: Fit) => void; onHits: (h: Hit[]) => void; floatRef: React.MutableRefObject<number>; motion: boolean }) {
   const loaded = useGLTF(typeof src === "string" ? [src] : src.map((p) => p.src));
   const scene = useMemo(() => {
     if (typeof src === "string") {
@@ -121,6 +123,9 @@ function Garment({ src, points, activeKey, onPick, onZoom, onFit, motion }: { sr
     return outfit;
   }, [loaded, src]);
   const hits = useHits(scene, points);
+  useEffect(() => {
+    onHits(hits);
+  }, [hits, onHits]);
   const group = useRef<Group>(null);
   const box = useMemo(() => new Box3().setFromObject(scene), [scene]);
   useEffect(() => {
@@ -132,13 +137,11 @@ function Garment({ src, points, activeKey, onPick, onZoom, onFit, motion }: { sr
     const g = group.current;
     if (!g || !motion) return;
     g.position.y = MathUtils.damp(g.position.y, Math.sin(clock.elapsedTime * 0.8) * (box.max.y - box.min.y) * 0.008, 6, Math.min(dt, 0.05));
+    floatRef.current = g.position.y;
   });
   return (
     <group ref={group}>
       <primitive object={scene} />
-      {hits.map((h, i) => (
-        <Marker key={h.key} hit={h} n={i + 1} active={h.key === activeKey} onPick={onPick} onZoom={onZoom} />
-      ))}
     </group>
   );
 }
@@ -148,7 +151,7 @@ function Garment({ src, points, activeKey, onPick, onZoom, onFit, motion }: { sr
  * damping, so a drag, a flick, a guided view and the scroll all blend instead of fighting. It runs in the render
  * loop on refs, with no React state.
  */
-function MotionRig({ fit, apiRef, reduced }: { fit: React.RefObject<Fit | null>; apiRef: React.RefObject<Rig | null>; reduced: boolean }) {
+function MotionRig({ fit, apiRef, reduced, hitsRef, markersRef, floatRef }: { fit: React.RefObject<Fit | null>; apiRef: React.RefObject<Rig | null>; reduced: boolean; hitsRef: React.RefObject<Hit[]>; markersRef: React.RefObject<(HTMLButtonElement | null)[]>; floatRef: React.RefObject<number> }) {
   const s = useRef({
     init: false,
     yaw: 0, yawT: 0, pitch: 0, pitchT: 0, zoom: 1, zoomT: 1,
@@ -278,6 +281,27 @@ function MotionRig({ fit, apiRef, reduced }: { fit: React.RefObject<Fit | null>;
     target.set(c.ax, c.ay - c.sc * 0.04 * f.h, c.az);
     cam.position.set(target.x + dist * Math.sin(yaw) * Math.cos(pitch), target.y + dist * Math.sin(pitch), target.z + dist * Math.cos(yaw) * Math.cos(pitch));
     cam.lookAt(target);
+
+    // Pin each numbered point's button to its spot on the cloth. They are ordinary page buttons, moved here with no React state.
+    const hits = hitsRef.current;
+    const els = markersRef.current;
+    if (!hits.length) return;
+    cam.updateMatrixWorld();
+    const v = SCRATCH_V;
+    const dir = SCRATCH_DIR;
+    for (let i = 0; i < hits.length; i++) {
+      const el = els[i];
+      if (!el) continue;
+      v.copy(hits[i].pos);
+      v.y += floatRef.current;
+      v.project(cam);
+      dir.copy(cam.position).sub(hits[i].pos).normalize();
+      // A point fades out as the cloth it sits on turns away from the camera.
+      const facing = v.z < 1 && hits[i].normal.dot(dir) > 0.25;
+      el.style.transform = `translate3d(${(v.x * 0.5 + 0.5) * state.size.width}px, ${(-v.y * 0.5 + 0.5) * state.size.height}px, 0) translate(-50%, -50%)`;
+      el.style.opacity = facing ? "1" : "0";
+      el.style.pointerEvents = facing ? "auto" : "none";
+    }
   });
   return null;
 }
@@ -315,6 +339,37 @@ function Loading() {
 }
 
 /**
+ * Everything in the scene except the camera. The garment's size is kept in state here, inside the 3D tree, so
+ * reporting it never schedules an update on the page's own React tree while the canvas is being torn down.
+ */
+function Stage({ src, points, onHits, floatRef, fitRef, motion }: { src: string | Part[]; points: Point3D[]; onHits: (h: Hit[]) => void; floatRef: React.MutableRefObject<number>; fitRef: React.MutableRefObject<Fit | null>; motion: boolean }) {
+  const [size, setSize] = useState<Fit | null>(null);
+  const onFit = useCallback(
+    (f: Fit) => {
+      fitRef.current = f;
+      setSize(f);
+    },
+    [fitRef],
+  );
+  return (
+    <>
+      <Garment src={src} points={points} onFit={onFit} onHits={onHits} floatRef={floatRef} motion={motion} />
+      {/* Restrained studio light: a soft key from the upper left, a cool fill, and a rim from behind to lift the edge off the navy. */}
+      <ambientLight intensity={0.9} />
+      <directionalLight position={[-2.2, 3.5, 3.5]} intensity={1.5} color="#fff3e4" />
+      <directionalLight position={[3.2, 1.2, 2]} intensity={0.5} color="#b9c8ff" />
+      <directionalLight position={[0.6, 2.5, -4]} intensity={1.3} color="#dbe6ff" />
+      <Environment resolution={128} environmentIntensity={0.5}>
+        <Lightformer form="rect" intensity={1.6} position={[0, 4, 3]} scale={[8, 3, 1]} />
+        <Lightformer form="rect" intensity={0.8} position={[-5, 1, 2]} scale={[3, 6, 1]} color="#9fb4ff" />
+        <Lightformer form="rect" intensity={0.6} position={[5, 1, -2]} scale={[3, 6, 1]} />
+      </Environment>
+      {size && <ContactShadows position={[size.cx, size.minY - 0.015 * size.h, size.cz]} opacity={0.45} scale={Math.max(size.w, size.d) * 3.2} blur={2.4} far={size.h * 0.4} frames={1} />}
+    </>
+  );
+}
+
+/**
  * A real 3D garment: drag to turn it, flick for a little momentum. It breathes gently when left alone and eases
  * back to its resting view. The arrow keys turn it, plus and minus zoom, 0 resets. Scrolling the page past the hero
  * turns and eases the camera a little. The page scrolls normally over the model, and Ctrl + wheel (or a trackpad
@@ -345,7 +400,10 @@ export default function Garment3DPremium({
   const [coarse, setCoarse] = useState(false);
   const [visible, setVisible] = useState(true);
   const [dragging, setDragging] = useState(false);
-  const [fitState, setFitState] = useState<Fit | null>(null);
+  const [hits, setHits] = useState<Hit[]>([]);
+  const hitsRef = useRef<Hit[]>([]);
+  const markersRef = useRef<(HTMLButtonElement | null)[]>([]);
+  const floatRef = useRef(0);
   const root = useRef<HTMLDivElement>(null);
   const rig = useRef<Rig | null>(null);
   const fit = useRef<Fit | null>(null);
@@ -359,6 +417,10 @@ export default function Garment3DPremium({
     setCoarse(window.matchMedia("(pointer: coarse)").matches);
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
+
+  useEffect(() => {
+    hitsRef.current = hits;
+  }, [hits]);
 
   // A chosen view glides the camera there. Clearing the view (the visitor took hold) never cancels a glide in progress.
   useEffect(() => {
@@ -399,11 +461,6 @@ export default function Garment3DPremium({
       el.removeEventListener("wheel", onWheel);
     };
   }, [gl, reduced]);
-
-  const onFit = useCallback((f: Fit) => {
-    fit.current = f;
-    setFitState(f);
-  }, []);
 
   const grabbed = () => onGrab();
   const zoomTo = (hit: Hit) => {
@@ -505,23 +562,36 @@ export default function Garment3DPremium({
             }}
           >
             <Suspense fallback={null}>
-              <Garment src={src} points={points} activeKey={activeKey} onPick={onPick} onZoom={zoomTo} onFit={onFit} motion={!reduced} />
-              {/* Restrained studio light: a soft key from the upper left, a cool fill, and a rim from behind to lift the edge off the navy. */}
-              <ambientLight intensity={0.9} />
-              <directionalLight position={[-2.2, 3.5, 3.5]} intensity={1.5} color="#fff3e4" />
-              <directionalLight position={[3.2, 1.2, 2]} intensity={0.5} color="#b9c8ff" />
-              <directionalLight position={[0.6, 2.5, -4]} intensity={1.3} color="#dbe6ff" />
-              <Environment resolution={128} environmentIntensity={0.5}>
-                <Lightformer form="rect" intensity={1.6} position={[0, 4, 3]} scale={[8, 3, 1]} />
-                <Lightformer form="rect" intensity={0.8} position={[-5, 1, 2]} scale={[3, 6, 1]} color="#9fb4ff" />
-                <Lightformer form="rect" intensity={0.6} position={[5, 1, -2]} scale={[3, 6, 1]} />
-              </Environment>
-              {fitState && <ContactShadows position={[fitState.cx, fitState.minY - 0.015 * fitState.h, fitState.cz]} opacity={0.45} scale={Math.max(fitState.w, fitState.d) * 3.2} blur={2.4} far={fitState.h * 0.4} frames={1} />}
+              <Stage src={src} points={points} onHits={setHits} floatRef={floatRef} fitRef={fit} motion={!reduced} />
             </Suspense>
-            <MotionRig fit={fit} apiRef={rig} reduced={reduced} />
+            <MotionRig fit={fit} apiRef={rig} reduced={reduced} hitsRef={hitsRef} markersRef={markersRef} floatRef={floatRef} />
           </Canvas>
         </Boundary>
       )}
+      {/* The numbered points: plain buttons, kept on the cloth by the motion controller. */}
+      {hits.map((h, i) => (
+        <button
+          key={h.key}
+          ref={(el) => {
+            markersRef.current[i] = el;
+          }}
+          type="button"
+          aria-label={`${i + 1}. ${h.label}`}
+          aria-pressed={h.key === activeKey}
+          onClick={() => {
+            onPick(h.key);
+            zoomTo(h);
+          }}
+          onFocus={() => onPick(h.key)}
+          onPointerDown={(e) => e.stopPropagation()}
+          style={{ opacity: 0, pointerEvents: "none" }}
+          className="group absolute left-0 top-0 z-20 grid size-11 cursor-pointer place-items-center rounded-full transition-opacity duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#ffc82c]"
+        >
+          <span aria-hidden className={`grid size-8 place-items-center rounded-full border-2 transition-[transform,background-color,border-color] duration-200 group-hover:scale-110 ${h.key === activeKey ? "border-[#ffc82c] bg-[#0e1b4f]/55" : "border-white bg-[#0e1b4f]/35 group-hover:bg-[#0e1b4f]/60"}`}>
+            <span className={`size-2.5 rounded-full transition-colors duration-200 ${h.key === activeKey ? "bg-[#ffc82c]" : "bg-white"}`} />
+          </span>
+        </button>
+      ))}
       <Loading />
       <button
         type="button"
