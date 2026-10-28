@@ -35,9 +35,17 @@ export function CollectionBanner({ slug, products, video, children }: { slug?: s
   const own = !hasPhoto(slug) && products && products.length > 0 ? products.slice(0, 3) : null;
   return (
     <section className="mx-auto max-w-page px-4 pt-6 sm:px-6 lg:px-10 lg:pt-8">
-      <div className="relative isolate grid overflow-clip rounded-[1.6rem] bg-[#22231f] text-white lg:min-h-[26rem] lg:grid-cols-[1fr_1.1fr]">
+      <div className={`relative isolate grid overflow-clip rounded-[1.6rem] bg-[#22231f] text-white lg:min-h-[26rem] ${video ? "" : "lg:grid-cols-[1fr_1.1fr]"}`}>
+        {/* A promo film covers the whole banner; a gradient keeps the text on the left readable. Reduced motion keeps the photograph. */}
+        {video && (
+          <>
+            <Image src={photo.src} alt="" fill priority sizes="100vw" className="-z-20 object-cover" style={{ objectPosition: photo.pos }} />
+            <video src={video} poster={photo.src} autoPlay muted loop playsInline preload="metadata" aria-hidden className="absolute inset-0 -z-10 size-full object-cover motion-reduce:hidden" />
+            <span aria-hidden className="absolute inset-0 -z-[5] bg-gradient-to-r from-[#22231f]/90 via-[#22231f]/45 to-transparent" />
+          </>
+        )}
         <div className="relative z-10 flex flex-col justify-center px-6 py-10 sm:px-12 lg:px-16 lg:py-14">{children}</div>
-        {own ? (
+        {video ? null : own ? (
           <div className="relative flex min-h-64 items-end justify-center gap-2 overflow-clip bg-[#e4e0d3] px-4 pt-8 sm:gap-4 lg:min-h-0 lg:px-8">
             {own.map((p, i) => (
               <div key={p.src} className={`relative h-[16rem] min-w-0 flex-1 sm:h-[20rem] lg:h-[24rem] ${i === 1 ? "lg:h-[26rem]" : ""}`}>
@@ -48,8 +56,6 @@ export function CollectionBanner({ slug, products, video, children }: { slug?: s
         ) : (
           <div className="relative min-h-64 overflow-clip lg:min-h-0">
             <Image src={photo.src} alt="" fill priority sizes="(min-width:1024px) 55vw, 100vw" className="scrub-parallax object-cover" style={{ objectPosition: photo.pos }} />
-            {/* An optional promo film: silent, looping, and hidden for reduced motion, where the photograph stays. */}
-            {video && <video src={video} poster={photo.src} autoPlay muted loop playsInline preload="metadata" aria-hidden className="absolute inset-0 size-full object-cover motion-reduce:hidden" />}
             {/* Fades the photograph into the text panel so there is no hard seam. */}
             <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#22231f] via-transparent to-transparent lg:bg-gradient-to-r" />
           </div>
