@@ -448,9 +448,10 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       </div>
 
       {/* The product viewer. */}
-      <div className="sp-leave-figure relative z-10 my-6 flex justify-center px-5 lg:absolute lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[6.25rem] lg:my-0 lg:px-0">
+      <div className={`sp-leave-figure relative z-10 my-6 flex justify-center px-5 lg:absolute lg:my-0 lg:px-0 ${model ? "sp-figure-full" : "lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[6.25rem]"}`}>
         {model ? (
-          <div className="sp-product relative w-full max-w-[22rem] overflow-hidden lg:h-full lg:w-auto lg:max-w-none" style={{ aspectRatio: "2 / 3" }}>
+          // Full-bleed on desktop: the 3D stage is the whole hero, so a close-up is never clipped inside a box.
+          <div className="sp-product relative aspect-[2/3] w-full max-w-[22rem] overflow-hidden lg:aspect-auto lg:h-full lg:w-full lg:max-w-none">
             <Viewer key={`${model}-${classic}`} src={model === "/models/look" ? LOOK_PARTS : model} label={product.label} poster={product.frames[0]} points={points3d} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} view={view3d} onGrab={() => setView3d(null)} />
           </div>
         ) : (

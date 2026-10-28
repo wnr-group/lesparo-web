@@ -276,7 +276,9 @@ function MotionRig({ fit, apiRef, reduced, hitsRef, markersRef, floatRef }: { fi
     const pitch = MathUtils.clamp(c.pitch - c.pys * 0.03 + c.sc * 0.07, -0.4, 0.45);
     const cam = state.camera as PerspectiveCamera;
     const half = Math.tan(MathUtils.degToRad(cam.fov) / 2);
-    const fitDist = Math.max(f.h / 2 / half, f.w / 2 / (half * cam.aspect)) / 0.8 + f.d / 2;
+    // On a wide, full-bleed stage the garment fills less of the height than in the narrow portrait box on a phone.
+    const fill = cam.aspect > 1.2 ? 0.64 : 0.8;
+    const fitDist = Math.max(f.h / 2 / half, f.w / 2 / (half * cam.aspect)) / fill + f.d / 2;
     const dist = fitDist * c.zoom * (1 + 0.16 * c.sc);
     target.set(c.ax, c.ay - c.sc * 0.04 * f.h, c.az);
     cam.position.set(target.x + dist * Math.sin(yaw) * Math.cos(pitch), target.y + dist * Math.sin(pitch), target.z + dist * Math.cos(yaw) * Math.cos(pitch));
@@ -467,7 +469,12 @@ export default function Garment3DPremium({
   const grabbed = () => onGrab();
   const zoomTo = (hit: Hit) => {
     grabbed();
-    rig.current?.goTo({ az: Math.atan2(hit.normal.x, hit.normal.z), zoom: 0.4, aimY: 0, at: [hit.pos.x, hit.pos.y, hit.pos.z] });
+    // Turn to face the point and come in close, but keep the whole garment in frame: aim most of the way toward the
+    // garment's middle, so the point lands off-centre instead of the cloth being cut off at the edges.
+    const f = fit.current;
+    const k = 0.4;
+    const at: [number, number, number] = f ? [f.cx + (hit.pos.x - f.cx) * k, f.cy + (hit.pos.y - f.cy) * k, f.cz + (hit.pos.z - f.cz) * k] : [hit.pos.x, hit.pos.y, hit.pos.z];
+    rig.current?.goTo({ az: Math.atan2(hit.normal.x, hit.normal.z), zoom: 0.62, aimY: 0, at });
   };
   const reset = () => {
     grabbed();
@@ -600,7 +607,7 @@ export default function Garment3DPremium({
         aria-label="Reset the view"
         onClick={reset}
         onPointerDown={(e) => e.stopPropagation()}
-        className="absolute bottom-3 right-3 z-20 grid size-11 place-items-center border border-white/40 bg-[#0e1b4f]/80 text-white backdrop-blur hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-[#ffc82c]"
+        className="absolute bottom-3 right-3 z-20 grid size-11 lg:bottom-7 lg:left-1/2 lg:right-auto lg:ml-[14rem] place-items-center border border-white/40 bg-[#0e1b4f]/80 text-white backdrop-blur hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-[#ffc82c]"
       >
         <RotateCcw className="size-4" aria-hidden />
       </button>
