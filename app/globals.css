@@ -623,3 +623,99 @@
     animation-delay: 0s !important;
   }
 }
+
+/*
+ * Editorial motion (components/site/split-words.tsx, home-sections.tsx, collection-banner.tsx).
+ *   data-reveal="words"  each word rises from behind a mask, staggered by --i (played once, like the other reveals)
+ *   .scrub-mask          opens from an inset rounded window to full size, tied to scroll position (reversible)
+ *   .scrub-parallax      a photo drifts against its frame while the frame passes through the viewport
+ *   .marquee-row         large type slides sideways with scroll; .marquee-rev travels the other way
+ * Static where scroll timelines are unsupported or motion is reduced.
+ */
+.sw-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+.sw-word {
+  display: inline-block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-reveal-on] [data-reveal="words"] .sw-word {
+    transition: translate 1s var(--ease-out-soft);
+    transition-delay: calc(var(--delay, 0s) + var(--i, 0) * 70ms);
+  }
+  :root[data-reveal-on] [data-reveal="words"]:not([data-revealed]) .sw-word {
+    translate: 0 112%;
+  }
+}
+@keyframes scrub-mask {
+  from {
+    clip-path: inset(9% 5% round 2.2rem);
+  }
+  to {
+    clip-path: inset(0 round 0.4rem);
+  }
+}
+@keyframes scrub-parallax {
+  from {
+    translate: 0 -7%;
+  }
+  to {
+    translate: 0 7%;
+  }
+}
+@keyframes marquee-slide {
+  from {
+    translate: 6% 0;
+  }
+  to {
+    translate: -34% 0;
+  }
+}
+@keyframes marquee-slide-rev {
+  from {
+    translate: -34% 0;
+  }
+  to {
+    translate: 6% 0;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scrub-mask {
+      animation: scrub-mask linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 90%;
+    }
+    .scrub-parallax {
+      scale: 1.16;
+      animation: scrub-parallax linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+    .marquee-row {
+      animation: marquee-slide linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+    .marquee-rev {
+      animation-name: marquee-slide-rev;
+    }
+  }
+}
+
+/* Banner headlines are on screen at load, so their words rise on load instead of waiting for a scroll reveal. */
+@keyframes sw-load {
+  from {
+    translate: 0 112%;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-onload] .sw-word {
+    animation: sw-load 1.1s var(--ease-out-soft) both;
+    animation-delay: calc(0.15s + var(--i, 0) * 90ms);
+  }
+}

@@ -31,10 +31,10 @@ export function CollectionBanner({ slug, children }: { slug?: string; children: 
   const photo = photoFor(slug);
   return (
     <section className="mx-auto max-w-page px-4 pt-6 sm:px-6 lg:px-10 lg:pt-8">
-      <div className="relative isolate grid overflow-hidden rounded-[1.6rem] bg-[#22231f] text-white lg:min-h-[26rem] lg:grid-cols-[1fr_1.1fr]">
+      <div className="relative isolate grid overflow-clip rounded-[1.6rem] bg-[#22231f] text-white lg:min-h-[26rem] lg:grid-cols-[1fr_1.1fr]">
         <div className="relative z-10 flex flex-col justify-center px-6 py-10 sm:px-12 lg:px-16 lg:py-14">{children}</div>
-        <div className="relative min-h-64 lg:min-h-0">
-          <Image src={photo.src} alt="" fill priority sizes="(min-width:1024px) 55vw, 100vw" className="object-cover" style={{ objectPosition: photo.pos }} />
+        <div className="relative min-h-64 overflow-clip lg:min-h-0">
+          <Image src={photo.src} alt="" fill priority sizes="(min-width:1024px) 55vw, 100vw" className="scrub-parallax object-cover" style={{ objectPosition: photo.pos }} />
           {/* Fades the photograph into the text panel so there is no hard seam. */}
           <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#22231f] via-transparent to-transparent lg:bg-gradient-to-r" />
         </div>

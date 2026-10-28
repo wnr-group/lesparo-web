@@ -1,6 +1,7 @@
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { SplitWords } from "@/components/site/split-words";
 import { photoFor } from "@/components/site/collection-banner";
 import { ProductCard } from "@/components/site/product-card";
 import type { CategoryNode, ProductCard as Product } from "@/lib/catalogue/queries";
@@ -11,7 +12,7 @@ export function TopCollections({ items }: { items: CategoryNode[] }) {
     <section aria-labelledby="top-collections" className="pt-12 lg:pt-16">
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
         <h2 id="top-collections" className="text-center font-display text-[clamp(1.8rem,1.2rem+2vw,2.8rem)] font-extrabold uppercase tracking-tight text-ink">
-          Top collections
+          <SplitWords>Top collections</SplitWords>
         </h2>
         <ul className="mt-8 flex gap-5 overflow-x-auto pb-2 [scrollbar-width:none] sm:justify-center lg:gap-9 [&::-webkit-scrollbar]:hidden">
           {items.map((c) => (
@@ -48,9 +49,9 @@ export function ShopByRange({ items }: { items: CategoryNode[] }) {
             const tone = garment ? "bg-[#22231f] text-white" : solid[solidIndex++ % solid.length];
             return (
               <li key={c.id} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }} className={layout[i]}>
-                <Link href={`/collections/${c.slug}`} className={`group relative block h-full w-full overflow-hidden ${tone}`}>
+                <Link href={`/collections/${c.slug}`} className={`group relative block h-full w-full overflow-clip ${tone} ${i === 0 ? "scrub-mask" : ""}`}>
                   {garment ? (
-                    <Image src={photo.src} alt="" fill sizes={i === 0 ? "(min-width:1024px) 50vw, 100vw" : "(min-width:1024px) 50vw, 100vw"} className="object-cover transition-transform duration-[900ms] ease-[var(--ease-out-soft)] group-hover:scale-[1.05]" style={{ objectPosition: photo.pos }} />
+                    <Image src={photo.src} alt="" fill sizes="(min-width:1024px) 50vw, 100vw" className="scrub-parallax object-cover" style={{ objectPosition: photo.pos }} />
                   ) : (
                     c.coverUrl && <Image src={c.coverUrl} alt="" fill sizes="(min-width:1024px) 25vw, 50vw" className={`cutout object-contain transition-transform ${i === 1 ? "p-[3%] pb-[18%]" : "p-[14%] pb-[26%]"}  duration-[900ms] ease-[var(--ease-out-soft)] group-hover:scale-[1.07]`} />
                   )}
@@ -81,7 +82,7 @@ export function NewLaunches({ products }: { products: Product[] }) {
           <div className="flex items-center gap-4">
             <span className="rotate-[-8deg] rounded-md bg-ink px-3 py-1.5 text-[0.7rem] font-extrabold uppercase leading-tight tracking-wider text-white shadow-md">New arrival</span>
             <h2 id="new-launches" className="font-display text-[clamp(1.8rem,1.2rem+2.4vw,3.2rem)] font-extrabold uppercase tracking-tight text-ink">
-              Our new launches
+              <SplitWords>Our new launches</SplitWords>
             </h2>
           </div>
           <Link href="/shop?sort=newest" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold shadow-sm transition-colors hover:bg-ink hover:text-white">

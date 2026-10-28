@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { ScrollMarquee, SplitWords } from "@/components/site/split-words";
 import { CollectionBanner } from "@/components/site/collection-banner";
 import { ShopByRange } from "@/components/site/home-sections";
 import { getCategoryTree } from "@/lib/catalogue/queries";
@@ -20,7 +21,7 @@ export default async function CollectionsPage() {
       <CollectionBanner>
         <p className="eyebrow !text-white/60">Collections</p>
         <h1 className="mt-3 max-w-xl font-display text-[clamp(2.4rem,1.4rem+4vw,5rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
-          Shop the <span className="text-white/55">whole range</span>
+          <SplitWords onLoad>Shop the</SplitWords> <SplitWords onLoad className="text-white/55">whole range</SplitWords>
         </h1>
         <p className="mt-5 max-w-md text-white/70">Gents and kids garments, and woven fabrics from Erode: pick a range, or send us a wholesale enquiry.</p>
         <div className="mt-8 flex flex-wrap gap-3">
@@ -34,6 +35,8 @@ export default async function CollectionsPage() {
       </CollectionBanner>
 
       <ShopByRange items={all} />
+
+      <ScrollMarquee rows={[all.map((c) => c.name).join(" · "), "Accomplish great things · LESPARO"]} />
 
       <div className="mx-auto mt-16 max-w-page space-y-16 px-4 pb-20 sm:px-6 lg:px-10">
         {tree.map((top) => (

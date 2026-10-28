@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CatalogueBrowser, CatalogueSkeleton } from "@/components/site/catalogue-browser";
+import { SplitWords } from "@/components/site/split-words";
 import { CollectionBanner } from "@/components/site/collection-banner";
 import { getCategories, getCategoryBySlug } from "@/lib/catalogue/queries";
 
@@ -47,7 +48,7 @@ async function CollectionHeader({ params }: { params: Promise<{ slug: string }> 
         </ol>
       </nav>
       <h1 className="mt-4 font-display text-[clamp(2.4rem,1.4rem+4vw,5rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
-        {category.name}
+        <SplitWords onLoad>{category.name}</SplitWords>
         {trail.length > 2 && <span className="text-white/55"> · {trail[trail.length - 2].name}</span>}
       </h1>
       {category.description && <p className="mt-4 max-w-prose text-white/70">{category.description}</p>}

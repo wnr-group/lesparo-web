@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CatalogueBrowser, CatalogueSkeleton } from "@/components/site/catalogue-browser";
+import { SplitWords } from "@/components/site/split-words";
 import { CollectionBanner } from "@/components/site/collection-banner";
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export default function ShopPage(props: PageProps<"/shop">) {
       <CollectionBanner>
         <p className="eyebrow !text-white/60">Catalogue</p>
         <h1 className="mt-3 font-display text-[clamp(2.4rem,1.4rem+4vw,5rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
-          All <span className="text-white/55">products</span>
+          <SplitWords onLoad>All</SplitWords> <SplitWords onLoad className="text-white/55">products</SplitWords>
         </h1>
         <p className="mt-5 max-w-md text-white/70">The full LESPARO range. Filter by fabric or size, or send us a wholesale enquiry for bulk pricing.</p>
         <div className="mt-8">
