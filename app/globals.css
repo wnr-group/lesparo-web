@@ -850,3 +850,28 @@
   }
 }
 
+
+/* Navigation dropdown (components/site/site-nav.tsx): the panel opens with a short wipe, and its columns rise in one after another. */
+@keyframes menu-wipe {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes menu-item-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.6rem;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .menu-panel[data-open="true"] {
+    animation: menu-wipe 0.45s var(--ease-out-soft) both;
+  }
+  .menu-panel[data-open="true"] .menu-item {
+    animation: menu-item-rise 0.5s var(--ease-out-soft) calc(0.08s + var(--i, 0) * 70ms) both;
+  }
+}
+
