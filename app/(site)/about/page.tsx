@@ -2,6 +2,7 @@ import { ArrowRight, ArrowUpRight, Phone, RefreshCw, ShieldCheck } from "lucide-
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { BrandFilm } from "@/components/site/brand-film";
 import { ButtonLink } from "@/components/ui/button";
 import { BUSINESS } from "@/lib/business";
 import { getCategoryTree, listProducts, type CategoryNode } from "@/lib/catalogue/queries";
@@ -115,6 +116,9 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* The LESPARO film, straight after the introduction. */}
+      <BrandFilm open src="/lesparo_video.mp4" title="The LESPARO film" />
 
       {/* ========================================================== vision */}
       <section aria-labelledby="vision-heading" className="bg-[#f4f5ff] py-20 lg:py-28">
