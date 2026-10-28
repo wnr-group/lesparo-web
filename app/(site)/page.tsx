@@ -94,6 +94,9 @@ export default async function HomePage() {
         </>
       )}
 
+      {/* ------------------------------------------------------- campaign film: Move Freely */}
+      <BrandFilm open src="/videos/active-life.mp4" title="LESPARO: Move freely" />
+
       <BrandStatement />
       <BrandStory />
 
