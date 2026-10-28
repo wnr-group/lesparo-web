@@ -30,7 +30,7 @@ const VIEWS_3D: Record<string, View3DDef[]> = {
     { id: "waist", label: "Waistband", az: 0, zoom: 0.5, aimY: 0.36, point: "Drawstring waistband" },
   ],
   tee: [
-    { id: "front", label: "Front", az: 0, zoom: 1, aimY: 0, point: "Textured knit" },
+    { id: "front", label: "Front", az: 0, zoom: 1, aimY: 0, point: "LESPARO brand" },
     { id: "side", label: "Side", az: Math.PI / 2, zoom: 1, aimY: 0, point: "Contrast cuff" },
     { id: "back", label: "Back", az: Math.PI, zoom: 1, aimY: 0, point: "Textured knit" },
     { id: "neck", label: "Collar", az: 0, zoom: 0.45, aimY: 0.33, point: "Polo collar" },
@@ -58,6 +58,7 @@ const POINTS_3D: Record<string, { label: string; side: Point3D["side"]; u: numbe
     { label: "Back pocket", side: "back", u: 0.42, v: 0.88 },
   ],
   tee: [
+    { label: "LESPARO brand", side: "front", u: 0.7, v: 0.68 },
     { label: "Polo collar", side: "front", u: 0.64, v: 0.9 },
     { label: "Textured knit", side: "front", u: 0.4, v: 0.55 },
     { label: "Contrast cuff", side: "right", u: 0.5, v: 0.62 },
@@ -67,7 +68,7 @@ const POINTS_3D: Record<string, { label: string; side: Point3D["side"]; u: numbe
 
 type Cta = { label: string; href: string };
 /** A numbered point on one frame. It shows while the viewer is within `tol` frames of that frame. */
-type Spot = { frame: number; x: number; y: number; label: string; detail?: string };
+type Spot = { frame: number; x: number; y: number; label: string; detail?: string; /** Artwork to show in the detail panel instead of a close-up of the photo (for example the brand mark). */ art?: string };
 export type TurntableSet = { frames: string[]; spots: Spot[] };
 type Product = { id: string; label: string; frames: string[]; spots: Spot[]; spin: boolean; keyLabels: string[] };
 
@@ -97,6 +98,7 @@ const STAND_IN: Record<string, { frames: string[]; spots: Spot[]; keys: string[]
     frames: ["/spotlight/polo-front.jpg"],
     keys: ["Front"],
     spots: [
+      { frame: 0, x: 0.7, y: 0.34, label: "LESPARO brand", art: "/lesparo-bird.png" },
       { frame: 0, x: 0.5, y: 0.09, label: "Polo collar" },
       { frame: 0, x: 0.52, y: 0.5, label: "Textured knit" },
       { frame: 0, x: 0.87, y: 0.49, label: "Contrast cuff" },
@@ -120,6 +122,7 @@ const DETAILS: Record<string, string> = {
   "Back pocket": "A pocket on the back, finished with neat stitching.",
   "Textured fabric": "A fine, even texture that shows in the cloth up close.",
   "LESPARO bird mark": "The LESPARO bird mark, the brand's sign on the garment.",
+  "LESPARO brand": "The LESPARO bird mark, the brand's sign, shown here on the chest.",
   "Polo collar": "An open polo collar in cream, set against the brown body.",
   "Textured knit": "A raised, woven-look knit that gives the cloth depth.",
   "Contrast cuff": "A cream cuff on each short sleeve, in contrast to the body.",
@@ -575,7 +578,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       <div aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[16rem] lg:p-0 xl:w-[23rem] 2xl:right-12 2xl:w-[26rem]">
         {active ? (
           <div key={keyOf(active)} className="sp-detail flex flex-col gap-4 bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm ">
-            <span aria-hidden className="block h-44 w-full shrink-0 bg-no-repeat sm:h-52 lg:h-44 xl:h-52 2xl:h-56" style={{ backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "400% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
+            <span aria-hidden className="block h-44 w-full shrink-0 bg-no-repeat sm:h-52 lg:h-44 xl:h-52 2xl:h-56" style={active.art ? { backgroundImage: `url(${active.art})`, backgroundSize: "auto 72%", backgroundPosition: "center", backgroundColor: "#14226b" } : { backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "400% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
             <div className="min-w-0">
               <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#ffc82c]">
                 Detail {activeIdx + 1} of {visibleSpots.length}
