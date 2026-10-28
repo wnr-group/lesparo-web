@@ -91,3 +91,24 @@
     }
   }
 }
+
+/* The history chapters (components/site/history-tabs.tsx): each year's panel slides in, its photograph opening upward. */
+@keyframes hist-in {
+  from {
+    opacity: 0;
+    translate: 0 1.2rem;
+  }
+}
+@keyframes hist-wipe {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hist-panel {
+    animation: hist-in 0.6s var(--ease-out-soft) both;
+  }
+  .hist-photo {
+    animation: hist-wipe 0.9s var(--ease-out-soft) 0.1s both;
+  }
+}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BrandFilm } from "@/components/site/brand-film";
 import { CollectionBanner } from "@/components/site/collection-banner";
 import { CountUp } from "@/components/site/count-up";
+import { HistoryTabs } from "@/components/site/history-tabs";
 import { Magnetic } from "@/components/site/pointer-fx";
 import { SplitWords } from "@/components/site/split-words";
 import { ButtonLink } from "@/components/ui/button";
@@ -114,52 +115,24 @@ export default function AboutPage() {
       </section>
 
       {/* ======================================================== history */}
-      <section aria-labelledby="history-heading" className="overflow-x-clip bg-white py-20 lg:py-28">
+      <section aria-labelledby="history-heading" className="bg-white py-20 lg:py-28">
         <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
           <div className="grid gap-6 lg:grid-cols-12 lg:items-end">
             <div className="lg:col-span-7">
               <p data-reveal="up" className="eyebrow">
                 Company history
               </p>
-              <h2 id="history-heading" className="uppercase mt-4 font-display text-[clamp(2.2rem,1.2rem+4vw,5rem)] font-extrabold leading-[0.95] tracking-tight">
+              <h2 id="history-heading" className="mt-4 font-display text-[clamp(2.2rem,1.2rem+4vw,5rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
                 <SplitWords>One family, four chapters.</SplitWords>
               </h2>
             </div>
             <p data-reveal="up" className="max-w-md leading-relaxed text-ink-soft lg:col-span-5 lg:justify-self-end">
-              Photographs show products from today’s LESPARO range that match what the business made in each era.
+              Choose a year. Photographs show products from today’s LESPARO range that match what the business made in each era.
             </p>
           </div>
-
-          <ol className="timeline relative mt-14 lg:mt-20">
-            <span aria-hidden className="absolute bottom-0 left-[5px] top-2 w-px bg-line lg:left-1/2" />
-            <span aria-hidden className="timeline-fill absolute bottom-0 left-[5px] top-2 w-px origin-top bg-indigo lg:left-1/2" />
-            {HISTORY.map((h, i) => {
-              const flip = i % 2 === 1;
-              return (
-                <li key={h.year} className="relative grid gap-6 pb-14 pl-10 last:pb-0 lg:grid-cols-2 lg:gap-24 lg:pb-24 lg:pl-0">
-                  <span aria-hidden className="absolute left-0 top-3 size-[11px] rounded-full bg-indigo ring-[5px] ring-white lg:left-1/2 lg:-translate-x-1/2" />
-                  <div data-reveal="up" className={flip ? "lg:order-2" : ""}>
-                    <p className="font-display text-[clamp(4.5rem,2.5rem+8vw,9.5rem)] font-extrabold leading-[0.8] tracking-[-0.07em] text-indigo">{h.year}</p>
-                    <h3 className="mt-5 font-display text-2xl font-bold tracking-tight sm:text-3xl">{h.title}</h3>
-                    <p className="mt-3 max-w-prose text-lg leading-relaxed text-ink-soft">{h.body}</p>
-                  </div>
-                  <div className={`ab-zoom group relative aspect-[4/3] w-full max-w-md self-center overflow-hidden rounded-2xl bg-[#22231f] ${flip ? "lg:order-1 lg:justify-self-end" : ""}`}>
-                    {h.photo ? (
-                      <>
-                        <Image src={h.photo.src} alt={`${h.label}, from today’s LESPARO range`} fill sizes="(min-width:1024px) 28rem, 90vw" className="hz object-cover" style={{ objectPosition: h.photo.pos }} />
-                        <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
-                        <p className="absolute inset-x-0 bottom-0 px-5 py-4 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-white">From today’s range · {h.label}</p>
-                      </>
-                    ) : (
-                      <p aria-hidden className="absolute inset-0 grid place-items-center font-display text-[7rem] font-extrabold tracking-[-0.06em] text-white/20">
-                        {h.year.slice(2)}
-                      </p>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+          <div className="mt-12 lg:mt-16">
+            <HistoryTabs items={HISTORY.map((h) => ({ year: h.year, title: h.title, body: h.body, photo: "photo" in h ? h.photo : undefined, label: "label" in h ? h.label : undefined }))} />
+          </div>
         </div>
       </section>
 
