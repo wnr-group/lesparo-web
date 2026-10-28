@@ -107,9 +107,6 @@ export async function Footer() {
           </ul>
         </div>
       </div>
-      <p aria-hidden className="pointer-events-none -mb-[0.18em] select-none text-center font-display text-[clamp(4rem,2rem+17vw,17rem)] font-extrabold leading-none tracking-tight text-white/[0.05]">
-        LESPARO
-      </p>
       <div className="border-t border-paper/10">
         <p className="mx-auto max-w-page px-4 py-6 text-xs text-paper/50 sm:px-6 lg:px-10">LESPARO is a device trademark of Y. Sathish, trading as Abija Exports (Application 3620885, Class 25).</p>
       </div>
