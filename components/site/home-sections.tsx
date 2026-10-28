@@ -12,7 +12,7 @@ export function TopCollections({ items }: { items: PhotoTile[] }) {
     <section aria-labelledby="top-collections" className="pt-12 lg:pt-16">
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
         <h2 id="top-collections" className="text-center font-display text-[clamp(1.8rem,1.2rem+2vw,2.8rem)] font-extrabold uppercase tracking-tight text-ink">
-          <SplitWords>Top collections</SplitWords>
+          <SplitWords>Explore the range</SplitWords>
         </h2>
         <ul className="mt-8 flex gap-5 overflow-x-auto pb-2 [scrollbar-width:none] sm:justify-center lg:gap-9 [&::-webkit-scrollbar]:hidden">
           {items.map((c) => (
