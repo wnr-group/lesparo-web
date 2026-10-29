@@ -1,15 +1,23 @@
 "use client";
 
 import clsx from "clsx";
-import { ChevronDown, Menu, Search, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ChevronDown, Menu, Search, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { CartLink } from "./cart";
 import { EnquiryListLink } from "./enquiry-list";
 
 export type NavGroup = { label: string; href: string; columns: { label: string; href: string; links: { label: string; href: string }[] }[] };
 
 type Props = { groups: NavGroup[] };
+
+/** A photograph for each dropdown, from the studio shoot and the lifestyle artwork. Keyed by the last part of the group link. */
+const FEATURES: Record<string, { src: string; caption: string }> = {
+  garments: { src: "/history/today-gents.jpg", caption: "Gents wear" },
+  "fabric-unstitched": { src: "/history/today-lungi.jpg", caption: "Woven lines" },
+};
 
 const STATIC_LINKS = [
   { label: "About", href: "/about" },
@@ -56,7 +64,7 @@ function DesktopMenu({ group, pathname }: { group: NavGroup; pathname: string })
         aria-expanded={open}
         aria-controls={id}
         onClick={() => setOpen((o) => !o)}
-        className={clsx("nav-link flex items-center gap-1 rounded-full px-3.5 py-2 text-[0.9rem] font-medium transition-colors hover:text-indigo", (active || open) && "text-indigo")}
+        className={clsx("nav-link flex items-center gap-1 rounded-full px-3.5 py-2 text-[0.82rem] font-bold uppercase tracking-[0.06em] transition-colors hover:text-indigo", (active || open) && "text-indigo")}
         aria-current={active ? "page" : undefined}
       >
         {group.label}
@@ -69,28 +77,42 @@ function DesktopMenu({ group, pathname }: { group: NavGroup; pathname: string })
           open ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0",
         )}
       >
-        <div className="flex gap-10 rounded-3xl border border-line bg-white px-8 py-7 shadow-[0_30px_60px_-24px_rgb(18_22_76/0.3)]">
-          {group.columns.map((col) => (
-            <div key={col.href} className="min-w-40">
-              <Link href={col.href} className="link-draw font-display font-semibold text-xl">
-                {col.label}
-              </Link>
-              <ul className="mt-3 space-y-2">
-                {col.links.map((l) => (
-                  <li key={l.href}>
-                    <Link href={l.href} className="link-draw text-sm text-ink-soft hover:text-ink" aria-current={isActive(pathname, l.href) ? "page" : undefined}>
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+        <div className="menu-panel grid w-[min(50rem,92vw)] grid-cols-[1fr_13rem] overflow-clip rounded-[1.1rem] border border-line bg-white shadow-[0_34px_70px_-28px_rgb(18_22_76/0.4)]" data-open={open}>
+          <div className="flex flex-col p-8">
+            <div className="grid flex-1 gap-8" style={{ gridTemplateColumns: `repeat(${group.columns.length}, minmax(0, 1fr))` }}>
+              {group.columns.map((col, ci) => (
+                <div key={col.href} className="menu-item" style={{ ["--i" as string]: ci }}>
+                  <Link href={col.href} className="group/col flex items-center gap-1.5 font-display text-lg font-extrabold uppercase tracking-tight">
+                    <span className="hline">{col.label}</span>
+                    <ArrowUpRight className="size-4 -translate-x-1 opacity-0 transition-[opacity,transform] duration-300 group-hover/col:translate-x-0 group-hover/col:opacity-100" aria-hidden />
+                  </Link>
+                  <ul className="mt-3 space-y-1.5 border-t border-ink/10 pt-3">
+                    {col.links.map((l) => (
+                      <li key={l.href}>
+                        <Link href={l.href} className="group/l inline-flex items-center gap-1 text-[0.92rem] text-ink-soft transition-[color,transform] duration-300 hover:translate-x-1 hover:text-ink" aria-current={isActive(pathname, l.href) ? "page" : undefined}>
+                          {l.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
-          ))}
-          <div className="flex min-w-36 flex-col justify-end border-l border-line pl-8">
-            <Link href={group.href} className="link-draw text-sm font-medium">
-              View all {group.label.toLowerCase()} →
+            <Link href={group.href} className="menu-item group/all mt-7 inline-flex items-center gap-2 self-start border-t border-ink/10 pt-4 text-sm font-bold" style={{ ["--i" as string]: group.columns.length }}>
+              <span className="hline">View all {group.label.toLowerCase()}</span>
+              <ArrowRight className="size-4 transition-transform duration-300 group-hover/all:translate-x-1" aria-hidden />
             </Link>
           </div>
+          {FEATURES[group.href.split("/").pop() ?? ""] && (
+            <Link href={group.href} tabIndex={open ? 0 : -1} aria-label={`${group.label}: ${FEATURES[group.href.split("/").pop() ?? ""].caption}`} className="menu-feature group/f relative block min-h-[19rem] overflow-clip bg-[#22231f]">
+              <Image src={FEATURES[group.href.split("/").pop() ?? ""].src} alt="" fill sizes="220px" quality={85} className="object-cover transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover/f:scale-[1.06]" />
+              <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+              <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-4 text-white">
+                <span className="font-display text-lg font-extrabold uppercase leading-tight tracking-tight">{FEATURES[group.href.split("/").pop() ?? ""].caption}</span>
+                <ArrowUpRight className="size-5 shrink-0 transition-transform duration-300 group-hover/f:rotate-45" aria-hidden />
+              </span>
+            </Link>
+          )}
         </div>
       </div>
     </li>
@@ -157,7 +179,7 @@ export function SiteNav({ groups }: Props) {
           <li>
             <Link
               href="/shop"
-              className="nav-link rounded-full px-3.5 py-2 text-[0.9rem] font-medium transition-colors hover:text-indigo aria-[current=page]:text-indigo"
+              className="nav-link rounded-full px-3.5 py-2 text-[0.82rem] font-bold uppercase tracking-[0.06em] transition-colors hover:text-indigo aria-[current=page]:text-indigo"
               aria-current={isActive(pathname, "/shop") ? "page" : undefined}
             >
               Shop
@@ -170,7 +192,7 @@ export function SiteNav({ groups }: Props) {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className="nav-link rounded-full px-3.5 py-2 text-[0.9rem] font-medium transition-colors hover:text-indigo aria-[current=page]:text-indigo"
+                className="nav-link rounded-full px-3.5 py-2 text-[0.82rem] font-bold uppercase tracking-[0.06em] transition-colors hover:text-indigo aria-[current=page]:text-indigo"
                 aria-current={isActive(pathname, l.href) ? "page" : undefined}
               >
                 {l.label}
@@ -191,6 +213,7 @@ export function SiteNav({ groups }: Props) {
         >
           {search ? <X className="size-[18px]" aria-hidden /> : <Search className="size-[18px]" aria-hidden />}
         </button>
+        <CartLink className="flex h-10 items-center gap-1.5 rounded-full px-3 hover:bg-linen" />
         <EnquiryListLink className="hidden h-10 items-center gap-2 rounded-full bg-indigo px-4 text-[0.85rem] font-semibold text-white transition-colors hover:bg-indigo-deep sm:inline-flex" />
         <button type="button" onClick={() => setDrawer(true)} className="flex size-10 items-center justify-center rounded-full hover:bg-linen lg:hidden" aria-label="Open menu" aria-haspopup="dialog">
           <Menu className="size-5" aria-hidden />
@@ -221,7 +244,7 @@ export function SiteNav({ groups }: Props) {
           </div>
           <div className="flex-1 overflow-y-auto px-5 py-6">
             <SearchBar onClose={() => setDrawer(false)} />
-            <ul className="mt-8 space-y-1 font-display font-semibold text-[1.7rem] leading-tight">
+            <ul className="menu-list mt-8 space-y-1 font-display font-semibold text-[1.7rem] leading-tight">
               <li>
                 <Link href="/shop" className="block py-1.5">
                   Shop all

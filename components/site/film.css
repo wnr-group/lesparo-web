@@ -1,0 +1,23 @@
+/*
+ * The films open out from an inset, rounded window to full width as they scroll into view. Driven by the scroll
+ * position itself (a CSS view timeline), so it costs no JavaScript and reverses when you scroll back. Desktop only, since
+ * clipping a playing video every scroll frame is costly on phones. Browsers without scroll timelines, and visitors who asked
+ * for reduced motion, simply see the film at full width.
+ */
+@keyframes film-open {
+  from {
+    clip-path: inset(0 5% round 1.5rem);
+  }
+  to {
+    clip-path: inset(0 0 round 0);
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 1024px) {
+    .film-open {
+      animation: film-open linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 40%;
+    }
+  }
+}

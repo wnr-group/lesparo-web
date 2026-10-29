@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CatalogueBrowser, CatalogueSkeleton } from "@/components/site/catalogue-browser";
-import { Container } from "@/components/ui/primitives";
-import { getCategories, getCategoryBySlug } from "@/lib/catalogue/queries";
+import { SplitWords } from "@/components/site/split-words";
+import { CollectionBanner, hasPhoto } from "@/components/site/collection-banner";
+import { getCategories, getCategoryBySlug, listProducts } from "@/lib/catalogue/queries";
 
 export async function generateStaticParams() {
   return (await getCategories()).map((c) => ({ slug: c.slug }));
@@ -22,14 +25,26 @@ export async function generateMetadata(props: PageProps<"/collections/[slug]">):
   };
 }
 
+/** The stretch of the film that plays: 0:00 to 0:06:12 (6 seconds and 12 frames at the file's 24 fps, which is 6.5 s), then it loops. */
+const GENTS_CLIP: [number, number] = [0, 6 + 12 / 24];
+
+/** A promo film for a collection, if public/videos/<slug>_video.mp4 exists (gents_video.mp4 for Gents). */
+function filmFor(slug: string) {
+  const name = `${slug}_video.mp4`;
+  return existsSync(join(process.cwd(), "public", "videos", name)) ? `/videos/${name}` : undefined;
+}
+
 async function CollectionHeader({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const found = await getCategoryBySlug(slug);
   if (!found) notFound();
   const { category, trail, children } = found;
+  // Collections without a shoot photograph show their own products instead.
+  const { products: own } = hasPhoto(slug) ? { products: [] } : await listProducts({ categoryIds: found.subtreeIds, pageSize: 3 });
+  const bannerProducts = own.filter((p) => p.images[0]).map((p) => ({ src: p.images[0].url, alt: p.name }));
   return (
-    <>
-      <nav aria-label="Breadcrumb" className="text-sm text-muted">
+    <CollectionBanner slug={slug} products={bannerProducts} video={filmFor(slug)} clip={filmFor(slug) ? GENTS_CLIP : undefined}>
+      <nav aria-label="Breadcrumb" className="text-sm text-white/60">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
             <Link href="/collections" className="link-draw">
@@ -46,23 +61,23 @@ async function CollectionHeader({ params }: { params: Promise<{ slug: string }> 
           ))}
         </ol>
       </nav>
-      <h1 className="mt-4 font-display text-headline font-bold">
-        {category.name}
-        {trail.length > 2 && <span className="text-muted"> · {trail[trail.length - 2].name}</span>}
+      <h1 className="mt-4 font-display text-[clamp(2.4rem,1.4rem+4vw,5rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
+        <SplitWords onLoad>{category.name}</SplitWords>
+        {trail.length > 2 && <span className="text-white/55"> · {trail[trail.length - 2].name}</span>}
       </h1>
-      {category.description && <p className="mt-4 max-w-prose text-ink-soft">{category.description}</p>}
+      {category.description && <p className="mt-4 max-w-prose text-white/70">{category.description}</p>}
       {children.length > 0 && (
-        <ul className="mt-8 flex flex-wrap gap-2">
+        <ul className="mt-7 flex flex-wrap gap-2">
           {children.map((c) => (
             <li key={c.id}>
-              <Link href={`/collections/${c.slug}`} className="inline-flex h-9 items-center border border-sand px-4 text-sm transition-colors hover:border-ink hover:bg-ink hover:text-paper">
+              <Link href={`/collections/${c.slug}`} className="inline-flex h-10 items-center rounded-full border border-white/35 px-5 text-sm font-semibold transition-colors hover:border-white hover:bg-white hover:text-ink">
                 {c.name}
               </Link>
             </li>
           ))}
         </ul>
       )}
-    </>
+    </CollectionBanner>
   );
 }
 
@@ -75,15 +90,15 @@ async function CollectionProducts({ params, searchParams }: { params: Promise<{ 
 
 export default function CollectionPage(props: PageProps<"/collections/[slug]">) {
   return (
-    <Container className="py-12 lg:py-16">
-      <Suspense fallback={<div className="h-28" />}>
+    <>
+      <Suspense fallback={<div className="h-64" />}>
         <CollectionHeader params={props.params} />
       </Suspense>
-      <div className="mt-10">
+      <div className="mx-auto mt-10 max-w-page px-4 pb-16 sm:px-6 lg:px-10 lg:pb-20">
         <Suspense fallback={<CatalogueSkeleton />}>
           <CollectionProducts params={props.params} searchParams={props.searchParams} />
         </Suspense>
       </div>
-    </Container>
+    </>
   );
 }

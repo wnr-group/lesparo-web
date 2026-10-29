@@ -134,11 +134,10 @@ async function main() {
       sizes: parsed.sizes,
       packing: parsed.packing,
       quote_enabled: true,
-      retail_enabled: false,
       is_published: true,
       is_featured: LIVE_HOMEPAGE_PRODUCTS.includes(p.legacyId),
     };
-    const row = await db.product.upsert({ where: { legacy_id: p.legacyId }, create: { legacy_id: p.legacyId, ...data }, update: data, select: { id: true } });
+    const row = await db.product.upsert({ where: { legacy_id: p.legacyId }, create: { legacy_id: p.legacyId, retail_enabled: false, ...data }, update: data, select: { id: true } });
     productSlugs.set(p.legacyId, slug);
 
     if (!skipImages) {

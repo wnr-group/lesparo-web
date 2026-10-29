@@ -73,7 +73,7 @@ export async function CatalogueBrowser({
               key={p}
               href={pageHref(p)}
               aria-current={p === result.page ? "page" : undefined}
-              className={`flex size-10 items-center justify-center text-sm ${p === result.page ? "bg-ink text-paper" : "hover:bg-linen"}`}
+              className={`flex size-10 items-center justify-center rounded-full text-sm font-semibold ${p === result.page ? "bg-ink text-paper" : "hover:bg-[#f2f3f5]"}`}
             >
               {p}
             </Link>

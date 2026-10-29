@@ -1,0 +1,164 @@
+/*
+ * About page scroll effects, in the manner of Scrolltide's section library:
+ *   focus reveal   vision words pull from blur into sharp as they travel up the screen
+ *   zoom reveal    history photographs open from a small inset window to full size
+ *   fan deck       the three range cards splay out of a gathered hand as the section arrives
+ *   layered depth  the hero photographs move at different rates from the panel behind them
+ *   ghost wordmark a giant LESPARO rises into the foot of the page, cropped by its edge
+ * All scroll-linked in CSS (animation-timeline) so there is no scroll listener. Content is fully visible
+ * where scroll timelines are unsupported, and nothing animates for reduced motion.
+ */
+@keyframes ab-focus {
+  from {
+    opacity: 0.18;
+    filter: blur(7px);
+  }
+}
+@keyframes ab-zoom {
+  from {
+    clip-path: inset(16% 16% 16% 16% round 1.5rem);
+    scale: 0.88;
+    opacity: 0.4;
+  }
+}
+@keyframes ab-fan {
+  from {
+    rotate: calc(var(--k, 0) * 9deg);
+    translate: calc(var(--k, 0) * -38%) 4%;
+    opacity: 0.5;
+  }
+}
+@keyframes ab-lag-a {
+  to {
+    translate: 0 -9%;
+  }
+}
+@keyframes ab-lag-b {
+  to {
+    translate: 0 -22%;
+  }
+}
+@keyframes ab-panel-zoom {
+  to {
+    scale: 1.06;
+  }
+}
+@keyframes ab-wordmark {
+  from {
+    translate: 0 38%;
+    opacity: 0.3;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ab-focus {
+      animation: ab-focus linear both;
+      animation-timeline: view();
+      animation-range: cover 8% cover 36%;
+    }
+    .ab-zoom {
+      animation: ab-zoom linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 38%;
+    }
+    .ab-fan {
+      transform-origin: 50% 110%;
+      animation: ab-fan linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 45%;
+    }
+    /* Hero: the panel breathes while the two photographs drift upward at different rates. */
+    .ab-panel {
+      animation: ab-panel-zoom linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90svh;
+    }
+    .ab-lag-a {
+      animation: ab-lag-a linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90svh;
+    }
+    .ab-lag-b {
+      animation: ab-lag-b linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 90svh;
+    }
+    .ab-wordmark {
+      animation: ab-wordmark linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+  }
+}
+
+/* The history chapters (components/site/history-tabs.tsx): each year's panel slides in, its photograph opening upward. */
+@keyframes hist-in {
+  from {
+    opacity: 0;
+    translate: 0 1.2rem;
+  }
+}
+@keyframes hist-wipe {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hist-panel {
+    animation: hist-in 0.6s var(--ease-out-soft) both;
+  }
+  .hist-photo {
+    animation: hist-wipe 0.6s var(--ease-out-soft) 0.05s both;
+  }
+}
+
+/* History: the countdown bar, the slow push-in on each photograph, and text and inset arriving in sequence. */
+@keyframes hist-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes hist-kenburns {
+  from {
+    scale: 1;
+  }
+  to {
+    scale: 1.09;
+  }
+}
+@keyframes hist-line-in {
+  from {
+    opacity: 0;
+    translate: 0 0.9rem;
+  }
+}
+@keyframes hist-inset-in {
+  from {
+    opacity: 0;
+    translate: 0 1.6rem;
+  }
+}
+.hist-progress {
+  animation: hist-progress var(--step, 6500ms) linear both;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hist-photo img {
+    animation: hist-kenburns 8s ease-out both;
+  }
+  .hist-line {
+    animation: hist-line-in 0.5s var(--ease-out-soft) var(--d, 0s) both;
+  }
+  .hist-inset {
+    animation: hist-inset-in 0.55s var(--ease-out-soft) 0.3s both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hist-progress {
+    animation: none;
+    transform: scaleX(0);
+  }
+}

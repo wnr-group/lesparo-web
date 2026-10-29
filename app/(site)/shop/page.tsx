@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { Suspense } from "react";
 import { CatalogueBrowser, CatalogueSkeleton } from "@/components/site/catalogue-browser";
-import { Container } from "@/components/ui/primitives";
+import { SplitWords } from "@/components/site/split-words";
+import { CollectionBanner } from "@/components/site/collection-banner";
 
 export const metadata: Metadata = {
   title: "Shop all products",
@@ -9,16 +14,29 @@ export const metadata: Metadata = {
   alternates: { canonical: "/shop" },
 };
 
+/** The shop promo film, if one has been added at public/videos/shop-banner.mp4. Without it the banner keeps its photograph. */
+const shopVideo = () => (existsSync(join(process.cwd(), "public", "videos", "shop-banner.mp4")) ? "/videos/shop-banner.mp4" : undefined);
+
 export default function ShopPage(props: PageProps<"/shop">) {
   return (
-    <Container className="py-12 lg:py-16">
-      <p className="eyebrow">Catalogue</p>
-      <h1 className="mt-3 font-display text-headline font-bold">All products</h1>
-      <div className="mt-10">
+    <>
+      <CollectionBanner video={shopVideo()}>
+        <p className="eyebrow !text-white/60">Catalogue</p>
+        <h1 className="mt-3 font-display text-[clamp(2.4rem,1.4rem+4vw,5rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
+          <SplitWords onLoad>All</SplitWords> <SplitWords onLoad className="text-white/55">products</SplitWords>
+        </h1>
+        <p className="mt-5 max-w-md text-white/70">The full LESPARO range. Filter by fabric or size, or send us a wholesale enquiry for bulk pricing.</p>
+        <div className="mt-8">
+          <Link href="/wholesale#enquire" className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-bold text-ink transition-transform hover:-translate-y-0.5">
+            Wholesale enquiry <ArrowRight className="size-4" aria-hidden />
+          </Link>
+        </div>
+      </CollectionBanner>
+      <div className="mx-auto mt-10 max-w-page px-4 pb-16 sm:px-6 lg:px-10 lg:pb-20">
         <Suspense fallback={<CatalogueSkeleton />}>
           <CatalogueBrowser searchParams={props.searchParams} basePath="/shop" />
         </Suspense>
       </div>
-    </Container>
+    </>
   );
 }

@@ -1,31 +1,18 @@
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, RefreshCw, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { CountUp } from "@/components/site/count-up";
-import { HeroEarthrise } from "@/components/site/hero-earthrise";
-import type { RingItem } from "@/components/site/product-ring";
-import { CardDeck, type DeckItem } from "@/components/site/card-deck";
-import { PinnedTrack } from "@/components/site/pinned-track";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { BrandFilm } from "@/components/site/brand-film";
+import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
+import { CIRCLE_TILES, RANGE_TILES } from "@/components/site/home-photos";
+import { NewLaunches, ShopByRange, TopCollections } from "@/components/site/home-sections";
+import { BrandStatement, BrandStory, FollowStrip } from "@/components/site/brand-sections";
+import { BuyerFaq, DetailPanels, StudioLooks } from "@/components/site/more-sections";
 import { ButtonLink } from "@/components/ui/button";
 import { Container, SectionHeading } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
-import { getCategoryTree, getHomepageContent, getProductsBySlugs, listProducts, type CategoryNode } from "@/lib/catalogue/queries";
-import { publicMediaUrl } from "@/lib/storage";
-
-const MILESTONES = [
-  { year: "1979", text: "Mr. Yuvaraj founds R. Yuvaraj in Erode — lungis, dhoties and mull cloth for Kerala." },
-  { year: "1999", text: "Y. Sathish joins the family business and leads its growth." },
-  { year: "2001", text: "Y. Sathish & Co. begins: churidar materials, Kerala dhoties and sarees." },
-  { year: "2017", text: "Abija Exports launches LESPARO — knitted and woven casual wear for gents and kids." },
-];
-
-/** Verified facts only (Company History page). */
-const FACTS = [
-  { value: "1979", label: "Family textile trade begins in Erode" },
-  { value: "3 states", label: "Showrooms supplied across Tamil Nadu, Kerala and Karnataka" },
-  { value: "2017", label: "LESPARO launched by Abija Exports" },
-  { value: "Gents & kids", label: "Knitted and woven casual wear, plus lungis, kavi, towels and kerchiefs" },
-];
+import { getCategoryBySlug, getCategoryTree, getHomepageContent, listProducts, type CategoryNode } from "@/lib/catalogue/queries";
 
 const STEPS = [
   ["Browse", "Add products to your enquiry list as you explore the catalogue."],
@@ -44,13 +31,13 @@ function CategoryTile({ category, square, sizes }: { category: CategoryNode; squ
             alt=""
             fill
             sizes={sizes}
-            className="object-contain p-[8%] cutout transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.06]"
+            className="object-contain p-[8%] cutout transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.06] group-focus-visible:scale-[1.06] group-active:scale-[1.04]"
           />
         )}
       </div>
       <div className="flex flex-1 items-center justify-between gap-3 px-0.5 pt-4">
         <div className="min-w-0">
-          <h3 className="font-display text-xl font-bold tracking-tight transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:translate-x-1 sm:text-2xl">{category.name}</h3>
+          <h3 className="font-display text-xl font-bold tracking-tight transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:translate-x-1 group-focus-visible:translate-x-1 group-active:translate-x-1 sm:text-2xl">{category.name}</h3>
           <p className="mt-0.5 truncate text-sm text-muted">{category.children.map((g) => g.name).join(" · ") || "View range"}</p>
         </div>
         <span className="hidden size-10 shrink-0 items-center justify-center rounded-full bg-paper ring-1 ring-line transition-colors duration-300 group-hover:bg-indigo group-hover:text-white group-hover:ring-indigo sm:flex">
@@ -61,181 +48,106 @@ function CategoryTile({ category, square, sizes }: { category: CategoryNode; squ
   );
 }
 
+/** A real 3D garment: public/models/<id>.glb (pants.glb, tee.glb). When present it replaces the photo viewer. */
+function model3d(id: string): string | undefined {
+  return existsSync(join(process.cwd(), "public", "models", `${id}.glb`)) ? `/models/${id}.glb` : undefined;
+}
+
+/**
+ * A product with a real 360-degree turntable set: 8 or more frames in public/turntable/<id>/ (sorted by file
+ * name), plus an optional hotspots.json of { frame, x, y, label }. Products without one use stand-in photos.
+ */
+function turntable(id: string): TurntableSet | undefined {
+  const dir = join(process.cwd(), "public", "turntable", id);
+  if (!existsSync(dir)) return undefined;
+  const files = readdirSync(dir)
+    .filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
+    .sort();
+  if (files.length < 8) return undefined;
+  let spots: TurntableSet["spots"] = [];
+  try {
+    spots = JSON.parse(readFileSync(join(dir, "hotspots.json"), "utf8"));
+  } catch {}
+  return { frames: files.map((f) => `/turntable/${id}/${f}`), spots };
+}
+
 export default async function HomePage() {
   const [content, tree] = await Promise.all([getHomepageContent(), getCategoryTree()]);
-  const featured = await getProductsBySlugs(content.featuredProductSlugs);
-  const heroImage = publicMediaUrl(content.hero.imagePath);
   const fabrics = tree.find((t) => t.slug !== "garments");
-  const featuredCategories = tree.flatMap((t) => t.children).filter((c) => content.featuredCategorySlugs.includes(c.slug));
   const { sections } = content;
-  const showcase = (featuredCategories.length ? featuredCategories : tree.flatMap((t) => t.children)).slice(0, 4);
-  // Hero ring: featured products first, then the rest of the catalogue, ten with photos.
-  const { products: catalogue } = await listProducts({ pageSize: 24 });
-  const ringItems: RingItem[] = [
-    ...(heroImage ? [{ id: "hero-image", href: content.hero.primaryCta.href, name: content.hero.heading, label: null, image: heroImage }] : []),
-    ...[...featured, ...catalogue]
-      .filter((p, i, all) => p.images[0] && all.findIndex((q) => q.id === p.id) === i)
-      .map((p) => ({ id: p.id, href: `/products/${p.slug}`, name: p.name, label: p.category?.name ?? null, image: p.images[0].url })),
-  ].slice(0, 10);
-
-  // Featured deck: the admin's featured products that have a photo.
-  const deck: DeckItem[] = featured
-    .filter((p) => p.images[0])
-    .slice(0, 6)
-    .map((p) => ({
-      id: p.id,
-      slug: p.slug,
-      name: p.name,
-      category: p.category?.name ?? null,
-      detail: [p.fabric, p.sizes.length ? `Sizes ${p.sizes.join(" · ")}` : null].filter(Boolean).join(" — "),
-      image: p.images[0].url,
-    }));
+  // New launches shows the kids range (newest first); with no kids category it falls back to the newest products overall.
+  const kids = await getCategoryBySlug("kids");
+  const { products: newest } = await listProducts({ sort: "newest", pageSize: 8, ...(kids ? { categoryIds: kids.subtreeIds } : {}) });
 
   return (
     <>
       {/* ---------------------------------------------------------------- hero */}
-      <HeroEarthrise
-        eyebrow={content.hero.eyebrow}
-        heading={content.hero.heading}
-        subheading={content.hero.subheading}
-        primaryCta={content.hero.primaryCta}
-        secondaryCta={content.hero.secondaryCta}
-        items={ringItems}
-      />
+      <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} turntables={{ pants: turntable("pants"), tee: turntable("tee") }} models={{ pants: model3d("pants"), tee: model3d("tee"), look: model3d("look") ?? (model3d("pants") && model3d("tee") ? "/models/look" : undefined) }} />
+
 
       {/* ---------------------------------------------------------- categories */}
       {sections.categories && (
-        <section className="py-20 lg:py-28">
-          <Container>
-            <SectionHeading
-              eyebrow="Collections"
-              title={
-                <>
-                  Garments, and the cloth <span className="text-indigo">behind them</span>
-                </>
-              }
-              action={
-                <ButtonLink href="/collections" variant="secondary" size="sm" className="self-start md:self-auto">
-                  All collections <ArrowRight className="size-3.5" aria-hidden />
-                </ButtonLink>
-              }
-            />
-            <ul className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
-              {showcase.map((c, i) => (
-                <li key={c.id} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }}>
-                  <CategoryTile category={c} sizes="(min-width:768px) 22vw, 45vw" />
-                </li>
-              ))}
-            </ul>
-          </Container>
-        </section>
+        <>
+          <TopCollections items={CIRCLE_TILES} />
+          <ShopByRange items={RANGE_TILES} />
+          <NewLaunches products={newest} />
+        </>
       )}
 
-      {/* ------------------------------------------------------- featured deck */}
-      {sections.products && deck.length > 0 && (
-        <section className="overflow-hidden py-20 lg:py-28">
-          <Container>
-            <SectionHeading
-              eyebrow="From the catalogue"
-              title="Everyday wear, made to supply"
-              intro="Shorts, tracks and 3/4ths in hosiery and jersey knits, packed in sets for retailers — alongside our lungis, kavi dhothies, towels and kerchiefs."
-              action={
-                <ButtonLink href="/shop" size="sm" className="self-start md:self-auto">
-                  Shop all products <ArrowRight className="size-3.5" aria-hidden />
-                </ButtonLink>
-              }
-            />
-            <div className="mt-14" data-reveal="up">
-              <CardDeck items={deck} />
-            </div>
-          </Container>
-        </section>
-      )}
+      {/* ------------------------------------------------------- campaign film: Move Freely */}
+      <BrandFilm open src="/videos/active-life.mp4" title="LESPARO: Move freely" />
 
-      {/* --------------------------------------------------------------- facts */}
+      <BrandStatement />
+      <BrandStory />
+
+      {/* ------------------------------------------------------------ lookbook film */}
+      <BrandFilm src="/lesparo-video-1.mp4" title="The LESPARO lookbook" />
+
+      <DetailPanels />
+
+
+      {/* ------------------------------------------------------- quality promise */}
       {sections.story && (
-        <section aria-labelledby="facts-heading" className="stats-track relative overflow-x-clip bg-indigo-deep text-white lg:h-[260vh]">
-          {/* Pinned on desktop: the facts appear one by one around the emblem as you scroll (globals.css .stat). */}
-          <div className="py-20 lg:sticky lg:top-[4.5rem] lg:flex lg:h-[calc(100svh-4.5rem)] lg:items-center lg:py-0">
-            <Container>
-              <h2 id="facts-heading" className="text-center font-display text-headline font-bold">
-                LESPARO at a glance
-              </h2>
-              <div className="mt-12 grid items-center gap-10 lg:grid-cols-[1fr_auto_1fr] lg:gap-16">
-                <dl className="grid gap-10 lg:text-right">
-                  {FACTS.slice(0, 2).map((f, i) => (
-                    <div key={f.value} className="stat flex flex-col-reverse" style={{ ["--n" as string]: i * 2 }}>
-                      <dt className="mt-2 text-white/65 lg:ml-auto lg:max-w-xs">{f.label}</dt>
-                      <dd className="font-display text-[clamp(2.75rem,2rem+2.5vw,4.5rem)] font-bold leading-none tracking-[-0.045em] text-sun">{f.value}</dd>
-                    </div>
+        <section aria-labelledby="quality-heading" className="bg-white py-20 lg:py-32">
+          <Container>
+            <div className="grid items-stretch gap-12 lg:grid-cols-12 lg:gap-16">
+              <div className="flex flex-col justify-center lg:col-span-7">
+                <p data-reveal="up" className="eyebrow">
+                  Quality promise
+                </p>
+                <h2 id="quality-heading" data-reveal="mask" style={{ ["--delay" as string]: "80ms" }} className="mt-5 font-display text-[clamp(2.3rem,1.2rem+4vw,5rem)] font-extrabold leading-[0.96] tracking-[-0.045em]">
+                  Good-quality wearables, and an <span className="text-indigo">unforgettable wearing experience.</span>
+                </h2>
+                <ul data-reveal="stagger" style={{ ["--delay" as string]: "200ms" }} className="mt-10 divide-y divide-line border-y border-line">
+                  {[
+                    { icon: ShieldCheck, title: "Quality policy", text: "We commit to the agreed requirement, details and price, and to customer satisfaction through quality procedures that meet or exceed international standards." },
+                    { icon: RefreshCw, title: "Replacement policy", text: "Our replacement policy speaks to our quality assurance: we make every effort to meet international quality, to a high standard of quality parameters." },
+                  ].map(({ icon: Icon, title, text }) => (
+                    <li key={title} className="flex gap-5 py-6">
+                      <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-indigo-soft">
+                        <Icon className="size-5 text-indigo" aria-hidden />
+                      </span>
+                      <div>
+                        <h3 className="font-display text-xl font-bold tracking-tight">{title}</h3>
+                        <p className="mt-1.5 max-w-xl leading-relaxed text-ink-soft">{text}</p>
+                      </div>
+                    </li>
                   ))}
-                </dl>
-                <div aria-hidden className="emblem relative mx-auto size-[min(72vw,22rem)]">
-                  <svg viewBox="0 0 200 200" className="absolute inset-0 size-full motion-safe:animate-[orbit_28s_linear_infinite]">
-                    <defs>
-                      <path id="facts-ring" d="M100,100 m-84,0 a84,84 0 1,1 168,0 a84,84 0 1,1 -168,0" />
-                    </defs>
-                    <text className="fill-white/70 font-display text-[11px] font-bold uppercase tracking-[0.32em]">
-                      <textPath href="#facts-ring">Knitted · Woven · Erode · Since 1979 · Knitted · Woven · Erode ·</textPath>
-                    </text>
-                  </svg>
-                  <div className="absolute inset-[18%] flex items-center justify-center rounded-full bg-white shadow-[0_30px_80px_-20px_rgb(0_0_0/0.6)]">
-                    <Image src="/lesparo-logo.png" alt="" width={678} height={446} className="w-[62%]" />
-                  </div>
+                </ul>
+                <div data-reveal="up" className="mt-8">
+                  <ButtonLink href="/about" variant="secondary">
+                    About LESPARO <ArrowRight className="size-4" aria-hidden />
+                  </ButtonLink>
                 </div>
-                <dl className="grid gap-10">
-                  {FACTS.slice(2).map((f, i) => (
-                    <div key={f.value} className="stat flex flex-col-reverse" style={{ ["--n" as string]: i * 2 + 1 }}>
-                      <dt className="mt-2 max-w-xs text-white/65">{f.label}</dt>
-                      <dd className="font-display text-[clamp(2.75rem,2rem+2.5vw,4.5rem)] font-bold leading-none tracking-[-0.045em] text-sun">{f.value}</dd>
-                    </div>
-                  ))}
-                </dl>
               </div>
-            </Container>
-          </div>
-        </section>
-      )}
 
-      {/* --------------------------------------------------------------- story */}
-      {sections.story && content.story.approved && (
-        <section aria-labelledby="story-heading" className="py-20 lg:py-0">
-          {/* Horizontal story: pinned on desktop, scrolling sideways; each year counts up from the one before. */}
-          <PinnedTrack label="LESPARO timeline, 1979 to 2017">
-            <div className="w-[min(88vw,30rem)] shrink-0 snap-start pl-4 pr-8 sm:pl-6 lg:w-[38rem] lg:pl-[max(2.5rem,calc((100vw-88rem)/2+2.5rem))] lg:pr-20">
-              <p data-reveal="up" className="eyebrow">
-                Our story
-              </p>
-              <h2 id="story-heading" data-reveal="mask" style={{ ["--delay" as string]: "80ms" }} className="mt-4 font-display text-headline font-bold">
-                {content.story.heading}
-              </h2>
-              <p data-reveal="up" style={{ ["--delay" as string]: "200ms" }} className="mt-6 max-w-prose text-[1.05rem] leading-relaxed text-ink-soft">
-                {content.story.body}
-              </p>
-              <div data-reveal="up" style={{ ["--delay" as string]: "280ms" }}>
-                <ButtonLink href="/about" variant="secondary" className="mt-8">
-                  Read the company history <ArrowRight className="size-4" aria-hidden />
-                </ButtonLink>
+              {/* One calm panel: the range standing together. */}
+              <div data-reveal="clip" className="relative min-h-[26rem] overflow-hidden rounded-[2rem] bg-[#22231f] lg:col-span-5 lg:min-h-[34rem]">
+                <p className="absolute left-6 top-6 z-10 rounded-full bg-white px-4 py-2 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-indigo shadow-sm">Abija Exports · Erode</p>
+                <Image src="/collections/kavi.jpg" alt="A LESPARO polo in brown knit" fill sizes="(min-width:1024px) 40vw, 100vw" className="object-cover" style={{ objectPosition: "50% 30%" }} />
               </div>
             </div>
-            {MILESTONES.map((m, i) => {
-              const latest = i === MILESTONES.length - 1;
-              const year = Number(m.year);
-              return (
-                <article key={m.year} className="flex w-[min(78vw,24rem)] shrink-0 snap-start flex-col self-stretch border-l border-line px-7 py-4 lg:my-[8vh] lg:w-[min(36vw,34rem)] lg:px-12">
-                  <p className="flex items-center gap-3 text-[0.72rem] font-bold uppercase tracking-[0.16em] text-muted">
-                    <span className={`size-2 rounded-full ${latest ? "bg-sun" : "bg-indigo"}`} />
-                    {String(i + 1).padStart(2, "0")} / {String(MILESTONES.length).padStart(2, "0")}
-                  </p>
-                  <h3 className="mt-16 font-display text-[clamp(4.5rem,2.5rem+6vw,10rem)] font-bold leading-[0.85] tracking-[-0.055em] text-indigo lg:mt-auto">
-                    <CountUp value={year} from={i ? Number(MILESTONES[i - 1].year) : year - 30} />
-                  </h3>
-                  <p className={`mt-6 max-w-sm text-lg leading-relaxed ${latest ? "text-ink" : "text-ink-soft"}`}>{m.text}</p>
-                </article>
-              );
-            })}
-            <div aria-hidden className="w-4 shrink-0 lg:w-[max(2.5rem,calc((100vw-88rem)/2+2.5rem))]" />
-          </PinnedTrack>
+          </Container>
         </section>
       )}
 
@@ -261,6 +173,12 @@ export default async function HomePage() {
           </Container>
         </section>
       )}
+
+      <StudioLooks />
+
+      <FollowStrip />
+
+      <BuyerFaq />
 
       {/* ----------------------------------------------------------- wholesale */}
       {sections.wholesale && (

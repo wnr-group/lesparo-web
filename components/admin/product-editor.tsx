@@ -171,10 +171,10 @@ export function ProductEditor({
         <fieldset className="space-y-2 border border-line p-4">
           <legend className="px-1 text-sm font-medium">Ordering</legend>
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" name="quoteEnabled" defaultChecked={p.quoteEnabled} className="accent-indigo" /> Quote requests (wholesale)
+            <input type="checkbox" name="quoteEnabled" defaultChecked={p.quoteEnabled} className="accent-indigo" /> Wholesale (B2B): show Enquire now
           </label>
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" name="retailEnabled" checked={retail} onChange={(e) => setRetail(e.target.checked)} className="accent-indigo" /> Retail price shown
+            <input type="checkbox" name="retailEnabled" checked={retail} onChange={(e) => setRetail(e.target.checked)} className="accent-indigo" /> Retail (B2C): show price, Add to cart and Buy now
           </label>
           <FieldError name="quoteEnabled" />
           {retail && (
@@ -182,7 +182,7 @@ export function ProductEditor({
               <L htmlFor="price">Price (INR)</L>
               <input id="price" name="price" inputMode="decimal" defaultValue={p.price ?? ""} className="field h-10 py-0" />
               <FieldError name="price" />
-              <p className="mt-1 text-xs text-muted">Online checkout is not enabled yet; the price is displayed only.</p>
+              <p className="mt-1 text-xs text-muted">Retail price per piece. You can also edit prices for many products at once under Pricing.</p>
             </div>
           )}
         </fieldset>
