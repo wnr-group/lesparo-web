@@ -56,32 +56,32 @@ model Category {
 }
 
 model Product {
-  id              String         @id @default(uuid())
+  id              String            @id @default(uuid())
   name            String
-  slug            String         @unique
-  sku             String?        @unique
+  slug            String            @unique
+  sku             String?           @unique
   category_id     String?
-  category        Category?      @relation(fields: [category_id], references: [id], onDelete: Restrict)
+  category        Category?         @relation(fields: [category_id], references: [id], onDelete: Restrict)
   description     String?
   /// Ordered label/value pairs, e.g. [{"label":"Fit type","value":"Regular"}].
-  specs           Json           @default("[]")
+  specs           Json              @default("[]")
   fabric          String?
   /// string[]
-  sizes           Json           @default("[]")
+  sizes           Json              @default("[]")
   packing         String?
-  quote_enabled   Boolean        @default(true)
-  retail_enabled  Boolean        @default(false)
+  quote_enabled   Boolean           @default(true)
+  retail_enabled  Boolean           @default(false)
   price           Float?
-  currency        String         @default("INR")
-  is_published    Boolean        @default(false)
-  is_featured     Boolean        @default(false)
+  currency        String            @default("INR")
+  is_published    Boolean           @default(false)
+  is_featured     Boolean           @default(false)
   archived_at     DateTime?
   seo_title       String?
   seo_description String?
-  legacy_id       Int?           @unique
+  legacy_id       Int?              @unique
   legacy_url      String?
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
   images          ProductImage[]
   enquiry_items   EnquiryItem[]
   order_items     RetailOrderItem[]
@@ -272,28 +272,41 @@ model Counter {
 // ---------------------------------------------------------------------------
 
 model RetailOrder {
-  id               String            @id @default(uuid())
-  order_number     String            @unique
-  idempotency_key  String            @unique
-  customer_name    String
-  email            String
-  phone            String
-  address_line     String
-  city             String
-  state            String
-  postcode         String
-  notes            String?
-  /// cod | online_pending
-  payment_method   String            @default("cod")
-  /// pending | paid | refunded
-  payment_status   String            @default("pending")
+  id                  String            @id @default(uuid())
+  order_number        String            @unique
+  idempotency_key     String            @unique
+  customer_name       String
+  email               String
+  phone               String
+  address_line        String
+  city                String
+  state               String
+  postcode            String
+  notes               String?
+  /// cod | razorpay | online_pending (legacy: "we will send a payment link")
+  payment_method      String            @default("cod")
+  /// pending | verifying | paid | failed | refunded
+  payment_status      String            @default("pending")
+  /// Random secret that lets the buyer (and only the buyer) open the status page and pay for this order.
+  access_token        String?           @unique
+  /// The Razorpay order created for this order (one per order; retries are new payment attempts on it).
+  razorpay_order_id   String?           @unique
+  /// Amount in paise sent to Razorpay, computed on the server from the stored line prices.
+  razorpay_amount     Int?
+  /// The captured payment that settled this order.
+  razorpay_payment_id String?
+  /// True once the checkout signature was verified and the payment confirmed as captured.
+  payment_verified    Boolean           @default(false)
+  paid_at             DateTime?
+  payments            Payment[]
+  audits              OrderAudit[]
   /// new | confirmed | shipped | delivered | cancelled
-  status           String            @default("new")
-  currency         String            @default("INR")
-  subtotal         Float
-  created_at       DateTime          @default(now())
-  updated_at       DateTime          @updatedAt
-  items            RetailOrderItem[]
+  status              String            @default("new")
+  currency            String            @default("INR")
+  subtotal            Float
+  created_at          DateTime          @default(now())
+  updated_at          DateTime          @updatedAt
+  items               RetailOrderItem[]
 
   @@index([status, created_at])
   @@map("retail_orders")
@@ -312,4 +325,61 @@ model RetailOrderItem {
 
   @@index([order_id])
   @@map("retail_order_items")
+}
+
+// ---------------------------------------------------------------------------
+// Razorpay payments. One row per payment attempt (a failed attempt followed by a
+// successful retry is two rows on the same order). Card and UPI details are never stored.
+// ---------------------------------------------------------------------------
+
+model Payment {
+  id                  String      @id @default(uuid())
+  order_id            String
+  order               RetailOrder @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  razorpay_order_id   String
+  razorpay_payment_id String      @unique
+  /// Paise.
+  amount              Int
+  currency            String
+  /// created | authorized | captured | failed | refunded
+  status              String
+  method              String?
+  error_code          String?
+  error_description   String?
+  /// Set when a second capture arrives for an order that is already paid: needs a refund from the Razorpay Dashboard.
+  duplicate           Boolean     @default(false)
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+
+  @@index([order_id])
+  @@map("payments")
+}
+
+/// Webhook deliveries, deduplicated on Razorpay's event id (X-Razorpay-Event-Id).
+model PaymentEvent {
+  id                  String    @id @default(uuid())
+  event_id            String    @unique
+  event_type          String
+  razorpay_order_id   String?
+  razorpay_payment_id String?
+  received_at         DateTime  @default(now())
+  processed_at        DateTime?
+  outcome             String?
+
+  @@map("payment_events")
+}
+
+/// Every manual change staff make to an order's status or payment status.
+model OrderAudit {
+  id         String      @id @default(uuid())
+  order_id   String
+  order      RetailOrder @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  actor      String
+  action     String
+  from_value String?
+  to_value   String?
+  created_at DateTime    @default(now())
+
+  @@index([order_id, created_at])
+  @@map("order_audits")
 }

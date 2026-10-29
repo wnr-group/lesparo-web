@@ -7,12 +7,20 @@ import { z } from "zod";
  * DATABASE_URL, STORAGE_DIR and AUTH_SECRET are read by lib/db.ts, lib/storage.ts and
  * lib/auth/session.ts.
  */
+/** A blank value in .env.local (KEY=) means "not set", not an invalid value. */
+const blankToUndefined = (v: unknown) => (typeof v === "string" && v.trim() === "" ? undefined : v);
+const optional = <T extends z.ZodType>(t: T) => z.preprocess(blankToUndefined, t.optional());
+
 const schema = z.object({
   NEXT_PUBLIC_SITE_URL: z.url(),
   RATE_LIMIT_SALT: z.string().min(8),
   CRM_PROVIDER: z.enum(["none", "mock"]).default("none"),
   EMAIL_PROVIDER: z.enum(["none", "mock"]).default("none"),
-  SALES_NOTIFICATION_EMAIL: z.email().optional(),
+  SALES_NOTIFICATION_EMAIL: optional(z.email()),
+  // Razorpay: online payment stays off until both the key pair is set. The webhook secret is needed to receive payment events.
+  RAZORPAY_KEY_ID: optional(z.string().min(1)),
+  RAZORPAY_KEY_SECRET: optional(z.string().min(1)),
+  RAZORPAY_WEBHOOK_SECRET: optional(z.string().min(1)),
 });
 
 export type ServerEnv = z.infer<typeof schema>;
