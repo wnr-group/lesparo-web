@@ -18,6 +18,26 @@ function failure(err: unknown): ActionState {
   return { error: "Something went wrong. Please try again." };
 }
 
+/** Opening an enquiry marks its notification as read, for the whole team. Already-read enquiries are left alone. */
+export async function markEnquirySeen(id: string): Promise<void> {
+  try {
+    await requireStaff();
+    await prisma.wholesaleEnquiry.updateMany({ where: { id: z.uuid().parse(id), admin_seen_at: null }, data: { admin_seen_at: new Date() } });
+  } catch (err) {
+    console.error("[admin/enquiries] mark seen", err);
+  }
+}
+
+/** The bell's "Mark all as read". */
+export async function markAllEnquiriesSeen(): Promise<void> {
+  try {
+    await requireStaff();
+    await prisma.wholesaleEnquiry.updateMany({ where: { admin_seen_at: null }, data: { admin_seen_at: new Date() } });
+  } catch (err) {
+    console.error("[admin/enquiries] mark all seen", err);
+  }
+}
+
 export async function updateEnquiry(id: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
   try {
     const session = await requireStaff();

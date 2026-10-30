@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { CountUp } from "@/components/site/count-up";
@@ -76,39 +76,6 @@ export function BrandStory() {
           </Link>
           </Magnetic>
         </div>
-      </div>
-    </section>
-  );
-}
-
-/** Follow strip: real studio photographs linking to the brand's Instagram profile. */
-export function FollowStrip() {
-  const insta = BUSINESS.social.find((s) => s.label === "Instagram");
-  const shots = ["back-polo", "pattern-tee", "crossbody-tee", "pants-front", "pants-side"];
-  if (!insta) return null;
-  return (
-    <section aria-labelledby="follow" className="py-14 lg:py-20">
-      <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <h2 id="follow" className="font-display text-[clamp(1.8rem,1.2rem+2vw,2.8rem)] font-extrabold uppercase tracking-tight">
-            <SplitWords>Follow @lesparofashions</SplitWords>
-          </h2>
-          <a href={insta.href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[#f2f3f5] px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-ink hover:text-white">
-            Instagram <ArrowUpRight className="size-4" aria-hidden />
-          </a>
-        </div>
-        <ul data-reveal="stagger" className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-4">
-          {shots.map((s, i) => (
-            <li key={s} className={i > 3 ? "hidden lg:block" : i > 2 ? "hidden sm:block lg:block" : ""}>
-              <a href={insta.href} target="_blank" rel="noopener noreferrer" aria-label="LESPARO on Instagram" className="group relative block aspect-[4/5] overflow-hidden bg-[#22231f]">
-                <Image src={`/looks/${s}.jpg`} alt="" fill sizes="(min-width:1024px) 20vw, 33vw" className="hz object-cover" />
-                <span aria-hidden className="absolute inset-0 grid place-items-center bg-ink/0 transition-colors duration-500 group-hover:bg-ink/35">
-                  <ArrowUpRight className="size-9 translate-y-3 text-white opacity-0 transition-all duration-500 ease-[var(--ease-out-soft)] group-hover:translate-y-0 group-hover:opacity-100" />
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );

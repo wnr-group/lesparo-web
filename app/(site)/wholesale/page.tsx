@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { CollectionBanner } from "@/components/site/collection-banner";
 import { EnquiryForm } from "@/components/site/enquiry-form";
+import { LoopVideo } from "@/components/site/loop-video";
 import { SplitWords } from "@/components/site/split-words";
 import { BUSINESS } from "@/lib/business";
 import { getCategoryTree, getQuotableProducts } from "@/lib/catalogue/queries";
@@ -89,10 +90,17 @@ export default async function WholesalePage(props: PageProps<"/wholesale">) {
         </div>
       </section>
 
+      {/* Who you'd be buying from: the journey, in ten seconds. Erode at sunrise, the loom, father and son, the workshop. */}
+      <section aria-label="LESPARO's textile journey" className="mx-auto max-w-page px-4 pt-14 sm:px-6 lg:px-10 lg:pt-20">
+        <div data-reveal="clip">
+          <LoopVideo src="/videos/textile-journey.mp4" label="LESPARO's textile journey: Erode, since 1979" className="aspect-[16/9] lg:aspect-[21/9]" />
+        </div>
+      </section>
+
       {/* The form. */}
       <section id="enquire" aria-labelledby="enquire-heading" className="mx-auto max-w-page scroll-mt-24 px-4 py-14 sm:px-6 lg:px-10 lg:py-20">
-        <div className="grid gap-10 lg:grid-cols-[1fr_2fr] lg:gap-20">
-          <div className="lg:sticky lg:top-28 lg:self-start">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-8 max-w-xl">
             <h2 id="enquire-heading" className="font-display text-[clamp(1.5rem,1.1rem+1.2vw,2.2rem)] font-extrabold uppercase leading-tight tracking-tight">
               Your enquiry
             </h2>

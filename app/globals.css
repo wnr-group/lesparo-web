@@ -875,3 +875,31 @@
   }
 }
 
+
+/* Accordion: height animates where the browser supports ::details-content (progressive enhancement; otherwise it opens instantly). */
+:root {
+  interpolate-size: allow-keywords;
+}
+details.acc::details-content {
+  block-size: 0;
+  overflow: clip;
+  transition:
+    block-size 0.35s var(--ease-atelier),
+    content-visibility 0.35s allow-discrete;
+}
+details.acc[open]::details-content {
+  block-size: auto;
+}
+
+/* Soft filled inputs for the wholesale enquiry form. */
+.field-soft {
+  border-color: transparent;
+  background: var(--color-paper);
+  border-radius: 0.6rem;
+}
+.field-soft:hover {
+  border-color: var(--color-sand);
+}
+.field-soft:focus {
+  background: #fff;
+}

@@ -20,7 +20,7 @@ export default async function PricingPage(props: PageProps<"/admin/pricing">) {
   const categories = await db.category.findMany({ where: { products: { some: {} } }, select: { id: true, name: true }, orderBy: { display_order: "asc" } });
   const where: Prisma.ProductWhereInput = {
     archived_at: null,
-    ...(q && { OR: [{ name: { contains: q } }, { slug: { contains: q } }, { sku: { contains: q } }] }),
+    ...(q && { OR: [{ name: { contains: q, mode: "insensitive" as const } }, { slug: { contains: q, mode: "insensitive" as const } }, { sku: { contains: q, mode: "insensitive" as const } }] }),
     ...(category && { category_id: category }),
   };
   const [products, count] = await Promise.all([
@@ -79,7 +79,7 @@ export default async function PricingPage(props: PageProps<"/admin/pricing">) {
             ))}
           </select>
         </div>
-        <button type="submit" className="h-9 bg-ink px-4 text-sm text-paper">
+        <button type="submit" className="h-9 rounded-full bg-ink px-5 text-sm text-paper transition-colors hover:bg-indigo">
           Filter
         </button>
       </form>

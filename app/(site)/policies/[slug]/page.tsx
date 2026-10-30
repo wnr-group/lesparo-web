@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { LoopVideo } from "@/components/site/loop-video";
 import { Alert, Container } from "@/components/ui/primitives";
 import { POLICIES } from "@/lib/policies";
 
@@ -20,11 +21,11 @@ async function PolicyBody({ params }: { params: Promise<{ slug: string }> }) {
   const policy = POLICIES.find((p) => p.slug === slug);
   if (!policy) notFound();
   return (
-    <article className="max-w-prose">
+    <article>
       <p className="eyebrow">Policies</p>
-      <h1 className="mt-4 font-display text-headline font-bold">{policy.title}</h1>
+      <h1 className="mt-4 max-w-3xl font-display text-headline font-bold">{policy.title}</h1>
       {policy.status === "pending" && (
-        <div className="mt-8">
+        <div className="mt-8 max-w-prose">
           <Alert tone="info" title="This page is being finalised">
             The full policy is awaiting approval. For anything not covered here, please{" "}
             <Link href="/contact" className="underline">
@@ -35,15 +36,23 @@ async function PolicyBody({ params }: { params: Promise<{ slug: string }> }) {
         </div>
       )}
       {policy.status === "verified" && <p className="mt-4 text-sm text-muted">From the existing LESPARO website, lightly copy-edited for grammar.</p>}
-      <div className="mt-10 space-y-8">
+      {slug === "quality" && (
+        <div className="mt-10">
+          {/* Cotton, the loom, a waistband, folded garments, a boy at play, and the line "Crafted in Erode. Made for You." */}
+          <LoopVideo src="/videos/making-of.mp4" label="How LESPARO is made: crafted in Erode" className="aspect-[16/9] lg:aspect-[21/9]" />
+        </div>
+      )}
+      <div className="mt-12 border-t border-line">
         {policy.sections.map((s, i) => (
-          <section key={i}>
-            {s.heading && <h2 className="font-display font-semibold text-2xl">{s.heading}</h2>}
-            {s.body.map((p) => (
-              <p key={p} className="mt-3 leading-relaxed text-ink-soft">
-                {p}
-              </p>
-            ))}
+          <section key={i} className="grid gap-4 border-b border-line py-8 lg:grid-cols-12 lg:gap-10 lg:py-10">
+            {s.heading ? <h2 className="font-display text-2xl font-semibold lg:col-span-4">{s.heading}</h2> : <span className="hidden lg:col-span-4 lg:block" />}
+            <div className="max-w-prose lg:col-span-8">
+              {s.body.map((p, j) => (
+                <p key={p} className={`leading-relaxed text-ink-soft ${j ? "mt-3" : ""}`}>
+                  {p}
+                </p>
+              ))}
+            </div>
           </section>
         ))}
       </div>

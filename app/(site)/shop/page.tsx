@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CatalogueBrowser, CatalogueSkeleton } from "@/components/site/catalogue-browser";
+import { getCategoryTree } from "@/lib/catalogue/queries";
 import { SplitWords } from "@/components/site/split-words";
 import { CollectionBanner } from "@/components/site/collection-banner";
 
@@ -17,6 +18,13 @@ export const metadata: Metadata = {
 /** The shop promo film, if one has been added at public/videos/shop-banner.mp4. Without it the banner keeps its photograph. */
 const shopVideo = () => (existsSync(join(process.cwd(), "public", "videos", "shop-banner.mp4")) ? "/videos/shop-banner.mp4" : undefined);
 
+/** Garments, Fabric Unstitched ... with their sub-categories indented beneath. */
+async function ShopCatalogue({ searchParams }: { searchParams: PageProps<"/shop">["searchParams"] }) {
+  const tree = await getCategoryTree();
+  const categoryOptions = tree.flatMap((t) => [{ slug: t.slug, name: t.name, depth: 0 }, ...t.children.map((c) => ({ slug: c.slug, name: c.name, depth: 1 }))]);
+  return <CatalogueBrowser searchParams={searchParams} basePath="/shop" categoryOptions={categoryOptions} />;
+}
+
 export default function ShopPage(props: PageProps<"/shop">) {
   return (
     <>
@@ -25,7 +33,7 @@ export default function ShopPage(props: PageProps<"/shop">) {
         <h1 className="mt-3 font-display text-[clamp(2.4rem,1.4rem+4vw,5rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
           <SplitWords onLoad>All</SplitWords> <SplitWords onLoad className="text-white/55">products</SplitWords>
         </h1>
-        <p className="mt-5 max-w-md text-white/70">The full LESPARO range. Filter by fabric or size, or send us a wholesale enquiry for bulk pricing.</p>
+        <p className="mt-5 max-w-md text-white/70">The full LESPARO range. Search, filter by category, fabric, size or price, or send us a wholesale enquiry for bulk pricing.</p>
         <div className="mt-8">
           <Link href="/wholesale#enquire" className="inline-flex h-12 items-center gap-2 rounded-full bg-white px-6 text-sm font-bold text-ink transition-transform hover:-translate-y-0.5">
             Wholesale enquiry <ArrowRight className="size-4" aria-hidden />
@@ -34,7 +42,7 @@ export default function ShopPage(props: PageProps<"/shop">) {
       </CollectionBanner>
       <div className="mx-auto mt-10 max-w-page px-4 pb-16 sm:px-6 lg:px-10 lg:pb-20">
         <Suspense fallback={<CatalogueSkeleton />}>
-          <CatalogueBrowser searchParams={props.searchParams} basePath="/shop" />
+          <ShopCatalogue searchParams={props.searchParams} />
         </Suspense>
       </div>
     </>
