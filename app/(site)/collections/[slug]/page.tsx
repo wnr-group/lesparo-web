@@ -85,7 +85,7 @@ async function CollectionProducts({ params, searchParams }: { params: Promise<{ 
   const { slug } = await params;
   const found = await getCategoryBySlug(slug);
   if (!found) return null;
-  return <CatalogueBrowser searchParams={searchParams} basePath={`/collections/${slug}`} categoryIds={found.subtreeIds} showSearch={false} />;
+  return <CatalogueBrowser searchParams={searchParams} basePath={`/collections/${slug}`} categoryIds={found.subtreeIds} categoryOptions={found.children.map((c) => ({ slug: c.slug, name: c.name, depth: 0 }))} />;
 }
 
 export default function CollectionPage(props: PageProps<"/collections/[slug]">) {

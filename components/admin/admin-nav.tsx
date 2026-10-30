@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { FolderTree, Home, Inbox, LayoutDashboard, Package, ShoppingBag, Tag } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useNotifications } from "./notifications";
 
 const LINKS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -17,9 +18,10 @@ const LINKS = [
 
 export function AdminNav() {
   const pathname = usePathname();
+  const unread = useNotifications()?.count ?? 0;
   return (
     <nav aria-label="Admin">
-      <ul className="flex gap-1 overflow-x-auto lg:flex-col">
+      <ul className="flex gap-1 overflow-x-auto lg:flex-col lg:gap-0.5 lg:overflow-visible">
         {LINKS.map(({ href, label, icon: Icon, exact }) => {
           const active = exact ? pathname === href : pathname.startsWith(href);
           return (
@@ -27,10 +29,13 @@ export function AdminNav() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={clsx("flex items-center gap-3 whitespace-nowrap px-3 py-2 text-sm transition-colors", active ? "bg-indigo text-paper" : "text-ink-soft hover:bg-linen hover:text-ink")}
+                className={clsx("flex items-center gap-3 whitespace-nowrap rounded-lg px-3 py-2.5 text-sm transition-colors", active ? "bg-indigo font-medium text-paper shadow-sm" : "text-ink-soft hover:bg-linen hover:text-ink")}
               >
-                <Icon className="size-4" aria-hidden />
+                <Icon className="size-[1.05rem]" aria-hidden />
                 {label}
+                {href === "/admin/enquiries" && unread > 0 && (
+                  <span className={clsx("ml-auto grid min-w-5 place-items-center rounded-full px-1.5 text-[0.68rem] font-bold leading-5", active ? "bg-white text-indigo" : "bg-danger text-white")}>{unread > 99 ? "99+" : unread}</span>
+                )}
               </Link>
             </li>
           );

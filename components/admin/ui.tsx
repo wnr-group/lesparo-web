@@ -6,14 +6,14 @@ import { ENQUIRY_STATUS_LABELS, type EnquiryStatus } from "@/lib/validation/enqu
 
 export function PageHeader({ title, description, actions, back }: { title: string; description?: ReactNode; actions?: ReactNode; back?: { href: string; label: string } }) {
   return (
-    <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div className="mb-7 flex flex-col gap-4 border-b border-line pb-6 md:flex-row md:items-end md:justify-between">
       <div>
         {back && (
           <Link href={back.href} className="link-draw text-sm text-muted">
             ← {back.label}
           </Link>
         )}
-        <h1 className="mt-1 font-display text-4xl font-semibold">{title}</h1>
+        <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight">{title}</h1>
         {description && <p className="mt-2 text-sm text-ink-soft">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
@@ -38,10 +38,10 @@ export function PageSkeleton({ label = "Loading…" }: { label?: string }) {
 
 export function Panel({ title, children, className, actions }: { title?: string; children: ReactNode; className?: string; actions?: ReactNode }) {
   return (
-    <section className={clsx("border border-line bg-plate", className)}>
+    <section className={clsx("overflow-hidden rounded-xl border border-line bg-plate shadow-[0_1px_2px_rgb(18_22_76/0.04)]", className)}>
       {title && (
-        <div className="flex items-center justify-between border-b border-line px-5 py-3">
-          <h2 className="text-sm font-medium">{title}</h2>
+        <div className="flex items-center justify-between border-b border-line bg-ivory/60 px-5 py-3">
+          <h2 className="text-sm font-semibold">{title}</h2>
           {actions}
         </div>
       )}
@@ -52,12 +52,12 @@ export function Panel({ title, children, className, actions }: { title?: string;
 
 export function Table({ head, children, empty }: { head: string[]; children: ReactNode; empty?: ReactNode }) {
   return (
-    <div className="overflow-x-auto border border-line bg-plate">
+    <div className="overflow-x-auto rounded-xl border border-line bg-plate shadow-[0_1px_2px_rgb(18_22_76/0.04)]">
       <table className="w-full min-w-[40rem] text-left text-sm">
-        <thead className="border-b border-line bg-ivory text-xs uppercase tracking-[0.1em] text-muted">
+        <thead className="border-b border-line bg-ivory text-[0.7rem] uppercase tracking-[0.12em] text-muted">
           <tr>
             {head.map((h) => (
-              <th key={h} scope="col" className="px-4 py-3 font-medium">
+              <th key={h} scope="col" className="px-4 py-3.5 font-semibold">
                 {h}
               </th>
             ))}
@@ -106,12 +106,12 @@ export function Pagination({ page, pageCount, href }: { page: number; pageCount:
       </span>
       <div className="flex gap-2">
         {page > 1 && (
-          <Link href={href(page - 1)} className="border border-line bg-plate px-3 py-1.5 hover:border-ink">
+          <Link href={href(page - 1)} className="rounded-full border border-line bg-plate px-4 py-1.5 transition-colors hover:border-ink">
             Previous
           </Link>
         )}
         {page < pageCount && (
-          <Link href={href(page + 1)} className="border border-line bg-plate px-3 py-1.5 hover:border-ink">
+          <Link href={href(page + 1)} className="rounded-full border border-line bg-plate px-4 py-1.5 transition-colors hover:border-ink">
             Next
           </Link>
         )}

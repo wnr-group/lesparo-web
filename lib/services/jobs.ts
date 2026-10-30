@@ -12,7 +12,10 @@ export function currentDeps() {
 /** Jobs to enqueue for a new enquiry, with status reflecting current configuration. */
 export function jobsForNewEnquiry() {
   const deps = currentDeps();
-  const ops: JobOperation[] = ["crm.create_enquiry", "email.sales_notification", "email.buyer_confirmation"];
+  const all: JobOperation[] = ["crm.create_enquiry", "email.sales_notification", "email.buyer_confirmation"];
+  // Enquiries are received in the admin panel. A CRM or email step is queued only once that provider is configured;
+  // with none set up there is nothing to queue, so no "blocked" jobs pile up.
+  const ops = all.filter((operation) => (operation.startsWith("crm.") ? deps.crm : deps.email));
   return ops.map((operation) => {
     const reason = blockedReason(operation, deps);
     return {

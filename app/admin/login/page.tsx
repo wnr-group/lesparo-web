@@ -9,7 +9,7 @@ export default function LoginPage() {
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm">
-        <Image src="/lesparo-logo-v2.png" alt="LESPARO" width={900} height={484} className="mx-auto h-16 w-auto" priority />
+        <Image src="/lesparo-logo-v3.png" alt="LESPARO" width={875} height={460} className="mx-auto h-16 w-auto" priority />
         <h1 className="mt-8 text-center font-display font-semibold text-3xl">Staff sign in</h1>
         <form action={action} className="mt-8 space-y-4 border border-line bg-paper p-6">
           {state.error && (

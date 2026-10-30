@@ -6,7 +6,6 @@ import { BrandFilm } from "@/components/site/brand-film";
 import { CollectionBanner } from "@/components/site/collection-banner";
 import { CountUp } from "@/components/site/count-up";
 import { HistoryTabs } from "@/components/site/history-tabs";
-import { LoopVideo } from "@/components/site/loop-video";
 import { Magnetic, Tilt } from "@/components/site/pointer-fx";
 import { SplitWords } from "@/components/site/split-words";
 import { ButtonLink } from "@/components/ui/button";
@@ -158,11 +157,6 @@ export default function AboutPage() {
             </p>
           </div>
 
-          {/* The journey, in ten seconds: Erode at sunrise, the loom, father and son, the workshop, and the line "40 Years of Textile Heritage. Erode, Since 1979." */}
-          <div data-reveal="clip" className="mt-12 lg:mt-16">
-            <LoopVideo src="/videos/textile-journey.mp4" label="LESPARO's textile journey: Erode, since 1979" className="aspect-[16/9] lg:aspect-[21/9]" />
-          </div>
-
           <div className="mt-14 lg:mt-20">
             <HistoryTabs items={HISTORY.map((h) => ({ year: h.year, title: h.title, body: h.body, photo: h.photo, caption: h.caption, range: h.range }))} />
           </div>
@@ -204,8 +198,9 @@ export default function AboutPage() {
       <section aria-labelledby="quality-heading" className="bg-white py-20 lg:py-28">
         <div className="mx-auto grid max-w-page gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:items-center lg:gap-16 lg:px-10">
           <div data-reveal="clip" className="lg:col-span-6">
-            {/* Cotton, the loom, a waistband, folded garments, a boy at play, and the line "Crafted in Erode. Made for You." */}
-            <LoopVideo src="/videos/making-of.mp4" label="How LESPARO is made: crafted in Erode" className="aspect-[4/3] lg:aspect-[5/4]" />
+            <div className="relative aspect-[4/3] overflow-hidden bg-[#22231f] lg:aspect-[5/4]">
+              <Image src="/about/range-fabric.jpg" alt="Woven LESPARO fabric" fill unoptimized sizes="(min-width:1024px) 50vw, 100vw" className="object-cover" />
+            </div>
           </div>
           <div className="lg:col-span-6">
             <p data-reveal="up" className="eyebrow">
