@@ -1,9 +1,8 @@
 // LESPARO schema: catalogue, staff users, wholesale enquiries, site content, integration
 // outbox. Quote-first: no orders/payments until retail checkout is confirmed.
 //
-// Datasource: SQLite (a single local file, see DATABASE_URL) - no Supabase/Postgres needed.
-// Columns keep the snake_case names of the original Postgres schema. JSON-shaped values
-// (specs, sizes, site content) use Prisma's Json type, which SQLite stores as text.
+// Datasource: Supabase Postgres (DATABASE_URL at runtime, DIRECT_URL for migrations, see prisma.config.ts).
+// Columns use snake_case names. JSON-shaped values (specs, sizes, site content) use Prisma's Json type.
 // Enumerated values are plain strings, validated in lib/validation/*.
 
 generator client {
@@ -11,7 +10,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 // ---------------------------------------------------------------------------
@@ -143,6 +142,8 @@ model WholesaleEnquiry {
   quotation_valid_until String?
   quotation_details     String?
   follow_up_at          DateTime?
+  /** First time any staff member opened the enquiry; null = still an unread notification. */
+  admin_seen_at         DateTime?
   follow_up_outcome     String?
   crm_record_id         String?
   /// not_configured | pending | synced | failed
