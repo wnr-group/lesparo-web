@@ -18,7 +18,7 @@
   background-color: var(--color-indigo-800);
 }
 /*
- * The stage: the brand indigo with patches of white scattered over it (.sp-art), kept clear of the copy. The hero's text, panels and accents read the variables below.
+ * The stage: the brand indigo with a fine monoline print over it (.sp-art). The hero's text, panels and accents read the variables below.
  *   --sp-1/2/3   centre, middle and edge of the indigo   --sp-key   key light      --sp-glow   light behind the product
  *   --sp-fg      text and outlines (r g b)               --sp-on-fg text on a filled --sp-fg button
  *   --sp-panel   glass panels (r g b)                     --sp-accent small labels and markers (r g b)
@@ -40,62 +40,35 @@
     radial-gradient(70% 60% at 18% 0%, var(--sp-key), transparent 70%),
     radial-gradient(85% 75% at 52% 46%, var(--sp-1) 0%, var(--sp-2) 55%, var(--sp-3) 100%);
 }
-/* The patches (an SVG over the stage): white shapes scattered over the indigo, drifting very slowly. */
+/*
+ * The motif (.sp-art): a monoline print in a half-drop repeat, like a woven textile: a T-shirt, track pants and a
+ * cloud in fine white line, sun-yellow sparkle stars, and small sky and white sparkles between them (200px tile).
+ * A mask fades it out behind the garment and across the copy, so it frames them, and it drifts diagonally very slowly.
+ */
 .sp-art {
   position: absolute;
   inset: 0;
   z-index: 0;
-  width: 100%;
-  height: 100%;
   pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cpath transform='translate%2850 50%29' d='M-7 -12L-16 -7L-12 1L-8 -1V14H8V-1L12 1L16 -7L7 -12C5 -8.5 -5 -8.5 -7 -12Z' stroke='%23ffffff' stroke-opacity='.3' stroke-width='1.4' fill='none' stroke-linejoin='round' stroke-linecap='round'/%3E%3Cpath transform='translate%28150 150%29' d='M-8 -14H8L10 14H2L0 -1L-2 14H-10Z M-8 -10H8' stroke='%23ffffff' stroke-opacity='.3' stroke-width='1.4' fill='none' stroke-linejoin='round' stroke-linecap='round'/%3E%3Cpath transform='translate%28150 50%29' d='M-14 6H12C17 6 18 -2 12 -3C11 -9 3 -11 -1 -6C-4 -9 -11 -8 -11 -2C-17 -2 -18 6 -14 6Z' stroke='%23ffffff' stroke-opacity='.3' stroke-width='1.4' fill='none' stroke-linejoin='round' stroke-linecap='round'/%3E%3Cpath transform='translate%2850 150%29' d='M0 -8C1 -2 2 -1 8 0C2 1 1 2 0 8C-1 2 -2 1 -8 0C-2 -1 -1 -2 0 -8Z' fill='%23ffc82c' fill-opacity='.85'/%3E%3Cpath transform='translate%28100 100%29 scale%28.45%29' d='M0 -8C1 -2 2 -1 8 0C2 1 1 2 0 8C-1 2 -2 1 -8 0C-2 -1 -1 -2 0 -8Z' fill='%23ffffff' fill-opacity='.5'/%3E%3Cpath transform='translate%280 100%29 scale%28.35%29' d='M0 -8C1 -2 2 -1 8 0C2 1 1 2 0 8C-1 2 -2 1 -8 0C-2 -1 -1 -2 0 -8Z' fill='%238cc8ff' fill-opacity='.7'/%3E%3Cpath transform='translate%28100 0%29 scale%28.35%29' d='M0 -8C1 -2 2 -1 8 0C2 1 1 2 0 8C-1 2 -2 1 -8 0C-2 -1 -1 -2 0 -8Z' fill='%238cc8ff' fill-opacity='.7'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  -webkit-mask-image:
+    radial-gradient(ellipse 30% 42% at 55% 50%, transparent 30%, #000 100%),
+    linear-gradient(100deg, transparent 22%, #000 48%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    radial-gradient(ellipse 30% 42% at 55% 50%, transparent 30%, #000 100%),
+    linear-gradient(100deg, transparent 22%, #000 48%);
+  mask-composite: intersect;
 }
-@keyframes sp-patch-drift {
+@keyframes sp-motif-drift {
   to {
-    translate: 10px -8px;
+    background-position: 200px 200px;
   }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .sp-patch {
-    animation: sp-patch-drift 12s ease-in-out infinite alternate;
-  }
-  .sp-patch-b {
-    animation-duration: 15s;
-    animation-direction: alternate-reverse;
-  }
-  .sp-patch-c {
-    animation-duration: 18s;
-  }
-}
-
-/* The product's name, huge and tone-on-tone behind it, like a campaign poster. Slides in when the product changes. */
-.sp-bigword {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 0;
-  translate: -50% -50%;
-  font-family: var(--font-sport);
-  font-style: italic;
-  font-weight: 900;
-  font-size: clamp(7rem, 4rem + 17vw, 22rem);
-  line-height: 0.8;
-  letter-spacing: -0.05em;
-  white-space: nowrap;
-  text-transform: uppercase;
-  color: rgb(var(--sp-fg) / 0.075);
-  pointer-events: none;
-  user-select: none;
-}
-/* On phones the hero is a tall column and the word would land off-centre behind the controls. */
-@media (max-width: 1023px) {
-  .sp-bigword {
-    display: none;
-  }
-}
-@keyframes sp-bigword-in {
-  from {
-    opacity: 0;
-    translate: -44% -50%;
+  .sp-art {
+    animation: sp-motif-drift 60s linear infinite;
   }
 }
 
@@ -131,9 +104,6 @@
   }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .sp-bigword {
-    animation: sp-bigword-in 1s var(--ease-out-soft) both;
-  }
   .sp-fan > li {
     animation: sp-fan-in 0.7s var(--ease-out-soft) both;
   }

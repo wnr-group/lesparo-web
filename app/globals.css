@@ -783,15 +783,11 @@
   transition: translate 0.35s var(--ease-out-soft);
 }
 
-/* Hero depth: the halo and the big campaign word drift opposite the pointer, at different rates (see PointerDepth in the hero). */
+/* Hero depth: the halo drifts opposite the pointer (see PointerDepth in the hero). */
 @media (prefers-reduced-motion: no-preference) {
   .sp-halo {
     transform: translate3d(calc(var(--px, 0) * 26px), calc(var(--py, 0) * 18px), 0);
     transition: transform 0.9s var(--ease-out-soft);
-  }
-  .sp-bigword {
-    transform: translate3d(calc(var(--px, 0) * -34px), calc(var(--py, 0) * -22px), 0);
-    transition: transform 1.2s var(--ease-out-soft);
   }
 }
 
