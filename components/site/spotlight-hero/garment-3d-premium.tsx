@@ -330,13 +330,15 @@ function webglAvailable() {
   }
 }
 
+/** While the model loads: no percentage on screen, just a soft glow breathing where the garment will appear. */
 function Loading() {
-  const { active, progress } = useProgress();
+  const { active } = useProgress();
   if (!active) return null;
   return (
-    <p aria-live="polite" className="pointer-events-none absolute inset-0 z-10 grid place-items-center text-[0.72rem] font-bold uppercase tracking-[0.18em] text-white/85">
-      Loading 3D model {Math.round(progress)}%
-    </p>
+    <div aria-live="polite" className="pointer-events-none absolute inset-0 z-10 grid place-items-center">
+      <span className="sr-only">Loading the 3D model</span>
+      <span aria-hidden className="size-48 animate-pulse rounded-full bg-[radial-gradient(circle,rgb(255_255_255/0.16),transparent_70%)]" />
+    </div>
   );
 }
 
@@ -388,6 +390,7 @@ export default function Garment3DPremium({
   onPick = () => {},
   view = null,
   onGrab = () => {},
+  controls = true,
 }: {
   src: string | Part[];
   label: string;
@@ -397,6 +400,8 @@ export default function Garment3DPremium({
   onPick?: (key: string) => void;
   view?: View3D | null;
   onGrab?: () => void;
+  /** Show the reset button (the hero shows it only while the visitor is taking a closer look). */
+  controls?: boolean;
 }) {
   const [gl, setGl] = useState<boolean | null>(null);
   const [failed, setFailed] = useState(false);
@@ -602,6 +607,7 @@ export default function Garment3DPremium({
         </button>
       ))}
       <Loading />
+      {controls && (
       <button
         type="button"
         aria-label="Reset the view"
@@ -611,6 +617,7 @@ export default function Garment3DPremium({
       >
         <RotateCcw className="size-4" aria-hidden />
       </button>
+      )}
     </div>
   );
 }

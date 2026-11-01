@@ -233,6 +233,8 @@ export default function Garment3D({
   view = null,
   onGrab = () => {},
 }: {
+  /** Accepted for parity with the premium viewer; the classic viewer keeps its own controls. */
+  controls?: boolean;
   src: string | Part[];
   label: string;
   poster: string;
