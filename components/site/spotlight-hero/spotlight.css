@@ -198,9 +198,9 @@
   --sp-3: #e6e8f5;
 }
 .sp-stage[data-stage="modernist"] {
-  --sp-1: #fbf8f2;
-  --sp-2: #f4efe6;
-  --sp-3: #ebe4d8;
+  --sp-1: #fcf9f3;
+  --sp-2: #f5efe4;
+  --sp-3: #e9e1d2;
   --sp-glow: rgb(255 255 255 / 0.35);
 }
 .sp-stage[data-stage="prism"] {
@@ -270,12 +270,88 @@
   background: var(--c);
   mix-blend-mode: multiply;
 }
-[data-stage="modernist"] .sp-art > i:nth-child(1) { --x: 70%; --y: 50%; --s: 46vw; --c: rgb(38 46 134 / 0.85); clip-path: polygon(18% 6%, 92% 22%, 74% 96%, 6% 70%); --t: 26s; --dx: -2%; --dy: 2%; --ds: 1.04; }
-[data-stage="modernist"] .sp-art > i:nth-child(2) { --x: 84%; --y: 28%; --s: 30vw; --c: rgb(124 196 255 / 0.9); clip-path: polygon(0 30%, 70% 0, 100% 64%, 30% 100%); --t: 21s; --dx: 3%; --dy: -2%; --ds: 1.05; }
-[data-stage="modernist"] .sp-art > i:nth-child(3) { --x: 58%; --y: 80%; --s: 28vw; --c: rgb(176 96 63 / 0.9); clip-path: polygon(10% 0, 100% 40%, 60% 100%, 0 80%); --t: 23s; --dx: -3%; --dy: -2%; --ds: 1.05; }
-[data-stage="modernist"] .sp-art > i:nth-child(4) { --x: 88%; --y: 74%; --s: 20vw; --c: rgb(255 200 44 / 0.95); border-radius: 50%; mix-blend-mode: normal; --t: 18s; --dx: -6%; --dy: -4%; --ds: 1.06; }
-[data-stage="modernist"] .sp-art > i:nth-child(5) { --x: 48%; --y: 46%; --s: 40vw; --c: transparent; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgb(12 15 46 / 0.35); mix-blend-mode: normal; --t: 30s; --ds: 1.03; }
-[data-stage="modernist"] .sp-art > i:nth-child(6) { --x: 30%; --y: 104%; --s: 34vw; --c: rgb(185 168 255 / 0.7); clip-path: polygon(0 40%, 100% 0, 80% 100%, 20% 100%); --t: 25s; --dx: 4%; --dy: -3%; --ds: 1.04; }
+/* Composition, around the layout: copy left, garment centre, tabs top right, detail card bottom right. */
+[data-stage="modernist"] .sp-art > i:nth-child(1) { --x: 62%; --y: 52%; --s: 42vw; --c: rgb(38 46 134 / 0.9); clip-path: polygon(20% 4%, 94% 20%, 76% 96%, 4% 72%); --t: 26s; --dx: -2%; --dy: 2%; --ds: 1.04; }
+[data-stage="modernist"] .sp-art > i:nth-child(2) { --x: 88%; --y: 40%; --s: 30vw; --c: rgb(140 200 255 / 0.95); clip-path: polygon(0 30%, 70% 0, 100% 64%, 30% 100%); --t: 21s; --dx: 3%; --dy: -2%; --ds: 1.05; }
+[data-stage="modernist"] .sp-art > i:nth-child(3) { --x: 54%; --y: 92%; --s: 24vw; --c: rgb(194 100 63 / 0.92); clip-path: polygon(10% 0, 100% 40%, 60% 100%, 0 80%); --t: 23s; --dx: -3%; --dy: -2%; --ds: 1.05; }
+[data-stage="modernist"] .sp-art > i:nth-child(4) { --x: 98%; --y: 2%; --s: 15vw; --c: var(--color-sun); border-radius: 50%; mix-blend-mode: normal; --t: 18s; --dx: -5%; --dy: 4%; --ds: 1.06; }
+[data-stage="modernist"] .sp-art > i:nth-child(5) { --x: 50%; --y: 48%; --s: 40vw; --c: transparent; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgb(12 15 46 / 0.3); mix-blend-mode: normal; --t: 30s; --ds: 1.03; }
+[data-stage="modernist"] .sp-art > i:nth-child(6) { --x: 22%; --y: 104%; --s: 30vw; --c: rgb(185 168 255 / 0.75); clip-path: polygon(0 40%, 100% 0, 80% 100%, 20% 100%); --t: 25s; --dx: 4%; --dy: -3%; --ds: 1.04; }
+
+/*
+ * Photomontage (modernist only, desktop): people from the studio shoot set inside the composition as duotones. Each
+ * frame is a flat colour with the photo in greyscale multiplied over it, so the figure prints in that colour, like a
+ * Bauhaus poster. An arch on the right in sky, a disc low in the middle in sun, and a slim strip top centre in clay.
+ */
+.sp-montage {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .sp-stage[data-stage="modernist"] .sp-montage {
+    display: block;
+  }
+}
+.sp-montage > span {
+  position: absolute;
+  z-index: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--m);
+  pointer-events: none;
+}
+.sp-montage img {
+  filter: grayscale(1) contrast(1.15) brightness(1.08);
+  mix-blend-mode: multiply;
+}
+.sp-m-arch {
+  --m: rgb(140 200 255);
+  left: 70%;
+  top: 14%;
+  width: 13vw;
+  aspect-ratio: 2 / 3;
+  border-radius: 999px 999px 0 0;
+}
+.sp-m-disc {
+  --m: var(--color-sun);
+  left: 29%;
+  top: 63%;
+  width: 11vw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.sp-m-strip {
+  --m: rgb(194 100 63);
+  left: 33%;
+  top: 6%;
+  width: 6vw;
+  aspect-ratio: 1 / 2.4;
+  border-radius: 999px;
+}
+@keyframes sp-montage-in {
+  from {
+    opacity: 0;
+    translate: 0 1.2rem;
+    scale: 0.96;
+  }
+}
+@keyframes sp-montage-float {
+  50% {
+    translate: 0 -0.5rem;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sp-montage > span {
+    animation:
+      sp-montage-in 0.9s var(--ease-out-soft) both,
+      sp-montage-float 9s ease-in-out 1s infinite;
+  }
+  .sp-m-disc {
+    animation-delay: 0.1s, 1.4s !important;
+  }
+  .sp-m-strip {
+    animation-delay: 0.2s, 2s !important;
+  }
+}
 
 /*
  * Split: the banner cut in two along a diagonal that runs behind the garment. The left half (behind the copy) is the

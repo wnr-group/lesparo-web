@@ -139,6 +139,14 @@ const THEME: Record<string, { stage: string; word: string }> = {
   look: { stage: "indigo", word: "Look" },
 };
 
+/** The modernist banner's three frames (see .sp-montage): an arch, a disc and a slim strip. */
+export type MontageFrame = "arch" | "disc" | "strip";
+const MONTAGE_FRAMES: { id: MontageFrame; className: string; sizes: string }[] = [
+  { id: "arch", className: "sp-m-arch", sizes: "13vw" },
+  { id: "disc", className: "sp-m-disc", sizes: "11vw" },
+  { id: "strip", className: "sp-m-strip", sizes: "6vw" },
+];
+
 /**
  * Art directions for the canvas (./spotlight.css). ART is the live choice; "worlds" uses each product's own colour
  * (THEME). While the team compares them, a small picker shows outside production builds, or anywhere with ?art= in
@@ -208,34 +216,6 @@ function ArtPicker({ art, onArt, colour, onColour }: { art: string; onArt: (id: 
   );
 }
 
-/** On-model photographs from the studio shoot (public/looks, public/collections), three per product, fanned bottom left. */
-const WORN: Record<string, { href: string; photos: { src: string; alt: string; pos?: string }[] }> = {
-  tee: {
-    href: "/collections/gents",
-    photos: [
-      { src: "/collections/range.jpg", alt: "The brown textured polo with cream trim, worn with cream trousers", pos: "50% 25%" },
-      { src: "/looks/back-polo.jpg", alt: "The polo from the back, showing the woven texture" },
-      { src: "/collections/garments.jpg", alt: "The polo styled with a scarf at the waist", pos: "50% 25%" },
-    ],
-  },
-  pants: {
-    href: "/collections/gents-tracks",
-    photos: [
-      { src: "/looks/cargo-pants.jpg", alt: "Brown cargo track pants from the front" },
-      { src: "/looks/beige-tee.jpg", alt: "Cargo track pants worn with a beige tee", pos: "50% 30%" },
-      { src: "/looks/pants-side.jpg", alt: "Cargo track pants from the side, showing the pocket" },
-    ],
-  },
-  look: {
-    href: "/shop",
-    photos: [
-      { src: "/looks/crossbody-tee.jpg", alt: "A tee with a crossbody bag and black track pants", pos: "50% 25%" },
-      { src: "/looks/training.jpg", alt: "A sage tee and black track pants in training", pos: "50% 25%" },
-      { src: "/looks/tee-knee.jpg", alt: "A textured grey tee", pos: "50% 25%" },
-    ],
-  },
-};
-
 /** Frames with a transparent background (.webp or .png) float on the stage; anything else is shown as a photograph. */
 const isCut = (src: string) => /\.(webp|png)$/i.test(src);
 /** Close-ups in the detail panel use the original photograph, which keeps the cloth and its surroundings. */
@@ -259,7 +239,7 @@ const ringDist = (a: number, b: number, n: number) => Math.min(Math.abs(a - b), 
  * at a numbered spot to read it and see that cloth under a loupe cut from the same frame. A product with a real
  * turntable set (8 or more frames in public/turntable) spins smoothly; until then four real photographs stand in.
  */
-export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, turntables, models = {} }: { eyebrow: string; heading: string; subheading: string; cta: Cta; secondary: Cta; turntables: Partial<Record<string, TurntableSet>>; models?: Partial<Record<string, string>> }) {
+export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, turntables, models = {}, montage = {} }: { eyebrow: string; heading: string; subheading: string; cta: Cta; secondary: Cta; turntables: Partial<Record<string, TurntableSet>>; models?: Partial<Record<string, string>>; /** Artwork for the modernist frames (public/hero-art); a frame without one stays a flat shape. */ montage?: Partial<Record<MontageFrame, string>> }) {
   const products: Product[] = ["tee", "pants", "look"].map((id) => {
     const real = turntables[id];
     return real
@@ -527,11 +507,18 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         <i />
       </div>
       <div aria-hidden className="sp-halo" />
+      <div aria-hidden className="sp-montage">
+        {MONTAGE_FRAMES.map((f) => (
+          <span key={f.id} className={f.className}>
+            {montage[f.id] && <Image src={montage[f.id]!} alt="" fill sizes={f.sizes} className="object-cover" style={{ objectPosition: "50% 25%" }} />}
+          </span>
+        ))}
+      </div>
       {/* The logo bird, large and faint: only the original blue banner shows it. */}
       {/* eslint-disable-next-line @next/next/no-img-element -- decorative, fixed-size mark */}
       <img aria-hidden src="/lesparo-bird.png" alt="" width={1140} height={1464} className="sp-bird" />
       {/* The product's name, huge and tone-on-tone behind it; keyed so it slides in again on each switch. */}
-      <p key={product.id} aria-hidden className="sp-bigword">
+      <p key={`word-${product.id}`} aria-hidden className="sp-bigword">
         {THEME[product.id]?.word}
       </p>
       <div aria-hidden className="sp-floor" />
@@ -573,22 +560,6 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
               {secondary.label}
             </Link>
           </div>
-
-          {/* Worn: the product on the model, three photographs fanned like prints on a table. Desktop only. */}
-          {WORN[product.id] && (
-            <div className="mt-12 hidden lg:block">
-              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[rgb(var(--sp-fg)/0.7)]">On the model</p>
-              <ul key={product.id} className="sp-fan mt-4 flex">
-                {WORN[product.id].photos.map((ph, i) => (
-                  <li key={ph.src} className={`relative ${i ? "-ml-6" : ""}`}>
-                    <Link href={WORN[product.id].href} className="relative block aspect-[3/4] w-[6.5rem] overflow-hidden rounded-xl shadow-[0_18px_30px_-12px_rgb(0_0_0/0.55)] ring-2 ring-[rgb(var(--sp-fg)/0.85)] xl:w-[7.75rem]">
-                      <Image src={ph.src} alt={ph.alt} fill sizes="124px" className="object-cover" style={{ objectPosition: ph.pos ?? "50% 40%" }} />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </div>
 
