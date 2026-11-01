@@ -15,7 +15,7 @@ is **not built yet** — it waits on a business decision (see `docs/audit-and-de
 - **Tailwind CSS 4** with design tokens in `app/globals.css` ("Modern Textile Atelier")
 - **Prisma 7 + SQLite**: a single local database file (`prisma/dev.db`); no Docker or hosted database needed
 - Staff sign-in: email + password (bcrypt) with a signed session cookie (`jose`)
-- Uploads on local disk in `storage/` (public images in `storage/media/`, private enquiry files in `storage/attachments/`)
+- Uploads in Supabase Storage (public images in the `product-media` bucket, private enquiry files in `enquiry-attachments`); create the buckets with `npm run storage:setup`
 - **Zod** for validation shared by forms and server actions
 - **Vitest** unit tests
 
@@ -50,7 +50,7 @@ The default admin's password is set in `scripts/seed-admin.ts` (override with `A
 | `npm run db:studio` | Browse and edit the database in Prisma Studio |
 | `npm run admin:seed` | Create the default admin account (keeps an existing password) |
 | `npm run catalogue:crawl` | Re-snapshot the live lesparo.com catalogue into `data/live-catalogue.json` |
-| `npm run catalogue:import` | Upsert the snapshot into the database (idempotent), download images to `storage/media/`, write `data/legacy-redirects.json` |
+| `npm run catalogue:import` | Upsert the snapshot into the database (idempotent), copy images into the `product-media` bucket, write `data/legacy-redirects.json` |
 | `npm run staff:grant -- <email> <admin\|sales> [--password <pw>]` | Create a staff user / grant a role (`--revoke` to remove) |
 | `npm run jobs:run` | Process due CRM/email jobs once |
 
@@ -66,7 +66,6 @@ lib/services/        enquiry submission, integration job runner, upload sniffing
 lib/integrations/    provider-independent CRM and email adapters (+ test mocks)
 lib/validation/      Zod schemas shared by client and server
 prisma/              schema.prisma and SQL migrations
-storage/             uploaded images and enquiry files (git-ignored)
 scripts/             catalogue crawl/import, staff provisioning, job runner
 tests/               unit tests
 docs/                database, integrations, deployment, audit & decision register

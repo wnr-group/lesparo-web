@@ -2,7 +2,7 @@
  * Imports data/live-catalogue.json (from crawl-live-catalogue.ts) into the local database.
  *
  * - Idempotent: categories and products are upserted by their PrestaShop legacy_id.
- * - Images are downloaded from lesparo.com into storage/media/ (already-downloaded files are kept).
+ * - Images are copied from lesparo.com into the `product-media` Supabase Storage bucket (images already there are kept).
  * - The live site's 4th-level "product line" categories (one product each) are folded into
  *   their parent; their URLs are redirected to the product instead.
  * - Writes data/legacy-redirects.json, consumed by next.config.ts.
@@ -10,10 +10,11 @@
  *   npm run catalogue:import            (uses .env.local)
  *   npm run catalogue:import -- --skip-images
  */
-import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { parseLegacyDescription } from "../lib/catalogue/legacy-description";
 import { DEFAULT_HOMEPAGE } from "../lib/validation/content";
+import { publicMediaUrl, saveFile } from "../lib/storage";
 import { slugify } from "../lib/validation/catalogue";
 import { db } from "./db";
 
@@ -35,7 +36,6 @@ const MAX_CATEGORY_DEPTH = 3;
 /** Products shown under "New Arrivals" on the live homepage, in order. */
 const LIVE_HOMEPAGE_PRODUCTS = [28, 34, 36, 38, 39, 40, 41, 42, 43, 35];
 
-const MEDIA_DIR = path.resolve(process.env.STORAGE_DIR ?? path.join(process.cwd(), "storage"), "media");
 const skipImages = process.argv.includes("--skip-images");
 
 function displayName(raw: string): string {
@@ -52,15 +52,13 @@ function pathOf(u: string) {
 }
 
 async function download(url: string, storagePath: string): Promise<boolean> {
-  const file = path.join(MEDIA_DIR, storagePath);
-  if (await access(file).then(() => true, () => false)) return true;
+  if ((await fetch(publicMediaUrl(storagePath)!, { method: "HEAD" })).ok) return true;
   const res = await fetch(url);
   if (!res.ok) {
     console.warn(`  image ${url}: ${res.status}`);
     return false;
   }
-  await mkdir(path.dirname(file), { recursive: true });
-  await writeFile(file, Buffer.from(await res.arrayBuffer()));
+  await saveFile("media", storagePath, new Uint8Array(await res.arrayBuffer()));
   return true;
 }
 
