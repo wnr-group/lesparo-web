@@ -40,48 +40,6 @@
     radial-gradient(70% 60% at 18% 0%, var(--sp-key), transparent 70%),
     radial-gradient(85% 75% at 52% 46%, var(--sp-1) 0%, var(--sp-2) 55%, var(--sp-3) 100%);
 }
-/* Worn: a fan of three on-model photographs, bottom left. Cards straighten and lift on hover. */
-.sp-fan > li {
-  transition:
-    rotate 0.5s var(--ease-out-soft),
-    translate 0.5s var(--ease-out-soft);
-}
-.sp-fan > li:nth-child(1) {
-  rotate: -7deg;
-  translate: 0 0.4rem;
-}
-.sp-fan > li:nth-child(2) {
-  rotate: -1deg;
-  z-index: 1;
-}
-.sp-fan > li:nth-child(3) {
-  rotate: 6deg;
-  translate: 0 0.5rem;
-}
-@media (hover: hover) {
-  .sp-fan > li:hover {
-    rotate: 0deg;
-    translate: 0 -0.6rem;
-    z-index: 2;
-  }
-}
-@keyframes sp-fan-in {
-  from {
-    opacity: 0;
-    translate: 0 1.5rem;
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .sp-fan > li {
-    animation: sp-fan-in 0.7s var(--ease-out-soft) both;
-  }
-  .sp-fan > li:nth-child(2) {
-    animation-delay: 80ms;
-  }
-  .sp-fan > li:nth-child(3) {
-    animation-delay: 160ms;
-  }
-}
 /* The key light behind the product: a soft pool of light, no ring. */
 .sp-halo {
   position: absolute;

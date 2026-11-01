@@ -3,7 +3,6 @@
 import { ChevronRight, Minus, Plus, X } from "lucide-react";
 import { PointerDepth } from "@/components/site/pointer-fx";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./spotlight.css";
@@ -131,34 +130,6 @@ const DETAILS: Record<string, string> = {
   "Cream hem": "A cream band at the hem finishes the bottom edge.",
 };
 const SPIN_KEYS = ["Front", "Right", "Back", "Left"];
-
-/** On-model photographs from the studio shoot (public/looks, public/collections), three per product, fanned bottom left. */
-const WORN: Record<string, { href: string; photos: { src: string; alt: string; pos?: string }[] }> = {
-  tee: {
-    href: "/collections/gents",
-    photos: [
-      { src: "/collections/range.jpg", alt: "The brown textured polo with cream trim, worn with cream trousers", pos: "50% 25%" },
-      { src: "/looks/back-polo.jpg", alt: "The polo from the back, showing the woven texture" },
-      { src: "/collections/garments.jpg", alt: "The polo styled with a scarf at the waist", pos: "50% 25%" },
-    ],
-  },
-  pants: {
-    href: "/collections/gents-tracks",
-    photos: [
-      { src: "/looks/cargo-pants.jpg", alt: "Brown cargo track pants from the front" },
-      { src: "/looks/beige-tee.jpg", alt: "Cargo track pants worn with a beige tee", pos: "50% 30%" },
-      { src: "/looks/pants-side.jpg", alt: "Cargo track pants from the side, showing the pocket" },
-    ],
-  },
-  look: {
-    href: "/shop",
-    photos: [
-      { src: "/looks/crossbody-tee.jpg", alt: "A tee with a crossbody bag and black track pants", pos: "50% 25%" },
-      { src: "/looks/training.jpg", alt: "A sage tee and black track pants in training", pos: "50% 25%" },
-      { src: "/looks/tee-knee.jpg", alt: "A textured grey tee", pos: "50% 25%" },
-    ],
-  },
-};
 
 /** Frames with a transparent background (.webp or .png) float on the stage; anything else is shown as a photograph. */
 const isCut = (src: string) => /\.(webp|png)$/i.test(src);
@@ -437,22 +408,6 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
           </Link>
         </div>
       </div>
-
-      {/* Worn: the product on the model, three small photographs fanned in the bottom-left corner. Desktop only. */}
-      {WORN[product.id] && (
-        <div className="sp-copy absolute bottom-8 left-8 z-20 hidden lg:block xl:left-12">
-          <p className="text-[0.64rem] font-semibold uppercase tracking-[0.2em] text-[rgb(var(--sp-fg)/0.6)]">On the model</p>
-          <ul key={product.id} className="sp-fan mt-3 flex">
-            {WORN[product.id].photos.map((ph, i) => (
-              <li key={ph.src} className={`relative ${i ? "-ml-5" : ""}`}>
-                <Link href={WORN[product.id].href} className="relative block aspect-[3/4] w-[4.75rem] overflow-hidden rounded-lg shadow-[0_14px_24px_-12px_rgb(0_0_0/0.55)] ring-1 ring-[rgb(var(--sp-fg)/0.7)] xl:w-[5.5rem]">
-                  <Image src={ph.src} alt={ph.alt} fill sizes="88px" className="object-cover" style={{ objectPosition: ph.pos ?? "50% 40%" }} />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       {/* Take a closer look: shows the numbered points, the guided views and the detail card. */}
       <button
