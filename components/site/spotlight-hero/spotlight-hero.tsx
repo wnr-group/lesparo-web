@@ -139,6 +139,41 @@ const THEME: Record<string, { stage: string; word: string }> = {
   look: { stage: "indigo", word: "Look" },
 };
 
+/**
+ * Art directions for the canvas (./spotlight.css). ART is the live choice; "worlds" uses each product's own colour
+ * (THEME). While the team compares them, a small picker shows outside production builds, or anywhere with ?art= in
+ * the address, and the pick is remembered.
+ */
+const ART = "split";
+const ARTS: { id: string; label: string; swatch: string }[] = [
+  { id: "split", label: "Split", swatch: "linear-gradient(120deg,#12164c 0 46%,#fff 46% 50%,#ffc82c 50% 54%,#b0603f 54%)" },
+  { id: "aurora", label: "Aurora", swatch: "radial-gradient(circle at 70% 70%,#3a46c8,transparent 60%),radial-gradient(circle at 80% 20%,#7cc4ff,transparent 55%),#fff" },
+  { id: "prism", label: "Prism", swatch: "radial-gradient(circle at 60% 60%,#2f5bff,transparent 60%),radial-gradient(circle at 85% 20%,#7a3cff,transparent 55%),#04061a" },
+  { id: "modernist", label: "Modernist", swatch: "linear-gradient(135deg,#7cc4ff 0 33%,#262e86 33% 66%,#ffc82c 66%)" },
+  { id: "worlds", label: "Colour worlds", swatch: "linear-gradient(135deg,#b0603f 0 33%,#84926c 33% 66%,#2a3390 66%)" },
+];
+
+function ArtPicker({ art, onChange }: { art: string; onChange: (id: string) => void }) {
+  return (
+    <div role="radiogroup" aria-label="Banner art (trial)" className="absolute left-1/2 top-3 z-40 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/45 p-1.5 pl-3 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white/80 ring-1 ring-white/15 backdrop-blur-md lg:top-10">
+      <span className="mr-1 hidden sm:inline">Art</span>
+      {ARTS.map((a) => (
+        <button
+          key={a.id}
+          type="button"
+          role="radio"
+          aria-checked={art === a.id}
+          aria-label={a.label}
+          title={a.label}
+          onClick={() => onChange(a.id)}
+          className={`size-6 rounded-full ring-1 ring-white/30 transition-transform duration-200 hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun ${art === a.id ? "scale-110 outline-2 outline-offset-2 outline-white" : ""}`}
+          style={{ background: a.swatch }}
+        />
+      ))}
+    </div>
+  );
+}
+
 /** On-model photographs from the studio shoot (public/looks, public/collections), three per product, fanned bottom left. */
 const WORN: Record<string, { href: string; photos: { src: string; alt: string; pos?: string }[] }> = {
   tee: {
@@ -205,6 +240,27 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
     setClassic(new URLSearchParams(window.location.search).get("viewer") === "classic");
   }, []);
   const Viewer = classic ? GarmentClassic : Garment3D;
+
+  const [art, setArt] = useState(ART);
+  const [picker, setPicker] = useState(false);
+  useEffect(() => {
+    // Read in the browser after hydration, like ?viewer above.
+    const asked = new URLSearchParams(window.location.search).get("art");
+    let saved: string | null = null;
+    try {
+      saved = window.localStorage.getItem("lesparo-art");
+    } catch {}
+    const pick = [asked, saved].find((a) => a && ARTS.some((x) => x.id === a));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (pick) setArt(pick);
+    setPicker(process.env.NODE_ENV !== "production" || asked !== null);
+  }, []);
+  const chooseArt = (id: string) => {
+    setArt(id);
+    try {
+      window.localStorage.setItem("lesparo-art", id);
+    } catch {}
+  };
 
 
   const [pi, setPi] = useState(0);
@@ -414,15 +470,24 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const keyFrames = product.spin ? [0, 1, 2, 3].map((k) => Math.round((k * n) / 4)) : product.frames.map((_, i) => i);
 
   return (
-    <section aria-labelledby="hero-heading" data-stage={THEME[product.id]?.stage} className="sp-stage relative isolate flex flex-col overflow-hidden text-[rgb(var(--sp-fg))] lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
+    <section aria-labelledby="hero-heading" data-stage={art === "worlds" ? THEME[product.id]?.stage : art} data-product={product.id} className="sp-stage relative isolate flex flex-col overflow-hidden text-[rgb(var(--sp-fg))] lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
       {/* The stage: a soft halo of light behind the product and a floor. */}
       <PointerDepth />
+      <div aria-hidden className="sp-art">
+        <i />
+        <i />
+        <i />
+        <i />
+        <i />
+        <i />
+      </div>
       <div aria-hidden className="sp-halo" />
       {/* The product's name, huge and tone-on-tone behind it; keyed so it slides in again on each switch. */}
       <p key={product.id} aria-hidden className="sp-bigword">
         {THEME[product.id]?.word}
       </p>
       <div aria-hidden className="sp-floor" />
+      {picker && <ArtPicker art={art} onChange={chooseArt} />}
 
       <div className="sp-leave-text contents lg:absolute lg:left-8 lg:top-10 lg:z-20 lg:flex lg:max-w-[15rem] lg:flex-col xl:left-12 xl:max-w-[25rem]">
         {/* Text column, top left: a small label, a two-weight title, then the description and actions. */}
