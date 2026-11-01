@@ -90,7 +90,7 @@ export default function ContactPage() {
           </div>
         </div>
 
-        <div data-reveal="up" className="mt-14 flex flex-col items-start justify-between gap-5 bg-[#f2f3f5] p-6 sm:flex-row sm:items-center sm:p-8">
+        <div data-reveal="up" className="mt-14 flex flex-col items-start justify-between gap-5 bg-mist p-6 sm:flex-row sm:items-center sm:p-8">
           <p className="max-w-xl text-ink-soft">For bulk orders and quotations, the wholesale enquiry form reaches our sales team directly and gives you a reference number.</p>
           <ButtonLink href="/wholesale#enquire">Send a wholesale enquiry</ButtonLink>
         </div>

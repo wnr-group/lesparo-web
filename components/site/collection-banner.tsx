@@ -50,13 +50,13 @@ export function CollectionBanner({ slug, products, video, clip, children }: { sl
   const own = !video && !cover && !hasPhoto(slug) && products && products.length > 0 ? products.slice(0, 3) : null;
   return (
     <section className="mx-auto max-w-page px-4 pt-6 sm:px-6 lg:px-10 lg:pt-8">
-      <div className={`relative isolate grid overflow-clip rounded-[1.6rem] bg-[#22231f] text-white lg:min-h-[26rem] ${video || cover ? "" : "lg:grid-cols-[1fr_1.1fr]"}`}>
+      <div className={`relative isolate grid overflow-clip rounded-[1.6rem] bg-night text-white lg:min-h-[26rem] ${video || cover ? "" : "lg:grid-cols-[1fr_1.1fr]"}`}>
         {/* Artwork banners cover the whole panel; a soft gradient keeps the title readable over any crop. */}
         {cover && (
           <>
             {/* unoptimized: the artwork is already HD, and the image optimiser would re-encode it at 1920px and quality 75, which visibly softens it. */}
             <Image src={cover.src} alt="" fill priority unoptimized sizes="100vw" className="-z-10 object-cover" style={{ objectPosition: cover.pos }} />
-            <span aria-hidden className="absolute inset-0 -z-[5] bg-gradient-to-r from-[#22231f]/80 via-[#22231f]/25 to-transparent" />
+            <span aria-hidden className="absolute inset-0 -z-[5] bg-gradient-to-r from-night/80 via-night/25 to-transparent" />
           </>
         )}
         {/* A promo film covers the whole banner; a gradient keeps the text on the left readable. Reduced motion keeps the photograph. */}
@@ -68,12 +68,12 @@ export function CollectionBanner({ slug, products, video, clip, children }: { sl
             ) : (
               <video src={video} poster={photo.src} autoPlay muted loop playsInline preload="metadata" aria-hidden className="absolute inset-0 -z-10 size-full object-cover motion-reduce:hidden" />
             )}
-            <span aria-hidden className="absolute inset-0 -z-[5] bg-gradient-to-r from-[#22231f]/90 via-[#22231f]/45 to-transparent" />
+            <span aria-hidden className="absolute inset-0 -z-[5] bg-gradient-to-r from-night/90 via-night/45 to-transparent" />
           </>
         )}
         <div className="relative z-10 flex flex-col justify-center px-6 py-10 sm:px-12 lg:px-16 lg:py-14">{children}</div>
         {video || cover ? null : own ? (
-          <div className="relative flex min-h-64 items-end justify-center gap-2 overflow-clip bg-[#f2f3f5] px-4 pt-8 sm:gap-4 lg:min-h-0 lg:px-8">
+          <div className="relative flex min-h-64 items-end justify-center gap-2 overflow-clip bg-mist px-4 pt-8 sm:gap-4 lg:min-h-0 lg:px-8">
             {own.map((p, i) => (
               <div key={p.src} className={`relative h-[16rem] min-w-0 flex-1 sm:h-[20rem] lg:h-[24rem] ${i === 1 ? "lg:h-[26rem]" : ""}`}>
                 <Image src={p.src} alt={p.alt} fill priority={i === 0} sizes="(min-width:1024px) 18vw, 30vw" className="cutout object-contain object-bottom" />
@@ -84,7 +84,7 @@ export function CollectionBanner({ slug, products, video, clip, children }: { sl
           <div className="relative min-h-64 overflow-clip lg:min-h-0">
             <Image src={photo.src} alt="" fill priority sizes="(min-width:1024px) 55vw, 100vw" className="scrub-parallax object-cover" style={{ objectPosition: photo.pos }} />
             {/* Fades the photograph into the text panel so there is no hard seam. */}
-            <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-[#22231f] via-transparent to-transparent lg:bg-gradient-to-r" />
+            <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-night via-transparent to-transparent lg:bg-gradient-to-r" />
           </div>
         )}
       </div>

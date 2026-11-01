@@ -11,14 +11,14 @@ export function TopCollections({ items }: { items: PhotoTile[] }) {
   return (
     <section aria-labelledby="top-collections" className="pt-12 lg:pt-16">
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
-        <h2 id="top-collections" className="text-center font-display text-[clamp(1.8rem,1.2rem+2vw,2.8rem)] font-extrabold uppercase tracking-tight text-ink">
+        <h2 id="top-collections" className="text-center font-sport text-[clamp(1.8rem,1.2rem+2vw,2.8rem)] font-extrabold uppercase italic tracking-tight text-ink">
           <SplitWords>Explore the range</SplitWords>
         </h2>
         <ul className="mt-8 flex gap-5 overflow-x-auto pb-2 [scrollbar-width:none] sm:justify-center lg:gap-9 [&::-webkit-scrollbar]:hidden">
           {items.map((c) => (
             <li key={c.name} className="shrink-0">
               <Link href={c.href} className="group flex w-24 flex-col items-center gap-3 sm:w-32 lg:w-36">
-                <span className="relative size-24 overflow-hidden rounded-full bg-[#22231f] ring-1 ring-line transition-[box-shadow,transform] duration-500 ease-[var(--ease-out-soft)] group-hover:-translate-y-1 group-hover:ring-2 group-hover:ring-ink sm:size-32 lg:size-36">
+                <span className="relative size-24 overflow-hidden rounded-full bg-night ring-1 ring-line transition-[box-shadow,transform] duration-500 ease-[var(--ease-out-soft)] group-hover:-translate-y-1 group-hover:ring-2 group-hover:ring-ink sm:size-32 lg:size-36">
                   <Image src={c.src} alt="" fill sizes="144px" className="object-cover transition-transform duration-700 group-hover:scale-110" style={{ objectPosition: c.pos }} />
                 </span>
                 <span className="text-center text-[0.82rem] font-semibold leading-tight text-ink sm:text-sm">{c.name}</span>
@@ -40,11 +40,11 @@ export function ShopByRange({ items }: { items: PhotoTile[] }) {
         <ul className="grid grid-cols-2 gap-3 lg:h-[min(46rem,82vh)] lg:grid-cols-4 lg:grid-rows-2 lg:gap-4">
           {items.slice(0, 4).map((c, i) => (
             <li key={c.name} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }} className={layout[i]}>
-              <Link href={c.href} className={`group relative block h-full w-full overflow-clip bg-[#22231f] text-white ${i === 0 ? "scrub-mask" : ""}`}>
+              <Link href={c.href} className={`group relative block h-full w-full overflow-clip bg-night text-white ${i === 0 ? "scrub-mask" : ""}`}>
                 <Image src={c.src} alt="" fill sizes="(min-width:1024px) 50vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: c.pos }} />
                 <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent transition-opacity duration-500 group-hover:from-black/85" />
                 <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:-translate-y-1.5 sm:p-6">
-                  <span className="font-display text-[clamp(1.4rem,0.8rem+2vw,2.8rem)] font-extrabold uppercase leading-none tracking-tight">{c.name}</span>
+                  <span className="font-sport text-[clamp(1.4rem,0.8rem+2vw,2.8rem)] font-extrabold uppercase italic leading-none tracking-tight">{c.name}</span>
                   <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-ink transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:rotate-45 sm:size-12">
                     <ArrowUpRight className="size-5" aria-hidden />
                   </span>
@@ -62,12 +62,12 @@ export function ShopByRange({ items }: { items: PhotoTile[] }) {
 export function NewLaunches({ products }: { products: Product[] }) {
   if (!products.length) return null;
   return (
-    <section aria-labelledby="new-launches" className="bg-[#f2f3f5] py-12 lg:py-16">
+    <section aria-labelledby="new-launches" className="bg-mist py-12 lg:py-16">
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <span className="rotate-[-8deg] rounded-md bg-ink px-3 py-1.5 text-[0.7rem] font-extrabold uppercase leading-tight tracking-wider text-white shadow-md">New arrival</span>
-            <h2 id="new-launches" className="font-display text-[clamp(1.8rem,1.2rem+2.4vw,3.2rem)] font-extrabold uppercase tracking-tight text-ink">
+            <span className="rotate-[-6deg] rounded-md bg-sun px-3 py-1.5 font-sport text-[0.72rem] font-extrabold uppercase italic leading-tight tracking-wider text-ink shadow-[var(--shadow-card)]">New arrival</span>
+            <h2 id="new-launches" className="font-sport text-[clamp(1.8rem,1.2rem+2.4vw,3.2rem)] font-extrabold uppercase italic tracking-tight text-ink">
               <SplitWords>Our new launches</SplitWords>
             </h2>
           </div>

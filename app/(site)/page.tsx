@@ -12,6 +12,7 @@ import { BuyerFaq, DetailPanels, StudioLooks } from "@/components/site/more-sect
 import { ButtonLink } from "@/components/ui/button";
 import { Container, SectionHeading } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
+import { deptClass } from "@/lib/departments";
 import { getCategoryBySlug, getCategoryTree, getHomepageContent, listProducts, type CategoryNode } from "@/lib/catalogue/queries";
 
 const STEPS = [
@@ -24,7 +25,7 @@ const STEPS = [
 function CategoryTile({ category, square, sizes }: { category: CategoryNode; square?: boolean; sizes: string }) {
   return (
     <Link href={`/collections/${category.slug}`} className="group flex h-full flex-col">
-      <div className={`relative overflow-hidden rounded-2xl bg-mist transition-colors duration-500 group-hover:bg-[#e8eaf2] ${square ? "aspect-square" : "aspect-[4/5]"}`}>
+      <div className={`relative overflow-hidden rounded-2xl bg-mist transition-colors duration-500 group-hover:bg-linen ${square ? "aspect-square" : "aspect-[4/5]"}`}>
         {category.coverUrl && (
           <Image
             src={category.coverUrl}
@@ -37,7 +38,10 @@ function CategoryTile({ category, square, sizes }: { category: CategoryNode; squ
       </div>
       <div className="flex flex-1 items-center justify-between gap-3 px-0.5 pt-4">
         <div className="min-w-0">
-          <h3 className="font-display text-xl font-bold tracking-tight transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:translate-x-1 group-focus-visible:translate-x-1 group-active:translate-x-1 sm:text-2xl">{category.name}</h3>
+          <h3 className="flex items-center gap-2 font-display text-xl font-bold tracking-tight transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:translate-x-1 group-focus-visible:translate-x-1 group-active:translate-x-1 sm:text-2xl">
+            <span aria-hidden className={`${deptClass(category.slug) ?? ""} size-2 shrink-0 rounded-full bg-[var(--dept,var(--color-sun))]`} />
+            {category.name}
+          </h3>
           <p className="mt-0.5 truncate text-sm text-muted">{category.children.map((g) => g.name).join(" · ") || "View range"}</p>
         </div>
         <span className="hidden size-10 shrink-0 items-center justify-center rounded-full bg-paper ring-1 ring-line transition-colors duration-300 group-hover:bg-indigo group-hover:text-white group-hover:ring-indigo sm:flex">
@@ -94,6 +98,30 @@ export default async function HomePage() {
         </>
       )}
 
+      {/* ------------------------------------------------------------- fabrics */}
+      {sections.fabrics && fabrics && (
+        <section className="relative isolate overflow-hidden py-20 lg:py-28">
+          {/* Oversized outline type drifts sideways behind the tiles as the section scrolls past. */}
+          <p
+            aria-hidden
+            className="ghost-drift pointer-events-none absolute bottom-[8%] left-0 -z-10 select-none whitespace-nowrap font-display text-[clamp(6rem,4rem+12vw,15rem)] font-bold leading-none tracking-[-0.05em] text-transparent [-webkit-text-stroke:1.5px_var(--color-sand)]"
+          >
+            {fabrics.children.map((c) => c.name).join(" · ")}
+          </p>
+          <Container>
+            <SectionHeading eyebrow={fabrics.name} title="Lungi, kavi, towel and kerchief" intro="Woven fabric lines from the family’s original trade, continued under LESPARO." />
+            <ul className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
+              {fabrics.children.map((c, i) => (
+                <li key={c.id} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }}>
+                  <CategoryTile category={c} square sizes="(min-width:768px) 22vw, 45vw" />
+                </li>
+              ))}
+            </ul>
+          </Container>
+        </section>
+      )}
+
+
       {/* ------------------------------------------------------- campaign film: Move Freely */}
       <BrandFilm open src="/videos/active-life.mp4" title="LESPARO: Move freely" />
 
@@ -142,34 +170,11 @@ export default async function HomePage() {
               </div>
 
               {/* One calm panel: the range standing together. */}
-              <div data-reveal="clip" className="relative min-h-[26rem] overflow-hidden rounded-[2rem] bg-[#22231f] lg:col-span-5 lg:min-h-[34rem]">
+              <div data-reveal="clip" className="relative min-h-[26rem] overflow-hidden rounded-[2rem] bg-night lg:col-span-5 lg:min-h-[34rem]">
                 <p className="absolute left-6 top-6 z-10 rounded-full bg-white px-4 py-2 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-indigo shadow-sm">Abija Exports · Erode</p>
                 <Image src="/collections/kavi.jpg" alt="A LESPARO polo in brown knit" fill sizes="(min-width:1024px) 40vw, 100vw" className="object-cover" style={{ objectPosition: "50% 30%" }} />
               </div>
             </div>
-          </Container>
-        </section>
-      )}
-
-      {/* ------------------------------------------------------------- fabrics */}
-      {sections.fabrics && fabrics && (
-        <section className="relative isolate overflow-hidden py-20 lg:py-28">
-          {/* Oversized outline type drifts sideways behind the tiles as the section scrolls past. */}
-          <p
-            aria-hidden
-            className="ghost-drift pointer-events-none absolute bottom-[8%] left-0 -z-10 select-none whitespace-nowrap font-display text-[clamp(6rem,4rem+12vw,15rem)] font-bold leading-none tracking-[-0.05em] text-transparent [-webkit-text-stroke:1.5px_var(--color-sand)]"
-          >
-            {fabrics.children.map((c) => c.name).join(" · ")}
-          </p>
-          <Container>
-            <SectionHeading eyebrow={fabrics.name} title="Lungi, kavi, towel and kerchief" intro="Woven fabric lines from the family’s original trade, continued under LESPARO." />
-            <ul className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
-              {fabrics.children.map((c, i) => (
-                <li key={c.id} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }}>
-                  <CategoryTile category={c} square sizes="(min-width:768px) 22vw, 45vw" />
-                </li>
-              ))}
-            </ul>
           </Container>
         </section>
       )}

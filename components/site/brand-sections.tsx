@@ -11,7 +11,7 @@ export function BrandStatement() {
   const points = ["Gents and kids wear", "Woven fabrics from the family trade", "Made in Erode, supplied across three states"];
   return (
     <section aria-labelledby="brand-line" className="mx-auto max-w-page px-4 py-6 sm:px-6 lg:px-10">
-      <div className="grid overflow-clip rounded-[1.6rem] bg-[#f2f3f5] lg:min-h-[32rem] lg:grid-cols-[1.15fr_0.85fr]">
+      <div className="grid overflow-clip rounded-[1.6rem] bg-mist lg:min-h-[32rem] lg:grid-cols-[1.15fr_0.85fr]">
         <div className="flex flex-col justify-center px-6 py-12 sm:px-12 lg:px-16 lg:py-16">
           <p className="eyebrow">The LESPARO promise</p>
           <h2 id="brand-line" className="mt-5 font-display text-[clamp(2.4rem,1.2rem+4.6vw,5.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight">
@@ -49,7 +49,7 @@ export function BrandStory() {
   return (
     <section aria-labelledby="brand-story" className="py-16 lg:py-24">
       <div className="mx-auto grid max-w-page items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20 lg:px-10">
-        <div data-reveal="clip" className="group relative aspect-[4/5] lg:sticky lg:top-32 lg:self-start overflow-clip rounded-[1.6rem] bg-[#22231f]">
+        <div data-reveal="clip" className="group relative aspect-[4/5] lg:sticky lg:top-32 lg:self-start overflow-clip rounded-[1.6rem] bg-night">
           <Image src="/collections/range.jpg" alt="A LESPARO polo in brown knit, worn in the studio" fill sizes="(min-width:1024px) 42vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: "50% 30%" }} />
         </div>
         <div>

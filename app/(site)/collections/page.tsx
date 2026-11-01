@@ -52,7 +52,7 @@ export default async function CollectionsPage() {
               {top.children.map((c) => (
                 <li key={c.id}>
                   <Link href={`/collections/${c.slug}`} className="group block">
-                    <div className="relative aspect-[4/5] overflow-hidden rounded-[1.4rem] bg-mist transition-colors duration-500 group-hover:bg-[#e8eaf2]">
+                    <div className="relative aspect-[4/5] overflow-hidden rounded-[1.4rem] bg-mist transition-colors duration-500 group-hover:bg-linen">
                       {c.coverUrl && <Image src={c.coverUrl} alt="" fill sizes="(min-width:768px) 22vw, 45vw" className="cutout object-contain p-[8%] transition-transform duration-700 group-hover:scale-[1.05]" />}
                     </div>
                     <h3 className="mt-4 font-display text-xl font-bold">{c.name}</h3>
