@@ -38,7 +38,7 @@ export default async function OrdersPage(props: PageProps<"/admin/orders">) {
             ))}
           </select>
         </div>
-        <button type="submit" className="h-9 bg-ink px-4 text-sm text-paper">
+        <button type="submit" className="h-9 rounded-full bg-ink px-5 text-sm text-paper transition-colors hover:bg-indigo">
           Filter
         </button>
       </form>

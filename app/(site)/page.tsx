@@ -7,7 +7,7 @@ import { BrandFilm } from "@/components/site/brand-film";
 import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
 import { CIRCLE_TILES, RANGE_TILES } from "@/components/site/home-photos";
 import { NewLaunches, ShopByRange, TopCollections } from "@/components/site/home-sections";
-import { BrandStatement, BrandStory, FollowStrip } from "@/components/site/brand-sections";
+import { BrandStatement, BrandStory } from "@/components/site/brand-sections";
 import { BuyerFaq, DetailPanels, StudioLooks } from "@/components/site/more-sections";
 import { ButtonLink } from "@/components/ui/button";
 import { Container, SectionHeading } from "@/components/ui/primitives";
@@ -176,7 +176,6 @@ export default async function HomePage() {
 
       <StudioLooks />
 
-      <FollowStrip />
 
       <BuyerFaq />
 

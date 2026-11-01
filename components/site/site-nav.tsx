@@ -48,7 +48,7 @@ function DesktopMenu({ group, pathname }: { group: NavGroup; pathname: string })
   return (
     <li
       ref={ref}
-      className="relative"
+      className="flex h-full items-center"
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       onKeyDown={(e) => {
@@ -174,8 +174,8 @@ export function SiteNav({ groups }: Props) {
 
   return (
     <>
-      <nav aria-label="Main" className="hidden lg:block">
-        <ul className="flex items-center gap-1">
+      <nav aria-label="Main" className="hidden self-stretch lg:block">
+        <ul className="flex h-full items-center gap-1">
           <li>
             <Link
               href="/shop"

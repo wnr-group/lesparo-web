@@ -1,12 +1,12 @@
+import { ArrowRight, Check, ChevronRight, Plus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { RetailPurchase } from "@/components/site/cart";
 import { AddToEnquiryButton } from "@/components/site/enquiry-list";
-import { ProductCard } from "@/components/site/product-card";
 import { ProductGallery } from "@/components/site/product-gallery";
-import { ButtonLink } from "@/components/ui/button";
+import { RelatedProduct } from "@/components/site/product-related";
 import { Container } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
 import { formatPrice } from "@/lib/format";
@@ -28,6 +28,18 @@ export async function generateMetadata(props: PageProps<"/products/[slug]">): Pr
     alternates: { canonical: `/products/${slug}` },
     openGraph: { title: p.name, description, images: p.images[0] ? [{ url: p.images[0].url, width: 513, height: 655 }] : [] },
   };
+}
+
+function Disclosure({ title, children, open }: { title: string; children: React.ReactNode; open?: boolean }) {
+  return (
+    <details open={open} className="acc group border-b border-line">
+      <summary className="flex cursor-pointer list-none items-center justify-between py-4 text-[0.8rem] font-semibold uppercase tracking-[0.14em] [&::-webkit-details-marker]:hidden">
+        {title}
+        <Plus className="size-4 text-muted transition-transform duration-300 group-open:rotate-45" aria-hidden />
+      </summary>
+      <div className="pb-6">{children}</div>
+    </details>
+  );
 }
 
 async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
@@ -61,131 +73,160 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-      <nav aria-label="Breadcrumb" className="text-sm text-muted">
-        <ol className="flex flex-wrap items-center gap-2">
+      <nav aria-label="Breadcrumb" className="text-[0.8rem] text-muted">
+        <ol className="flex flex-wrap items-center gap-1.5">
           <li>
             <Link href="/shop" className="link-draw">
               Shop
             </Link>
           </li>
           {p.category && (
-            <li className="flex items-center gap-2">
-              <span aria-hidden>/</span>
+            <li className="flex items-center gap-1.5">
+              <ChevronRight className="size-3.5" aria-hidden />
               <Link href={`/collections/${p.category.slug}`} className="link-draw">
                 {p.category.name}
               </Link>
             </li>
           )}
+          <li className="flex min-w-0 items-center gap-1.5">
+            <ChevronRight className="size-3.5 shrink-0" aria-hidden />
+            <span aria-current="page" className="truncate text-ink">
+              {p.name}
+            </span>
+          </li>
         </ol>
       </nav>
 
-      <div className="mt-6 grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
-        <ProductGallery images={p.images} name={p.name} productId={p.id} />
+      <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:gap-14 xl:gap-20">
+        <div className="min-w-0 lg:sticky lg:top-28 lg:self-start motion-safe:animate-[rise_0.8s_var(--ease-out-soft)_both]">
+          <ProductGallery images={p.images} name={p.name} productId={p.id} />
+        </div>
 
-        <div className="lg:sticky lg:top-28 lg:self-start">
-          {p.category && <p className="eyebrow">{p.category.name}</p>}
-          <h1 className="mt-3 font-display text-[clamp(1.9rem,1.2rem+2.4vw,3.2rem)] font-extrabold uppercase leading-[1.02] tracking-tight">{p.name}</h1>
-          {p.description && <p className="mt-5 leading-relaxed text-ink-soft">{p.description}</p>}
+        <div className="min-w-0 motion-safe:animate-[rise_0.8s_var(--ease-out-soft)_0.12s_both]">
+          {p.category && (
+            <Link href={`/collections/${p.category.slug}`} className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted transition-colors hover:text-indigo">
+              {p.category.name}
+            </Link>
+          )}
+          <h1 className="mt-3 font-display text-[clamp(1.9rem,1.3rem+2vw,2.9rem)] font-bold leading-[1.05] tracking-tight">{p.name}</h1>
+          {retail && (
+            <p className="mt-4 flex flex-wrap items-baseline gap-x-3">
+              <span className="font-display text-[1.7rem] font-semibold tabular-nums tracking-tight">{formatPrice(p.price!, p.currency)}</span>
+              <span className="text-xs text-muted">per piece · inclusive of listed taxes where applicable</span>
+            </p>
+          )}
+          {p.description && <p className="mt-5 max-w-prose leading-relaxed text-ink-soft">{p.description}</p>}
 
           {p.sizes.length > 0 && !retail && (
-            <div className="mt-8">
-              <p className="eyebrow !text-[0.65rem]">Available sizes</p>
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {p.sizes.map((s) => (
-                  <li key={s} className="flex h-10 min-w-12 items-center justify-center rounded-full border border-sand bg-[#f2f3f5] px-4 text-sm font-semibold">
-                    {s}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <p className="mt-6 text-sm">
+              <span className="text-muted">Available sizes</span>
+              <span className="ml-3 font-medium">{p.sizes.join(" · ")}</span>
+            </p>
           )}
 
           {retail && (
-            <section aria-labelledby="retail-heading" className="mt-8 rounded-[1.4rem] border-2 border-ink bg-white p-5 sm:p-6">
-              <div className="flex items-baseline justify-between gap-4">
-                <h2 id="retail-heading" className="eyebrow">
-                  Buy online · Retail
-                </h2>
-                <p className="font-display text-3xl font-extrabold tabular-nums tracking-tight">{formatPrice(p.price!, p.currency)}</p>
-              </div>
-              <p className="mt-1 text-xs text-muted">Retail price per piece, inclusive of listed taxes where applicable.</p>
-              <div className="mt-5">
-                <RetailPurchase product={{ id: p.id, slug: p.slug, name: p.name, image: p.images[0]?.url ?? null, price: p.price!, currency: p.currency, sizes: p.sizes }} />
-              </div>
-            </section>
+            <div className="mt-8 border-t border-line pt-7">
+              <RetailPurchase product={{ id: p.id, slug: p.slug, name: p.name, image: p.images[0]?.url ?? null, price: p.price!, currency: p.currency, sizes: p.sizes }} />
+            </div>
           )}
 
           {p.quoteEnabled && (
-            <section aria-labelledby="wholesale-heading" className="mt-4 rounded-[1.4rem] bg-[#f2f3f5] p-5 sm:p-6">
-              <h2 id="wholesale-heading" className="eyebrow">
-                Buying in bulk · Wholesale
+            <section aria-labelledby="wholesale-heading" className={retail ? "mt-8 border-t border-line pt-7" : "mt-8"} id={retail ? undefined : "buy"}>
+              <h2 id="wholesale-heading" className="text-[0.8rem] font-semibold uppercase tracking-[0.14em]">
+                Wholesale &amp; bulk
               </h2>
-              <p className="mt-2 text-sm text-ink-soft">Shops, showrooms and resellers: ask for bulk pricing, pack sizes and supply details. Wholesale rates are quoted, not listed.</p>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <ButtonLink href={`/wholesale?product=${p.slug}#enquire`} size="lg" className="h-12">
-                  Enquire now
-                </ButtonLink>
-                <AddToEnquiryButton product={{ id: p.id, slug: p.slug, name: p.name }} />
+              <p className="mt-2 max-w-prose text-sm leading-relaxed text-ink-soft">Shops, showrooms and resellers: ask for bulk pricing, pack sizes and supply details. Wholesale rates are quoted, not listed.</p>
+              <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+                <Link
+                  href={`/wholesale?product=${p.slug}#enquire`}
+                  className="group/e inline-flex h-12 items-center justify-center gap-2 rounded-md bg-ink px-5 text-[0.88rem] font-semibold text-white transition-colors duration-300 hover:bg-indigo"
+                >
+                  Enquire now <ArrowRight className="size-4 transition-transform duration-300 group-hover/e:translate-x-1" aria-hidden />
+                </Link>
+                <AddToEnquiryButton variant="flat" product={{ id: p.id, slug: p.slug, name: p.name }} />
               </div>
             </section>
           )}
-          <p className="mt-4 text-sm text-muted">
-            Prefer to talk? Call{" "}
-            <a href={BUSINESS.phone.href} className="underline">
-              {BUSINESS.phone.display}
-            </a>{" "}
-            or customer care{" "}
-            <a href={BUSINESS.customerCare.href} className="underline">
-              {BUSINESS.customerCare.display}
-            </a>
-            .
-          </p>
 
-          {specs.length > 0 && (
-            <dl className="mt-10 divide-y divide-line border-y border-line text-sm">
-              {specs.map((s) => (
-                <div key={s.label + s.value} className="grid grid-cols-[9rem_1fr] gap-4 py-3">
-                  <dt className="text-muted">{s.label}</dt>
-                  <dd>{s.value}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
-          {features.length > 0 && (
-            <ul className="mt-6 space-y-2 text-sm text-ink-soft">
-              {features.map((f) => (
-                <li key={f.value} className="flex gap-3">
-                  <span aria-hidden className="mt-2 size-1 shrink-0 rounded-full bg-brass" />
-                  {f.value}
-                </li>
-              ))}
-            </ul>
-          )}
+          <div className="mt-9 border-t border-line">
+            {specs.length > 0 && (
+              <Disclosure title="Product details" open>
+                <dl className="text-sm">
+                  {specs.map((s) => (
+                    <div key={s.label + s.value} className="grid grid-cols-[7.5rem_1fr] gap-4 py-2">
+                      <dt className="text-muted">{s.label}</dt>
+                      <dd>{s.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </Disclosure>
+            )}
+            {features.length > 0 && (
+              <Disclosure title="Features">
+                <ul className="space-y-2.5 text-sm text-ink-soft">
+                  {features.map((f) => (
+                    <li key={f.value} className="flex gap-3">
+                      <Check className="mt-0.5 size-4 shrink-0 text-indigo" aria-hidden />
+                      {f.value}
+                    </li>
+                  ))}
+                </ul>
+              </Disclosure>
+            )}
+            <Disclosure title="Questions?">
+              <p className="text-sm leading-relaxed text-ink-soft">
+                Call{" "}
+                <a href={BUSINESS.phone.href} className="font-medium text-ink underline underline-offset-4">
+                  {BUSINESS.phone.display}
+                </a>{" "}
+                or customer care{" "}
+                <a href={BUSINESS.customerCare.href} className="font-medium text-ink underline underline-offset-4">
+                  {BUSINESS.customerCare.display}
+                </a>
+                .
+              </p>
+            </Disclosure>
+          </div>
         </div>
       </div>
 
       {related.length > 0 && (
-        <section className="mt-24 rounded-[1.6rem] bg-[#f2f3f5] px-5 py-12 sm:px-8 lg:px-10" aria-labelledby="related">
-          <h2 id="related" className="font-display text-[clamp(1.6rem,1.1rem+2vw,2.6rem)] font-extrabold uppercase tracking-tight">
-            More from {p.category?.name}
-          </h2>
+        <section className="mt-24 border-t border-line pt-14" aria-labelledby="related">
+          <div className="flex items-end justify-between gap-6">
+            <h2 id="related" className="font-display text-[clamp(1.5rem,1.1rem+1.5vw,2.3rem)] font-bold tracking-tight">
+              More from {p.category?.name}
+            </h2>
+            {p.category && (
+              <Link href={`/collections/${p.category.slug}`} className="link-draw hidden text-sm font-medium sm:inline">
+                View all
+              </Link>
+            )}
+          </div>
           <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 md:gap-x-6">
-            {related.map((r) => (
-              <li key={r.id}>
-                <ProductCard product={r} />
+            {related.map((r, i) => (
+              <li key={r.id} data-reveal="up" style={{ ["--delay" as string]: `${(i % 4) * 90}ms` }}>
+                <RelatedProduct product={r} />
               </li>
             ))}
           </ul>
         </section>
       )}
+
+      {/* Phones: the buy panel sits below the gallery, so keep the call to action in reach. */}
+      <div className="fixed inset-x-0 bottom-0 z-20 flex items-center justify-between gap-4 border-t border-line bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
+        <span className="min-w-0 truncate text-sm font-semibold">{retail ? formatPrice(p.price!, p.currency) : p.name}</span>
+        <a href="#buy" className="inline-flex h-11 shrink-0 items-center rounded-md bg-ink px-6 text-sm font-semibold text-white">
+          {retail ? "Buy now" : "Enquire"}
+        </a>
+      </div>
     </>
   );
 }
 
 export default function ProductPage(props: PageProps<"/products/[slug]">) {
   return (
-    <Container className="py-10 lg:py-14">
-      <Suspense fallback={<div className="aspect-[513/655] max-w-xl animate-pulse bg-linen" />}>
+    <Container className="py-8 pb-24 lg:py-12 lg:pb-14">
+      <Suspense fallback={<div className="aspect-[4/5] max-w-xl animate-pulse bg-linen" />}>
         <ProductView params={props.params} />
       </Suspense>
     </Container>

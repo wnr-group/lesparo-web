@@ -26,6 +26,36 @@ function done() {
   refresh();
 }
 
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
+type PreparedImage = { bytes: Uint8Array; ext: string };
+
+const imageFiles = (fd: FormData) => fd.getAll("images").filter((f): f is File => f instanceof File && f.size > 0);
+
+/** Checks every file (count, size, real file type) before anything is written, so a bad file never leaves a half-saved product. */
+async function prepareImages(files: File[]): Promise<{ error: string } | { images: PreparedImage[] }> {
+  if (files.length > 12) return { error: "Upload up to 12 images at a time." };
+  const images: PreparedImage[] = [];
+  for (const file of files) {
+    if (file.size > MAX_IMAGE_BYTES) return { error: `${file.name} is larger than 10 MB.` };
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const type = sniffFileType(bytes);
+    if (!type || type.mime === "application/pdf") return { error: `${file.name} is not a JPG, PNG or WebP image.` };
+    images.push({ bytes, ext: type.ext });
+  }
+  return { images };
+}
+
+async function attachImages(productId: string, slug: string, name: string, images: PreparedImage[], firstOrder: number, hasPrimary: boolean) {
+  let order = firstOrder;
+  for (const img of images) {
+    const path = `products/${slug}/${randomUUID()}.${img.ext}`;
+    await saveFile("media", path, img.bytes);
+    await prisma.productImage.create({ data: { product_id: productId, storage_path: path, alt_text: name, display_order: order++, is_primary: !hasPrimary } });
+    hasPrimary = true;
+  }
+}
+
 export async function saveProduct(id: string | null, _prev: ActionState, fd: FormData): Promise<ActionState> {
   let newId: string | null = null;
   try {
@@ -39,6 +69,13 @@ export async function saveProduct(id: string | null, _prev: ActionState, fd: For
     const parsed = productSchema.safeParse({ ...Object.fromEntries(fd.entries()), specs: z.array(specSchema).safeParse(specs).success ? specs : [] });
     if (!parsed.success) return { error: "Please check the highlighted fields.", fields: fieldErrors(parsed.error) };
     const p = parsed.data;
+    // New products can come with their photos; they are checked first so a bad file cannot leave a half-saved product behind.
+    let prepared: PreparedImage[] = [];
+    if (!id) {
+      const result = await prepareImages(imageFiles(fd));
+      if ("error" in result) return { error: result.error };
+      prepared = result.images;
+    }
     const row = {
       name: p.name,
       slug: p.slug,
@@ -61,6 +98,7 @@ export async function saveProduct(id: string | null, _prev: ActionState, fd: For
       await prisma.product.update({ where: { id: z.uuid().parse(id) }, data: row });
     } else {
       newId = (await prisma.product.create({ data: row, select: { id: true } })).id;
+      await attachImages(newId, p.slug, p.name, prepared, 0, false);
     }
     done();
   } catch (err) {
@@ -84,33 +122,18 @@ export async function setArchived(id: string, archived: boolean): Promise<Action
   }
 }
 
-const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
-
 export async function uploadImages(productId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
   try {
     await requireAdmin();
     const pid = z.uuid().parse(productId);
-    const files = fd.getAll("images").filter((f): f is File => f instanceof File && f.size > 0);
+    const files = imageFiles(fd);
     if (!files.length) return { error: "Choose at least one image." };
-    if (files.length > 12) return { error: "Upload up to 12 images at a time." };
+    const prepared = await prepareImages(files);
+    if ("error" in prepared) return { error: prepared.error };
 
     const product = await prisma.product.findUnique({ where: { id: pid }, select: { slug: true, name: true, images: { select: { display_order: true, is_primary: true } } } });
     if (!product) return { error: "Product not found." };
-    let order = Math.max(-1, ...product.images.map((i) => i.display_order)) + 1;
-    let hasPrimary = product.images.some((i) => i.is_primary);
-
-    for (const file of files) {
-      if (file.size > MAX_IMAGE_BYTES) return { error: `${file.name} is larger than 10 MB.` };
-      const bytes = new Uint8Array(await file.arrayBuffer());
-      const type = sniffFileType(bytes);
-      if (!type || type.mime === "application/pdf") return { error: `${file.name} is not a JPG, PNG or WebP image.` };
-      const path = `products/${product.slug}/${randomUUID()}.${type.ext}`;
-      await saveFile("media", path, bytes);
-      await prisma.productImage.create({
-        data: { product_id: pid, storage_path: path, alt_text: product.name, display_order: order++, is_primary: !hasPrimary },
-      });
-      hasPrimary = true;
-    }
+    await attachImages(pid, product.slug, product.name, prepared.images, Math.max(-1, ...product.images.map((i) => i.display_order)) + 1, product.images.some((i) => i.is_primary));
     done();
     return { ok: true };
   } catch (err) {

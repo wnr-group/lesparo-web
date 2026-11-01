@@ -20,7 +20,7 @@ export default async function AdminProductsPage(props: PageProps<"/admin/product
   const db = await requestDb();
   const categories = await db.category.findMany({ select: { id: true, name: true, parent_id: true }, orderBy: { display_order: "asc" } });
   const where: Prisma.ProductWhereInput = {
-    ...(q && { OR: [{ name: { contains: q } }, { slug: { contains: q } }, { sku: { contains: q } }, { fabric: { contains: q } }] }),
+    ...(q && { OR: [{ name: { contains: q, mode: "insensitive" as const } }, { slug: { contains: q, mode: "insensitive" as const } }, { sku: { contains: q, mode: "insensitive" as const } }, { fabric: { contains: q, mode: "insensitive" as const } }] }),
     ...(status === "published"
       ? { is_published: true, archived_at: null }
       : status === "draft"
@@ -98,7 +98,7 @@ export default async function AdminProductsPage(props: PageProps<"/admin/product
             ))}
           </select>
         </div>
-        <button type="submit" className="h-9 bg-ink px-4 text-sm text-paper">
+        <button type="submit" className="h-9 rounded-full bg-ink px-5 text-sm text-paper transition-colors hover:bg-indigo">
           Filter
         </button>
       </form>

@@ -2,8 +2,10 @@
 
 import { ArrowDown, ArrowUp, Plus, Star, Trash2, X } from "lucide-react";
 import Image from "next/image";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { slugify } from "@/lib/validation/catalogue";
+import { setDraft, type Draft } from "./card-preview";
+import { FilePicker } from "./file-picker";
 import { ActionButton, ActionForm, FieldError } from "./forms";
 
 type ActionState = { ok?: boolean; error?: string; fields?: Record<string, string> };
@@ -47,6 +49,13 @@ const EMPTY: EditableProduct = {
   seoDescription: null,
 };
 
+/** Reads the card-relevant fields straight from the form, so uncontrolled inputs are covered too. */
+function readDraft(form: HTMLFormElement): Draft {
+  const fd = new FormData(form);
+  const text = (k: string) => String(fd.get(k) ?? "");
+  return { name: text("name"), fabric: text("fabric"), description: text("description"), categoryId: text("categoryId"), price: text("price"), quoteEnabled: fd.get("quoteEnabled") === "on", retailEnabled: fd.get("retailEnabled") === "on" };
+}
+
 function L({ htmlFor, children, hint }: { htmlFor: string; children: React.ReactNode; hint?: string }) {
   return (
     <label htmlFor={htmlFor} className="mb-1 block text-xs text-muted">
@@ -73,9 +82,25 @@ export function ProductEditor({
   const [slugTouched, setSlugTouched] = useState(!isNew);
   const [specs, setSpecs] = useState<Spec[]>(p.specs);
   const [retail, setRetail] = useState(p.retailEnabled);
+  const wrap = useRef<HTMLDivElement>(null);
+
+  // Feed the card preview: once on mount, then on every change below; cleared when the editor goes away.
+  useEffect(() => {
+    const form = wrap.current?.closest("form");
+    if (form) setDraft(readDraft(form));
+    return () => setDraft(null);
+  }, []);
 
   return (
     <ActionForm action={action} submitLabel={isNew ? "Create product" : "Save product"} className="space-y-8">
+      <div
+        ref={wrap}
+        className="space-y-8"
+        onChange={(e) => {
+          const form = (e.target as HTMLElement).closest("form");
+          if (form) setDraft(readDraft(form));
+        }}
+      >
       <input type="hidden" name="specs" value={JSON.stringify(specs.filter((s) => s.label.trim() && s.value.trim()))} />
       <section className="grid gap-4 md:grid-cols-2">
         <div>
@@ -167,6 +192,14 @@ export function ProductEditor({
         <FieldError name="specs" />
       </section>
 
+      {isNew && (
+        <section>
+          <h3 className="mb-2 text-sm font-medium">Images</h3>
+          <p className="mb-3 text-xs text-muted">JPG, PNG or WebP, up to 10 MB each, up to 12. The first is the main image; you can reorder or change them after saving.</p>
+          <FilePicker id="new-images" name="images" multiple accept="image/jpeg,image/png,image/webp" label="Choose images" />
+        </section>
+      )}
+
       <section className="grid gap-4 md:grid-cols-2">
         <fieldset className="space-y-2 border border-line p-4">
           <legend className="px-1 text-sm font-medium">Ordering</legend>
@@ -214,6 +247,7 @@ export function ProductEditor({
           </div>
         </div>
       </details>
+      </div>
     </ActionForm>
   );
 }
@@ -284,10 +318,8 @@ export function ImageManager({
       {error && <p className="mt-3 text-sm text-danger">{error}</p>}
       <div className="mt-6 border-t border-line pt-4">
         <ActionForm action={uploadAction} submitLabel="Upload" successMessage="Uploaded." resetOnSuccess>
-          <label htmlFor="images" className="mb-1 block text-xs text-muted">
-            Add images (JPG, PNG or WebP, up to 10 MB each)
-          </label>
-          <input id="images" name="images" type="file" multiple accept="image/jpeg,image/png,image/webp" className="block text-sm" />
+          <p className="mb-2 text-xs text-muted">Add images (JPG, PNG or WebP, up to 10 MB each)</p>
+          <FilePicker id="images" name="images" multiple accept="image/jpeg,image/png,image/webp" label="Choose images" />
         </ActionForm>
       </div>
     </div>

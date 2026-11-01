@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Plus } from "lucide-react";
+import { Check, ClipboardPlus, Plus } from "lucide-react";
 import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import clsx from "clsx";
@@ -73,7 +73,7 @@ export function useEnquiryList() {
   };
 }
 
-export function AddToEnquiryButton({ product, variant = "full" }: { product: ListedProduct; variant?: "full" | "compact" }) {
+export function AddToEnquiryButton({ product, variant = "full" }: { product: ListedProduct; variant?: "full" | "compact" | "flat" | "icon" }) {
   const list = useEnquiryList();
   const added = list.has(product.id);
   return (
@@ -81,16 +81,23 @@ export function AddToEnquiryButton({ product, variant = "full" }: { product: Lis
       type="button"
       onClick={() => (added ? list.remove(product.id) : list.add(product))}
       aria-pressed={added}
+      title={variant === "icon" ? (added ? "In your enquiry" : "Add to enquiry") : undefined}
       className={clsx(
-        "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors duration-300",
-        variant === "full"
+        "inline-flex items-center justify-center gap-2 font-semibold transition-colors duration-300",
+        variant !== "flat" && variant !== "icon" && "rounded-full",
+        variant === "icon"
+          ? "size-9 rounded-full bg-white text-ink shadow-[0_6px_16px_-6px_rgb(18_22_76/0.45)] ring-1 ring-line hover:bg-indigo hover:text-white"
+          : variant === "flat"
+          ? "h-12 w-full rounded-md border border-ink/20 px-5 text-[0.88rem] hover:border-ink hover:bg-ink hover:text-white"
+          : variant === "full"
           ? "h-13 w-full border border-ink/15 px-6 text-[0.9rem] hover:border-ink hover:bg-ink hover:text-white"
           : "h-9 w-full bg-white/95 px-3 text-[0.78rem] text-ink shadow-[0_8px_20px_-8px_rgb(18_22_76/0.35)] ring-1 ring-line backdrop-blur hover:bg-indigo hover:text-white",
-        added && "border-indigo !bg-indigo-soft text-indigo hover:!bg-indigo hover:text-white",
+        added && variant !== "icon" && "border-indigo !bg-indigo-soft text-indigo hover:!bg-indigo hover:text-white",
+        added && variant === "icon" && "!bg-indigo !text-white",
       )}
     >
-      {added ? <Check className="size-4" aria-hidden /> : <Plus className="size-4" aria-hidden />}
-      {added ? "In your enquiry" : variant === "full" ? "Add to enquiry list" : "Add to enquiry"}
+      {added ? <Check className="size-4" aria-hidden /> : variant === "compact" || variant === "icon" ? <ClipboardPlus className="size-4" aria-hidden /> : <Plus className="size-4" aria-hidden />}
+      {variant === "icon" ? <span className="sr-only">{added ? "Remove from your enquiry" : "Add to enquiry"}</span> : added ? "In your enquiry" : variant === "full" ? "Add to enquiry list" : "Add to enquiry"}
     </button>
   );
 }

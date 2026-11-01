@@ -19,9 +19,8 @@
 }
 .sp-stage {
   background:
-    radial-gradient(70% 90% at 0% 0%, #2a3f9a 0%, transparent 60%),
-    radial-gradient(60% 80% at 100% 100%, #1a2a78 0%, transparent 62%),
-    linear-gradient(135deg, #14226b 0%, #0b1445 55%, #070d33 100%);
+    radial-gradient(60% 90% at 0% 0%, #2f46aa 0%, transparent 60%),
+    linear-gradient(110deg, #101d5c 0%, #1a2a7a 30%, #3d54b8 52%, #aebaec 76%, #eef1fc 100%);
 }
 /* A soft halo of light and one fine ring behind the product. */
 .sp-halo {
@@ -73,7 +72,7 @@
   inset: auto 0 0 0;
   z-index: 0;
   height: 26%;
-  background: linear-gradient(180deg, transparent, rgb(3 7 30 / 0.7));
+  background: linear-gradient(180deg, transparent, rgb(14 27 79 / 0.14));
   pointer-events: none;
 }
 

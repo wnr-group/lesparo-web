@@ -125,14 +125,17 @@ export function RetailPurchase({ product }: { product: BuyableProduct }) {
     <div id="buy" className="scroll-mt-28">
       {product.sizes.length > 0 && (
         <fieldset>
-          <legend className="text-sm font-medium">
-            Size <span className="text-danger">*</span>
+          <legend className="flex w-full items-baseline justify-between text-sm font-medium">
+            <span>
+              Size <span className="text-danger">*</span>
+            </span>
+            {size && <span className="text-muted">{size}</span>}
           </legend>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             {product.sizes.map((s) => (
               <label key={s} className="relative">
                 <input type="radio" name={`${uid}-size`} value={s} checked={size === s} onChange={() => (setSize(s), setError(""))} className="peer sr-only" />
-                <span className="flex h-11 min-w-12 cursor-pointer items-center justify-center rounded-full border border-sand bg-white px-4 text-sm font-medium transition-colors hover:border-indigo peer-checked:border-indigo peer-checked:bg-indigo peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-indigo">
+                <span className="flex h-11 min-w-[3.25rem] cursor-pointer items-center justify-center rounded-md border border-sand bg-white px-4 text-sm font-medium transition-[border-color,background-color,color] duration-200 hover:border-ink peer-checked:border-ink peer-checked:bg-ink peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-indigo">
                   {s}
                 </span>
               </label>
@@ -147,14 +150,14 @@ export function RetailPurchase({ product }: { product: BuyableProduct }) {
       )}
 
       <div className="mt-5 flex items-center gap-3">
-        <div role="group" aria-label="Quantity" className="inline-flex h-12 items-center rounded-full border border-sand bg-white">
-          <button type="button" aria-label="Decrease quantity" disabled={quantity <= 1} onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="grid size-12 place-items-center rounded-full hover:bg-paper disabled:opacity-40">
+        <div role="group" aria-label="Quantity" className="inline-flex h-12 items-center rounded-md border border-sand bg-white">
+          <button type="button" aria-label="Decrease quantity" disabled={quantity <= 1} onClick={() => setQuantity((q) => Math.max(1, q - 1))} className="grid size-12 place-items-center rounded-md transition-colors hover:bg-paper disabled:opacity-40">
             <Minus className="size-4" aria-hidden />
           </button>
           <span aria-live="polite" className="w-8 text-center font-semibold tabular-nums">
             {quantity}
           </span>
-          <button type="button" aria-label="Increase quantity" disabled={quantity >= MAX_QTY} onClick={() => setQuantity((q) => Math.min(MAX_QTY, q + 1))} className="grid size-12 place-items-center rounded-full hover:bg-paper disabled:opacity-40">
+          <button type="button" aria-label="Increase quantity" disabled={quantity >= MAX_QTY} onClick={() => setQuantity((q) => Math.min(MAX_QTY, q + 1))} className="grid size-12 place-items-center rounded-md transition-colors hover:bg-paper disabled:opacity-40">
             <Plus className="size-4" aria-hidden />
           </button>
         </div>
@@ -163,7 +166,7 @@ export function RetailPurchase({ product }: { product: BuyableProduct }) {
         </p>
       </div>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2">
+      <div className="mt-5 grid gap-2.5">
         <button
           type="button"
           onClick={() => {
@@ -173,7 +176,7 @@ export function RetailPurchase({ product }: { product: BuyableProduct }) {
             setJustAdded(true);
             window.setTimeout(() => setJustAdded(false), 2200);
           }}
-          className="inline-flex h-13 items-center justify-center gap-2 rounded-full border border-indigo px-6 text-[0.9rem] font-semibold text-indigo transition-colors hover:bg-indigo hover:text-white"
+          className="inline-flex h-13 items-center justify-center gap-2 rounded-md bg-indigo px-6 text-[0.9rem] font-semibold text-white transition-[background-color,transform] duration-300 hover:bg-indigo-deep active:scale-[0.99]"
         >
           {justAdded ? <Check className="size-4" aria-hidden /> : <ShoppingBag className="size-4" aria-hidden />}
           {justAdded ? "Added to cart" : "Add to cart"}
@@ -186,7 +189,7 @@ export function RetailPurchase({ product }: { product: BuyableProduct }) {
             cart.add(l);
             router.push("/checkout");
           }}
-          className="inline-flex h-13 items-center justify-center rounded-full bg-indigo px-6 text-[0.9rem] font-semibold text-white transition-colors hover:bg-indigo-deep"
+          className="inline-flex h-13 items-center justify-center rounded-md border border-ink px-6 text-[0.9rem] font-semibold text-ink transition-[background-color,color,transform] duration-300 hover:bg-ink hover:text-white active:scale-[0.99]"
         >
           Buy now
         </button>
@@ -198,30 +201,34 @@ export function RetailPurchase({ product }: { product: BuyableProduct }) {
   );
 }
 
-/** Compact card action: adds straight to the cart, or sends the buyer to the product page when a size must be chosen. */
-export function QuickAddButton({ product }: { product: BuyableProduct }) {
+/** Compact card action: adds straight to the cart; a product with several sizes opens its page at the size picker, since an item cannot be added without one. */
+export function QuickAddButton({ product, iconOnly = false }: { product: BuyableProduct; iconOnly?: boolean }) {
   const cart = useCart();
   const [done, setDone] = useState(false);
-  const cls =
-    "inline-flex h-9 w-full items-center justify-center gap-2 rounded-full bg-indigo px-3 text-[0.78rem] font-semibold text-white shadow-[0_8px_20px_-8px_rgb(18_22_76/0.45)] transition-colors hover:bg-indigo-deep";
+  const cls = iconOnly
+    ? "grid size-9 place-items-center rounded-full bg-white text-ink shadow-[0_6px_16px_-6px_rgb(18_22_76/0.45)] ring-1 ring-line transition-colors hover:bg-indigo hover:text-white"
+    : "inline-flex h-9 w-full items-center justify-center gap-2 rounded-full bg-indigo px-3 text-[0.78rem] font-semibold text-white shadow-[0_8px_20px_-8px_rgb(18_22_76/0.45)] transition-colors hover:bg-indigo-deep";
   if (product.sizes.length > 1)
     return (
-      <Link href={`/products/${product.slug}#buy`} className={cls}>
-        <ShoppingBag className="size-3.5" aria-hidden /> Choose size
+      <Link href={`/products/${product.slug}#buy`} className={cls} aria-label={iconOnly ? `Add ${product.name} to cart: pick a size` : undefined} title={iconOnly ? "Add to cart" : undefined}>
+        <ShoppingBag className="size-4" aria-hidden />
+        {!iconOnly && " Add to cart"}
       </Link>
     );
   return (
     <button
       type="button"
       className={cls}
+      aria-label={iconOnly ? `Add ${product.name} to cart` : undefined}
+      title={iconOnly ? "Add to cart" : undefined}
       onClick={() => {
         cart.add({ productId: product.id, slug: product.slug, name: product.name, image: product.image, size: product.sizes[0] ?? null, price: product.price, currency: product.currency, quantity: 1 });
         setDone(true);
         window.setTimeout(() => setDone(false), 1800);
       }}
     >
-      {done ? <Check className="size-3.5" aria-hidden /> : <ShoppingBag className="size-3.5" aria-hidden />}
-      {done ? "Added" : "Add to cart"}
+      {done ? <Check className="size-4" aria-hidden /> : <ShoppingBag className="size-4" aria-hidden />}
+      {!iconOnly && (done ? "Added" : "Add to cart")}
     </button>
   );
 }

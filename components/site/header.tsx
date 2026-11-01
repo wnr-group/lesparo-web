@@ -29,7 +29,7 @@ export async function Header() {
       <div className="relative mx-auto flex h-16 max-w-page items-center justify-between gap-6 px-4 sm:px-6 lg:h-[4.5rem] lg:px-10">
         <Link href="/" className="shrink-0" aria-label="LESPARO home">
           {/* Registered LESPARO mark, unaltered. */}
-          <Image src="/lesparo-logo-v2.png" alt="LESPARO" width={900} height={484} priority className="h-12 w-auto lg:h-14" />
+          <Image src="/lesparo-logo-v3.png" alt="LESPARO" width={875} height={460} priority className="h-12 w-auto lg:h-14" />
         </Link>
         {/* usePathname() is request data: a boundary lets pages re-render after admin edits. */}
         <Suspense>

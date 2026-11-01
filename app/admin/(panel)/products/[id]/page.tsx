@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
+import { CardPreview } from "@/components/admin/card-preview";
 import { ActionButton } from "@/components/admin/forms";
 import { ImageManager, ProductEditor } from "@/components/admin/product-editor";
 import { formatDate, PageHeader, Panel } from "@/components/admin/ui";
@@ -32,7 +33,7 @@ export default async function EditProductPage(props: PageProps<"/admin/products/
       <PageHeader
         back={{ href: "/admin/products", label: "Products" }}
         title={p.name}
-        description={<>Last updated {formatDate(p.updated_at, true)}{p.legacy_id ? ` · imported from lesparo.com (#${p.legacy_id})` : ""}</>}
+        description={<>Last updated {formatDate(p.updated_at, true)}</>}
         actions={
           <>
             {p.archived_at ? <Badge>Archived</Badge> : p.is_published ? <Badge tone="success">Published</Badge> : <Badge tone="warning">Draft</Badge>}
@@ -53,7 +54,7 @@ export default async function EditProductPage(props: PageProps<"/admin/products/
           </>
         }
       />
-      {sp.created && <div className="mb-6"><Alert tone="success" title="Product created. Add images below, then publish when ready." /></div>}
+      {sp.created && <div className="mb-6"><Alert tone="success" title="Product created. Check the details and images below, then publish when ready." /></div>}
       {readOnly && <div className="mb-6"><Alert tone="info" title="Read-only: only administrators can edit products." /></div>}
       <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
         <Panel title="Details">
@@ -83,6 +84,14 @@ export default async function EditProductPage(props: PageProps<"/admin/products/
             />
           </fieldset>
         </Panel>
+        <div className="space-y-6">
+        <Panel title="Card preview">
+          <CardPreview
+            initial={{ name: p.name, fabric: p.fabric ?? "", description: p.description ?? "", categoryId: p.category_id ?? "", price: p.price?.toString() ?? "", quoteEnabled: p.quote_enabled, retailEnabled: p.retail_enabled }}
+            images={images.map((i) => ({ url: publicMediaUrl(i.storage_path)!, alt: i.alt_text || p.name, width: i.width, height: i.height }))}
+            categories={categories.map((c) => ({ id: c.id, name: c.label.split(" › ").pop() ?? c.label, slug: "" }))}
+          />
+        </Panel>
         <Panel title={`Images (${images.length})`}>
           {readOnly ? (
             <p className="text-sm text-muted">Only administrators can manage images.</p>
@@ -94,6 +103,7 @@ export default async function EditProductPage(props: PageProps<"/admin/products/
             />
           )}
         </Panel>
+        </div>
       </div>
     </>
   );

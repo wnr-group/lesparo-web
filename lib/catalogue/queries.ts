@@ -16,7 +16,7 @@ function cacheCatalogue() {
 }
 
 export const PAGE_SIZE = 24;
-export const SORTS = { featured: "Featured", newest: "Newest", "name-asc": "Name, A–Z", "name-desc": "Name, Z–A" } as const;
+export const SORTS = { featured: "Featured", newest: "Newest", "name-asc": "Name, A–Z", "name-desc": "Name, Z–A", "price-asc": "Price, low to high", "price-desc": "Price, high to low" } as const;
 export type SortKey = keyof typeof SORTS;
 
 export type ProductImage = { url: string; alt: string; width: number | null; height: number | null };
@@ -28,6 +28,7 @@ export type ProductCard = {
   fabric: string | null;
   sizes: string[];
   packing: string | null;
+  description: string | null;
   quoteEnabled: boolean;
   retailEnabled: boolean;
   price: number | null;
@@ -38,7 +39,6 @@ export type ProductCard = {
 
 export type ProductDetail = ProductCard & {
   sku: string | null;
-  description: string | null;
   specs: Spec[];
   seoTitle: string | null;
   seoDescription: string | null;
@@ -81,6 +81,7 @@ function toCard(row: CardRow): ProductCard {
     fabric: row.fabric,
     sizes: jsonStrings(row.sizes),
     packing: row.packing,
+    description: row.description,
     quoteEnabled: row.quote_enabled,
     retailEnabled: row.retail_enabled,
     price: row.price,
@@ -137,17 +138,20 @@ export type ProductQuery = {
   categoryIds?: string[];
   fabric?: string;
   size?: string;
+  /** Retail price bounds, in the product currency. Products without a price are excluded while either is set. */
+  minPrice?: number;
+  maxPrice?: number;
   sort?: SortKey;
   page?: number;
   pageSize?: number;
 };
 
-/** Every word must match the name, fabric or SKU (substring, case-insensitive for ASCII). */
+/** Every word must match the name, fabric or SKU (substring, case-insensitive). */
 export function searchWhere<T extends string>(q: string, fields: T[]) {
   return q
     .split(" ")
     .filter(Boolean)
-    .map((w) => ({ OR: fields.map((f) => ({ [f]: { contains: w } }) as Record<T, { contains: string }>) }));
+    .map((w) => ({ OR: fields.map((f) => ({ [f]: { contains: w, mode: "insensitive" as const } }) as Record<T, { contains: string; mode: "insensitive" }>) }));
 }
 
 export async function listProducts(query: ProductQuery) {
@@ -163,6 +167,7 @@ export async function listProducts(query: ProductQuery) {
       AND: q ? searchWhere(q, ["name", "fabric", "sku"]) : undefined,
       ...(query.categoryIds?.length && { category_id: { in: query.categoryIds } }),
       ...(query.fabric && { fabric: query.fabric }),
+      ...((query.minPrice !== undefined || query.maxPrice !== undefined) && { price: { ...(query.minPrice !== undefined && { gte: query.minPrice }), ...(query.maxPrice !== undefined && { lte: query.maxPrice }) } }),
     },
     include: CARD_INCLUDE,
   });
@@ -174,6 +179,8 @@ export async function listProducts(query: ProductQuery) {
     newest: (a, b) => b.created_at.getTime() - a.created_at.getTime() || byId(a, b),
     "name-asc": (a, b) => a.name.localeCompare(b.name) || byId(a, b),
     "name-desc": (a, b) => b.name.localeCompare(a.name) || byId(a, b),
+    "price-asc": (a, b) => (a.price ?? Number.MAX_SAFE_INTEGER) - (b.price ?? Number.MAX_SAFE_INTEGER) || byId(a, b),
+    "price-desc": (a, b) => (b.price ?? -1) - (a.price ?? -1) || byId(a, b),
     featured: (a, b) => Number(b.is_featured) - Number(a.is_featured) || (a.legacy_id ?? Infinity) - (b.legacy_id ?? Infinity) || byId(a, b),
   };
   rows.sort(sorters[query.sort ?? "featured"]);
@@ -189,7 +196,7 @@ export async function getFacets(categoryIds?: string[]) {
   cacheCatalogue();
   const data = await prisma.product.findMany({
     where: { ...VISIBLE, ...(categoryIds?.length && { category_id: { in: categoryIds } }) },
-    select: { fabric: true, sizes: true },
+    select: { fabric: true, sizes: true, price: true },
   });
   const SIZE_ORDER = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
   const fabrics = [...new Set(data.map((r) => r.fabric).filter((f): f is string => !!f))].sort();
@@ -198,7 +205,8 @@ export async function getFacets(categoryIds?: string[]) {
     const ib = SIZE_ORDER.indexOf(b);
     return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.localeCompare(b, undefined, { numeric: true });
   });
-  return { fabrics, sizes };
+  const prices = data.map((r) => r.price).filter((p): p is number => p !== null);
+  return { fabrics, sizes, price: prices.length ? { min: Math.floor(Math.min(...prices)), max: Math.ceil(Math.max(...prices)) } : null };
 }
 
 export async function getProductBySlug(slug: string): Promise<ProductDetail | null> {
@@ -209,7 +217,6 @@ export async function getProductBySlug(slug: string): Promise<ProductDetail | nu
   return {
     ...toCard(row),
     sku: row.sku,
-    description: row.description,
     specs: (Array.isArray(row.specs) ? row.specs : []) as Spec[],
     seoTitle: row.seo_title,
     seoDescription: row.seo_description,

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { ActionButton, ActionForm, FieldError } from "@/components/admin/forms";
+import { MarkSeen } from "@/components/admin/notifications";
 import { EnquiryStatusBadge, formatDate, PageHeader, Panel, SyncBadge } from "@/components/admin/ui";
 import { Badge } from "@/components/ui/primitives";
 import { getStaffSession } from "@/lib/auth/staff";
@@ -50,6 +51,7 @@ export default async function EnquiryDetailPage(props: PageProps<"/admin/enquiri
 
   return (
     <>
+      <MarkSeen id={id} />
       <PageHeader
         back={{ href: "/admin/enquiries", label: "Enquiries" }}
         title={e.enquiry_number}
@@ -57,7 +59,7 @@ export default async function EnquiryDetailPage(props: PageProps<"/admin/enquiri
         actions={
           <span className="flex items-center gap-2">
             <EnquiryStatusBadge status={e.status as EnquiryStatus} />
-            <SyncBadge status={e.crm_sync_status} />
+            {e.crm_sync_status !== "not_configured" && <SyncBadge status={e.crm_sync_status} />}
           </span>
         }
       />
@@ -237,32 +239,34 @@ export default async function EnquiryDetailPage(props: PageProps<"/admin/enquiri
             </ActionForm>
           </Panel>
 
-          <Panel title="Integrations">
-            {jobs.length ? (
-              <ul className="space-y-3 text-sm">
-                {jobs.map((j) => (
-                  <li key={j.id} className="border-b border-line pb-3 last:border-0 last:pb-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <span>{JOB_LABELS[j.operation] ?? j.operation}</span>
-                      <Badge tone={j.status === "succeeded" ? "success" : j.status === "blocked" || j.status === "failed" ? "warning" : "neutral"}>{j.status}</Badge>
-                    </div>
-                    {j.last_error && <p className="mt-1 text-xs text-muted">{j.last_error}</p>}
-                    <p className="mt-1 text-xs text-muted">
-                      {j.attempts} attempt{j.attempts === 1 ? "" : "s"} · {j.provider}
-                    </p>
-                    {(j.status === "failed" || j.status === "blocked") && (
-                      <div className="mt-2">
-                        <ActionButton action={retryIntegrationJob.bind(null, j.id)}>Retry now</ActionButton>
+          {(jobs.length > 0 || e.crm_record_id) && (
+            <Panel title="Integrations">
+              {jobs.length ? (
+                <ul className="space-y-3 text-sm">
+                  {jobs.map((j) => (
+                    <li key={j.id} className="border-b border-line pb-3 last:border-0 last:pb-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span>{JOB_LABELS[j.operation] ?? j.operation}</span>
+                        <Badge tone={j.status === "succeeded" ? "success" : j.status === "blocked" || j.status === "failed" ? "warning" : "neutral"}>{j.status}</Badge>
                       </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-muted">No integration jobs.</p>
-            )}
-            {e.crm_record_id && <p className="mt-3 text-xs text-muted">CRM record: {e.crm_record_id}</p>}
-          </Panel>
+                      {j.last_error && <p className="mt-1 text-xs text-muted">{j.last_error}</p>}
+                      <p className="mt-1 text-xs text-muted">
+                        {j.attempts} attempt{j.attempts === 1 ? "" : "s"} · {j.provider}
+                      </p>
+                      {(j.status === "failed" || j.status === "blocked") && (
+                        <div className="mt-2">
+                          <ActionButton action={retryIntegrationJob.bind(null, j.id)}>Retry now</ActionButton>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-muted">No integration jobs.</p>
+              )}
+              {e.crm_record_id && <p className="mt-3 text-xs text-muted">CRM record: {e.crm_record_id}</p>}
+            </Panel>
+          )}
 
           <Panel title="Status history">
             <ol className="space-y-2 text-sm">

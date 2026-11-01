@@ -1,99 +1,92 @@
-import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ViewTransition } from "react";
+import { shortText } from "@/lib/catalogue/short-text";
 import type { ProductCard as Product } from "@/lib/catalogue/queries";
 import { formatPrice } from "@/lib/format";
-import { Tilt } from "./pointer-fx";
 import { QuickAddButton } from "./cart";
 import { AddToEnquiryButton } from "./enquiry-list";
 
+/**
+ * Catalogue tile: a white card holding a tall photograph on a cool grey plate (the photos are shot on white, so multiply drops
+ * the white and the garment sits on the plate), with the category as a tab in the top-left corner, a dot per photo beneath it,
+ * and the name, a line of detail and the price below. On hover the second photo fades in and two small icon buttons (cart, enquiry) appear at the top-right.
+ * The plate keeps the same view-transition name as the product page gallery, so it morphs across the navigation.
+ * Sizes are deliberately not listed here: they live on the product page.
+ */
 export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
   const [primary, secondary] = product.images;
   const retail = product.retailEnabled && product.price !== null;
+  const blurb = shortText(product.description);
+  const sizes = "(min-width: 1536px) 18vw, (min-width: 1280px) 22vw, (min-width: 640px) 30vw, 46vw";
   return (
-    <article className="group relative flex h-full flex-col">
-      {/* The plate: a soft studio-light gradient, the product standing on a contact shadow, a category tag top left and a
-          circular arrow top right. The photos are shot on white, so multiply drops the white and the product sits in the light.
-          Same view-transition name as the product page gallery, so the plate morphs across the navigation. */}
+    <article className="group relative flex h-full flex-col rounded-2xl bg-white p-2.5 shadow-[0_1px_2px_rgb(18_22_76/0.05)] ring-1 ring-line transition-shadow duration-500 hover:shadow-[0_22px_44px_-26px_rgb(18_22_76/0.4)]">
       <ViewTransition name={`product-${product.id}`} share="morph" default="none">
-        <Tilt className="relative aspect-[4/5] overflow-hidden rounded-[1.25rem] bg-[radial-gradient(120%_90%_at_50%_0%,#fbfbfd_0%,#f0f1f6_60%,#e6e8f0_100%)] ring-1 ring-ink/[0.06] transition-[box-shadow,--tw-ring-color] duration-500 group-hover:shadow-[0_28px_50px_-28px_rgb(18_20_58/0.35)] group-hover:ring-ink/15">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-[#f0f1f6] shadow-[0_4px_0_-1px_rgb(18_22_76/0.1)]">
           {primary ? (
             <>
-              {/* Contact shadow under the product. */}
-              <span aria-hidden className="absolute inset-x-[22%] bottom-[7%] h-[5%] rounded-[50%] bg-ink/20 blur-xl transition-opacity duration-500 group-hover:opacity-60" />
               <Image
                 src={primary.url}
                 alt={primary.alt}
                 fill
                 priority={priority}
-                sizes="(min-width: 1280px) 22vw, (min-width: 768px) 30vw, 46vw"
-                className={`object-contain p-[7%] cutout transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.05] ${secondary ? "group-hover:opacity-0" : ""}`}
+                sizes={sizes}
+                className={`cutout object-contain p-[4%] transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.03] ${secondary ? "group-hover:opacity-0" : ""}`}
               />
               {secondary && (
-                <Image
-                  src={secondary.url}
-                  alt=""
-                  aria-hidden
-                  fill
-                  sizes="(min-width: 1280px) 22vw, (min-width: 768px) 30vw, 46vw"
-                  className="object-contain p-[7%] opacity-0 cutout transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.05] group-hover:opacity-100"
-                />
+                <Image src={secondary.url} alt="" aria-hidden fill sizes={sizes} className="cutout object-contain p-[4%] opacity-0 transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.03] group-hover:opacity-100" />
               )}
             </>
           ) : (
-            <div className="flex h-full items-center justify-center font-display font-semibold text-lg text-muted">Image coming soon</div>
+            <div className="flex h-full items-center justify-center text-sm text-muted">Image coming soon</div>
           )}
           {product.category && (
-            <span className="absolute left-3 top-3 z-[6] rounded-full bg-white/80 px-3 py-1 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-ink/80 backdrop-blur">{product.category.name}</span>
+            <span className="absolute left-0 top-0 z-[5] rounded-br-xl bg-white px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-indigo">{product.category.name}</span>
           )}
-          <span aria-hidden className="absolute right-3 top-3 z-[6] grid size-9 place-items-center rounded-full bg-white/90 text-ink opacity-0 shadow-sm transition-[opacity,transform,background-color,color] duration-500 ease-[var(--ease-out-soft)] [@media(hover:hover)]:translate-y-1 group-hover:translate-y-0 group-hover:opacity-100 group-hover:bg-ink group-hover:text-white">
-            <ArrowUpRight className="size-4" />
-          </span>
-          {(product.quoteEnabled || retail) && (
-            // Visible on touch screens, revealed on hover/focus for pointer devices; never the only route to the action.
-            <div className="absolute inset-x-3 bottom-3 z-10 transition-[opacity,transform] duration-300 [@media(hover:hover)]:translate-y-2 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:translate-y-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:translate-y-0 [@media(hover:hover)]:group-hover:opacity-100">
-              <div className="grid gap-1.5">
-                {retail && <QuickAddButton product={{ id: product.id, slug: product.slug, name: product.name, image: primary?.url ?? null, price: product.price!, currency: product.currency, sizes: product.sizes }} />}
-                {product.quoteEnabled && <AddToEnquiryButton product={{ id: product.id, slug: product.slug, name: product.name }} variant="compact" />}
-              </div>
+          {(retail || product.quoteEnabled) && (
+            // Always visible on touch screens; rises on hover or focus for pointer devices. Never the only route to the action.
+            <div className="absolute right-2.5 top-2.5 z-10 flex flex-col gap-1.5 transition-[opacity,transform] duration-300 [@media(hover:hover)]:translate-x-2 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:translate-x-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:translate-x-0 [@media(hover:hover)]:group-hover:opacity-100">
+              {retail && <QuickAddButton product={{ id: product.id, slug: product.slug, name: product.name, image: primary?.url ?? null, price: product.price!, currency: product.currency, sizes: product.sizes }} iconOnly />}
+              {product.quoteEnabled && <AddToEnquiryButton product={{ id: product.id, slug: product.slug, name: product.name }} variant="icon" />}
             </div>
           )}
-        </Tilt>
+        </div>
       </ViewTransition>
-      <div className="mt-4 flex flex-1 flex-col px-0.5">
-        <h3 className="font-display text-[1.08rem] font-bold leading-snug tracking-tight">
+
+      {product.images.length > 1 && (
+        <div aria-hidden className="mt-2 flex justify-center gap-1">
+          {product.images.slice(0, 4).map((img, i) => (
+            <span key={img.url} className={`size-1.5 rounded-full transition-colors duration-300 ${i === 0 ? "bg-indigo-deep group-hover:bg-sand" : i === 1 ? "bg-sand group-hover:bg-indigo-deep" : "bg-sand"}`} />
+          ))}
+        </div>
+      )}
+
+      <div className="mt-2.5 flex flex-1 flex-col px-1 pb-1">
+        <h3 className="line-clamp-2 min-h-[2.6em] font-display text-[0.95rem] font-bold leading-[1.3] tracking-tight">
           <Link href={`/products/${product.slug}`} className="after:absolute after:inset-0 after:content-['']">
             <span className="hline">{product.name}</span>
           </Link>
         </h3>
-        {product.fabric && <p className="mt-0.5 text-[0.82rem] text-muted">{product.fabric}</p>}
-        {product.sizes.length > 0 && (
-          <ul aria-label="Sizes" className="mt-2.5 flex flex-wrap gap-1">
-            {product.sizes.slice(0, 5).map((s) => (
-              <li key={s} className="rounded-md border border-ink/12 px-1.5 py-0.5 text-[0.66rem] font-semibold leading-none text-ink-soft">
-                {s}
-              </li>
-            ))}
-            {product.sizes.length > 5 && <li className="px-1 py-0.5 text-[0.66rem] font-semibold leading-none text-muted">+{product.sizes.length - 5}</li>}
-          </ul>
-        )}
-        {/* Pinned to the bottom of the card, so prices line up across a row whatever the fabric and size lines above them hold. */}
-        <p className="mt-auto flex flex-wrap items-center gap-x-2.5 gap-y-1.5 pt-3">
-          {retail && <span className="font-display text-xl font-extrabold tabular-nums tracking-tight">{formatPrice(product.price!, product.currency)}</span>}
-          {product.quoteEnabled && (
-            <span className="rounded-full bg-ink/[0.06] px-2.5 py-1 text-[0.68rem] font-semibold text-ink-soft">{retail ? "Bulk on enquiry" : "Wholesale price on enquiry"}</span>
+        {product.fabric && <p className="mt-1 truncate text-[0.76rem] text-muted">{product.fabric}</p>}
+        {blurb && <p className="mt-1 line-clamp-2 text-[0.74rem] leading-snug text-ink-soft">{blurb}</p>}
+        {/* Pinned to the bottom of the card, so prices line up across a row whatever the lines above them hold. */}
+        <p className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1 pt-2.5">
+          {retail ? (
+            <span className="font-display text-[1.1rem] font-extrabold tabular-nums tracking-tight text-indigo-deep">{formatPrice(product.price!, product.currency)}</span>
+          ) : (
+            <span className="text-[0.8rem] font-semibold text-ink-soft">Price on enquiry</span>
           )}
+          {product.quoteEnabled && retail && <span className="rounded-md bg-success-soft px-2 py-0.5 text-[0.64rem] font-bold text-success">Bulk orders on enquiry</span>}
         </p>
       </div>
     </article>
   );
 }
 
-/** `reveal` rises each card in as it scrolls into view, staggered across the row. */
+/** Two columns on phones, three on tablets, four on desktop and wide screens. `reveal` rises each card in as it scrolls into view. */
 export function ProductGrid({ products, priorityCount = 0, reveal = false }: { products: Product[]; priorityCount?: number; reveal?: boolean }) {
   return (
-    <ul className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 md:gap-x-6 xl:grid-cols-4 xl:gap-y-14">
+    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4 xl:gap-5">
       {products.map((p, i) => (
         <li key={p.id} data-reveal={reveal ? "up" : undefined} style={reveal ? { ["--delay" as string]: `${(i % 4) * 90}ms` } : undefined}>
           <ProductCard product={p} priority={i < priorityCount} />
