@@ -4,7 +4,7 @@ import { z } from "zod";
 /**
  * Server-only configuration. Public values (NEXT_PUBLIC_*) are read directly where needed;
  * everything secret is validated here and must never be imported by client components.
- * DATABASE_URL, STORAGE_DIR and AUTH_SECRET are read by lib/db.ts, lib/storage.ts and
+ * DATABASE_URL, SUPABASE_SECRET_KEY and AUTH_SECRET are read by lib/db.ts, lib/storage.ts and
  * lib/auth/session.ts.
  */
 /** A blank value in .env.local (KEY=) means "not set", not an invalid value. */

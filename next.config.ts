@@ -2,6 +2,9 @@ import { randomBytes } from "node:crypto";
 import type { NextConfig } from "next";
 import legacyRedirects from "./data/legacy-redirects.json";
 
+// Catalogue images are served from the project's public Supabase Storage bucket (see lib/storage.ts).
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL) : null;
+
 const nextConfig: NextConfig = {
   // Without an AUTH_SECRET (e.g. on Vercel) each build signs sessions with its own random
   // secret, inlined into the server code; staff simply sign in again after a deploy.
@@ -19,6 +22,9 @@ const nextConfig: NextConfig = {
   experimental: {
     // Wholesale enquiries accept up to 3 reference files of 8 MB (validated again in lib/services/enquiries.ts).
     serverActions: { bodySizeLimit: "26mb" },
+  },
+  images: {
+    remotePatterns: supabaseUrl ? [{ protocol: "https", hostname: supabaseUrl.hostname, pathname: "/storage/v1/object/public/**" }] : [],
   },
   async redirects() {
     return [
