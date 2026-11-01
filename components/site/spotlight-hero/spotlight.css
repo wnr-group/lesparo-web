@@ -18,19 +18,12 @@
   background-color: var(--color-indigo-800);
 }
 /*
- * The stage: the banner cut in two along a diagonal that runs behind the garment. The left half (behind the copy) is
- * the brand indigo; the right half is the product's colour (clay, sage or cobalt, cross-fading on a switch). The cut
- * runs from 33% across the top to 62% across the bottom. The hero's text, panels and accents read the variables below.
+ * The stage: the brand indigo with patches of white scattered over it (.sp-art), kept clear of the copy. The hero's text, panels and accents read the variables below.
  *   --sp-1/2/3   centre, middle and edge of the indigo   --sp-key   key light      --sp-glow   light behind the product
  *   --sp-fg      text and outlines (r g b)               --sp-on-fg text on a filled --sp-fg button
  *   --sp-panel   glass panels (r g b)                     --sp-accent small labels and markers (r g b)
  *   --sp-shade   vignette and floor (r g b)               --sp-art   backing for artwork in the detail card (r g b)
  */
-@property --split-c {
-  syntax: "<color>";
-  inherits: true;
-  initial-value: #b0603f;
-}
 .sp-stage {
   --sp-1: #2a3390;
   --sp-2: var(--color-indigo-deep);
@@ -43,34 +36,35 @@
   --sp-accent: 255 200 44;
   --sp-shade: 4 6 22;
   --sp-art: 18 22 76;
-  --split-c: #b0603f;
   background:
     radial-gradient(70% 60% at 18% 0%, var(--sp-key), transparent 70%),
     radial-gradient(85% 75% at 52% 46%, var(--sp-1) 0%, var(--sp-2) 55%, var(--sp-3) 100%);
-  transition: --split-c 0.9s var(--ease-atelier);
 }
-.sp-stage[data-product="pants"] {
-  --split-c: #7d8a66;
-}
-.sp-stage[data-product="look"] {
-  --split-c: #2f63e0;
-}
+/* The patches (an SVG over the stage): white shapes scattered over the indigo, drifting very slowly. */
 .sp-art {
   position: absolute;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
-.sp-art > i {
-  position: absolute;
-  inset: 0;
-  display: block;
-  clip-path: polygon(33% 0, 100% 0, 100% 100%, 62% 100%);
-  background:
-    radial-gradient(60% 70% at 70% 45%, rgb(255 255 255 / 0.16), transparent 70%),
-    linear-gradient(160deg, rgb(255 255 255 / 0.06), rgb(0 0 0 / 0.28)),
-    var(--split-c);
+@keyframes sp-patch-drift {
+  to {
+    translate: 10px -8px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sp-patch {
+    animation: sp-patch-drift 12s ease-in-out infinite alternate;
+  }
+  .sp-patch-b {
+    animation-duration: 15s;
+    animation-direction: alternate-reverse;
+  }
+  .sp-patch-c {
+    animation-duration: 18s;
+  }
 }
 
 /* The product's name, huge and tone-on-tone behind it, like a campaign poster. Slides in when the product changes. */

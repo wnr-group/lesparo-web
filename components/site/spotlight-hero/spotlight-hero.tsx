@@ -412,9 +412,18 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
     <section aria-labelledby="hero-heading" data-product={product.id} className="sp-stage relative isolate flex flex-col overflow-hidden text-[rgb(var(--sp-fg))] lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
       {/* The stage: a soft halo of light behind the product and a floor. */}
       <PointerDepth />
-      <div aria-hidden className="sp-art">
-        <i />
-      </div>
+      {/* Patches of white scattered over the indigo: a few crisp, a few soft, one sky blue, and a faint glow behind the garment. */}
+      <svg aria-hidden className="sp-art" viewBox="0 0 1440 800" preserveAspectRatio="xMidYMid slice">
+        <path d="M1055 372C1054 458 1023 650 955 702C887 753 739 683 649 681C560 680 450 753 418 693C385 633 403 426 454 321C506 217 643 89 728 66C812 43 908 132 963 183C1017 234 1057 285 1055 372Z" fill="rgb(255 255 255 / 0.05)" />
+        <path className="sp-patch" d="M1616 394C1613 468 1550 562 1514 602C1478 642 1435 647 1400 635C1364 623 1321 593 1299 532C1277 471 1255 321 1268 268C1281 215 1334 232 1377 214C1421 196 1490 129 1530 159C1570 189 1618 321 1616 394Z" fill="rgb(255 255 255 / 0.92)" />
+        <path className="sp-patch sp-patch-b" d="M775 35C777 55 747 93 719 106C690 118 629 117 604 111C579 106 574 95 566 73C558 52 543 -1 557 -17C570 -33 623 -25 648 -25C673 -25 687 -27 708 -18C729 -8 773 14 775 35Z" fill="rgb(255 255 255 / 0.85)" />
+        <path className="sp-patch sp-patch-c" d="M687 744C693 772 658 813 627 829C595 845 539 850 498 842C456 833 398 797 377 776C356 754 358 732 373 714C387 696 427 677 463 668C499 660 551 650 588 662C626 675 681 716 687 744Z" fill="rgb(255 255 255 / 0.9)" />
+        <path className="sp-patch sp-patch-b" d="M1291 234C1292 254 1251 300 1228 319C1204 338 1179 356 1149 349C1118 341 1058 297 1044 275C1031 253 1057 234 1068 218C1079 203 1084 183 1109 180C1135 177 1189 192 1220 201C1250 210 1290 215 1291 234Z" fill="rgb(255 255 255 / 0.22)" />
+        <path className="sp-patch sp-patch-c" d="M1163 627C1167 657 1129 724 1102 740C1075 756 1033 733 1002 725C971 716 928 711 914 690C900 668 904 619 916 597C928 576 958 564 986 558C1013 551 1053 548 1083 559C1112 571 1160 597 1163 627Z" fill="rgb(127 168 255 / 0.35)" />
+        <path className="sp-patch" d="M274 792C268 824 168 871 116 894C64 916 -1 937 -38 926C-75 915 -88 853 -106 827C-123 800 -164 789 -143 764C-121 740 -27 690 23 679C72 668 110 680 152 699C194 718 280 759 274 792Z" fill="rgb(255 255 255 / 0.18)" />
+        <path className="sp-patch sp-patch-c" d="M920 106C920 111 922 123 919 126C916 130 906 126 899 126C892 125 880 126 875 123C871 119 868 109 872 104C875 99 890 96 897 94C904 93 912 93 916 95C920 97 919 101 920 106Z" fill="rgb(255 255 255 / 0.9)" />
+        <path className="sp-patch sp-patch-b" d="M354 691C353 695 345 700 339 704C334 707 327 713 322 711C318 709 314 699 312 694C310 688 308 685 310 680C312 676 318 669 324 668C330 667 339 673 344 677C348 680 354 686 354 691Z" fill="rgb(255 255 255 / 0.8)" />
+      </svg>
       <div aria-hidden className="sp-halo" />
       {/* The product's name, huge and tone-on-tone behind it; keyed so it slides in again on each switch. */}
       <p key={`word-${product.id}`} aria-hidden className="sp-bigword">
