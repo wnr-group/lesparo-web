@@ -4,8 +4,8 @@ export const ORDER_STATUSES = ["new", "confirmed", "shipped", "delivered", "canc
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = { new: "New", confirmed: "Confirmed", shipped: "Shipped", delivered: "Delivered", cancelled: "Cancelled" };
 
-export const PAYMENT_STATUSES = ["pending", "paid", "refunded"] as const;
-export const PAYMENT_METHODS = { cod: "Cash on delivery", online_pending: "Pay online (we will send a payment link)" } as const;
+export const PAYMENT_STATUSES = ["pending", "verifying", "paid", "failed", "refunded"] as const;
+export const PAYMENT_METHODS = { cod: "Cash on delivery", razorpay: "Pay online (Razorpay)", online_pending: "Pay online (we will send a payment link)" } as const;
 
 const text = (max: number, min = 1, msg = "This field is required.") => z.string().trim().min(min, msg).max(max);
 
@@ -25,7 +25,7 @@ export const orderSchema = z.object({
   state: text(80, 2, "Enter your state."),
   postcode: text(12, 4, "Enter your PIN code.").regex(/^[0-9A-Za-z\- ]{4,12}$/, "Enter a valid PIN code."),
   notes: z.string().trim().max(500).optional().transform((v) => v || null),
-  paymentMethod: z.enum(["cod", "online_pending"]),
+  paymentMethod: z.enum(["cod", "razorpay", "online_pending"]),
   /** Honeypot: real visitors never fill this. */
   website: z.string().max(0).optional(),
   items: z.array(orderItemSchema).min(1, "Your cart is empty.").max(30),

@@ -8,7 +8,9 @@ import { orderSchema } from "@/lib/validation/order";
 export type CheckoutState =
   | { status: "idle" }
   | { status: "error"; message: string; fields: Record<string, string> }
-  | { status: "success"; orderNumber: string; subtotal: number; currency: string };
+  | { status: "success"; orderNumber: string; subtotal: number; currency: string }
+  /** Order saved, awaiting online payment: the browser moves on to the payment page. */
+  | { status: "payment"; orderNumber: string; accessToken: string };
 
 export async function placeOrderAction(_prev: CheckoutState, fd: FormData): Promise<CheckoutState> {
   let items: unknown = [];
@@ -34,5 +36,6 @@ export async function placeOrderAction(_prev: CheckoutState, fd: FormData): Prom
     return { status: "error", message: "We could not place your order just now. Please try again, or call us to order by phone.", fields: {} };
   }
   if (!result.ok) return { status: "error", message: result.message, fields: {} };
+  if (result.paymentMethod === "razorpay" && result.accessToken) return { status: "payment", orderNumber: result.orderNumber, accessToken: result.accessToken };
   return { status: "success", orderNumber: result.orderNumber, subtotal: result.subtotal, currency: result.currency };
 }

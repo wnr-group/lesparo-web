@@ -2,6 +2,7 @@
 
 import { CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useSyncExternalStore } from "react";
 import type { CheckoutState } from "@/app/(site)/checkout/actions";
 import { ButtonLink } from "@/components/ui/button";
@@ -24,7 +25,11 @@ function Field({ id, label, error, children }: { id: string; label: string; erro
   );
 }
 
-const PAYMENTS = [
+const PAYMENTS_ONLINE = [
+  ["razorpay", "Pay online", "UPI, cards, netbanking and wallets, securely through Razorpay."],
+  ["cod", "Cash on delivery", "Pay when your order arrives."],
+];
+const PAYMENTS_OFFLINE = [
   ["cod", "Cash on delivery", "Pay when your order arrives."],
   ["online_pending", "Pay online", "We will send you a secure payment link after confirming your order."],
 ];
@@ -35,12 +40,15 @@ let pageKey = "";
 const clientKey = () => (pageKey ||= crypto.randomUUID());
 const noSubscribe = () => () => {};
 
-export function CheckoutForm({ action }: { action: (s: CheckoutState, fd: FormData) => Promise<CheckoutState> }) {
+export function CheckoutForm({ action, onlinePayments = false }: { action: (s: CheckoutState, fd: FormData) => Promise<CheckoutState>; onlinePayments?: boolean }) {
+  const router = useRouter();
+  const PAYMENTS = onlinePayments ? PAYMENTS_ONLINE : PAYMENTS_OFFLINE;
   const [state, formAction, pending] = useActionState(action, { status: "idle" } as CheckoutState);
   const cart = useCart();
   const key = useSyncExternalStore(noSubscribe, clientKey, () => "");
   const statusRef = useRef<HTMLDivElement>(null);
   const cleared = useRef(false);
+  const pushed = useRef(false);
   const f = state.status === "error" ? state.fields : {};
 
   useEffect(() => {
@@ -48,8 +56,21 @@ export function CheckoutForm({ action }: { action: (s: CheckoutState, fd: FormDa
       cleared.current = true;
       cart.clear();
     }
+    // Online payment: the order is saved; the status page takes the payment and shows its real state.
+    if (state.status === "payment" && !pushed.current) {
+      pushed.current = true;
+      router.push(`/checkout/status?o=${encodeURIComponent(state.orderNumber)}&t=${encodeURIComponent(state.accessToken)}`);
+    }
     if (state.status !== "idle") statusRef.current?.focus();
   });
+
+  if (state.status === "payment")
+    return (
+      <div ref={statusRef} tabIndex={-1} role="status" className="mt-10 flex max-w-xl items-center gap-3 border border-line bg-paper p-8 outline-none">
+        <Loader2 className="size-5 animate-spin" aria-hidden />
+        <p className="font-semibold">Order saved. Taking you to secure payment…</p>
+      </div>
+    );
 
   if (state.status === "success")
     return (
@@ -141,7 +162,7 @@ export function CheckoutForm({ action }: { action: (s: CheckoutState, fd: FormDa
               </label>
             ))}
           </div>
-          <p className="mt-3 text-xs text-muted">Online card payment is not switched on yet: no payment is taken on this website.</p>
+          <p className="mt-3 text-xs text-muted">{onlinePayments ? "Online payments are processed by Razorpay. Your order is saved first, so a closed or failed payment can be retried." : "Online card payment is not switched on yet: no payment is taken on this website."}</p>
         </fieldset>
         <div>
           <label htmlFor="notes" className="mb-1.5 block text-sm font-medium">
