@@ -3,6 +3,7 @@
 import { ArrowRight, Minus, Plus } from "lucide-react";
 import { PointerDepth } from "@/components/site/pointer-fx";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./spotlight.css";
@@ -131,6 +132,41 @@ const DETAILS: Record<string, string> = {
 };
 const SPIN_KEYS = ["Front", "Right", "Back", "Left"];
 
+/** Each product's colour world (the data-stage sets in ./spotlight.css) and the word set huge behind it. */
+const THEME: Record<string, { stage: string; word: string }> = {
+  tee: { stage: "clay", word: "Polo" },
+  pants: { stage: "sage", word: "Cargo" },
+  look: { stage: "indigo", word: "Look" },
+};
+
+/** On-model photographs from the studio shoot (public/looks, public/collections), three per product, fanned bottom left. */
+const WORN: Record<string, { href: string; photos: { src: string; alt: string; pos?: string }[] }> = {
+  tee: {
+    href: "/collections/gents",
+    photos: [
+      { src: "/collections/range.jpg", alt: "The brown textured polo with cream trim, worn with cream trousers", pos: "50% 25%" },
+      { src: "/looks/back-polo.jpg", alt: "The polo from the back, showing the woven texture" },
+      { src: "/collections/garments.jpg", alt: "The polo styled with a scarf at the waist", pos: "50% 25%" },
+    ],
+  },
+  pants: {
+    href: "/collections/gents-tracks",
+    photos: [
+      { src: "/looks/cargo-pants.jpg", alt: "Brown cargo track pants from the front" },
+      { src: "/looks/beige-tee.jpg", alt: "Cargo track pants worn with a beige tee", pos: "50% 30%" },
+      { src: "/looks/pants-side.jpg", alt: "Cargo track pants from the side, showing the pocket" },
+    ],
+  },
+  look: {
+    href: "/shop",
+    photos: [
+      { src: "/looks/crossbody-tee.jpg", alt: "A tee with a crossbody bag and black track pants", pos: "50% 25%" },
+      { src: "/looks/training.jpg", alt: "A sage tee and black track pants in training", pos: "50% 25%" },
+      { src: "/looks/tee-knee.jpg", alt: "A textured grey tee", pos: "50% 25%" },
+    ],
+  },
+};
+
 /** Frames with a transparent background (.webp or .png) float on the stage; anything else is shown as a photograph. */
 const isCut = (src: string) => /\.(webp|png)$/i.test(src);
 /** Close-ups in the detail panel use the original photograph, which keeps the cloth and its surroundings. */
@@ -169,6 +205,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
     setClassic(new URLSearchParams(window.location.search).get("viewer") === "classic");
   }, []);
   const Viewer = classic ? GarmentClassic : Garment3D;
+
 
   const [pi, setPi] = useState(0);
   const [frame, setFrame] = useState(0);
@@ -377,31 +414,32 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const keyFrames = product.spin ? [0, 1, 2, 3].map((k) => Math.round((k * n) / 4)) : product.frames.map((_, i) => i);
 
   return (
-    <section aria-labelledby="hero-heading" className="sp-stage relative isolate flex flex-col overflow-hidden text-white lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
+    <section aria-labelledby="hero-heading" data-stage={THEME[product.id]?.stage} className="sp-stage relative isolate flex flex-col overflow-hidden text-[rgb(var(--sp-fg))] lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
       {/* The stage: a soft halo of light behind the product and a floor. */}
       <PointerDepth />
       <div aria-hidden className="sp-halo" />
-      {/* The LESPARO bird from the logo, large and faint behind the product. */}
-      {/* eslint-disable-next-line @next/next/no-img-element -- decorative, fixed-size mark */}
-      <img aria-hidden src="/lesparo-bird.png" alt="" width={1140} height={1464} className="sp-bird" />
+      {/* The product's name, huge and tone-on-tone behind it; keyed so it slides in again on each switch. */}
+      <p key={product.id} aria-hidden className="sp-bigword">
+        {THEME[product.id]?.word}
+      </p>
       <div aria-hidden className="sp-floor" />
 
       <div className="sp-leave-text contents lg:absolute lg:left-8 lg:top-10 lg:z-20 lg:flex lg:max-w-[15rem] lg:flex-col xl:left-12 xl:max-w-[25rem]">
         {/* Text column, top left: a small label, a two-weight title, then the description and actions. */}
         <div className="sp-copy relative z-20 px-5 pt-8 sm:px-8 lg:p-0">
-          <p className="flex items-center gap-3 text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-white/75">
+          <p className="flex items-center gap-3 text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-[rgb(var(--sp-fg)/0.75)]">
             <span aria-hidden className="size-1.5 rounded-full bg-sun" />
             {eyebrow}
           </p>
           <h1 id="hero-heading" className="mt-5 font-display text-[clamp(1.9rem,1rem+1.7vw,2.9rem)] leading-[1.06] tracking-[-0.03em] text-balance">
-            <span className="block font-light text-white/85">
+            <span className="block font-light text-[rgb(var(--sp-fg)/0.85)]">
               {words.slice(0, cut).map((w, i) => (
                 <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: i }}>
                   {w}&nbsp;
                 </span>
               ))}
             </span>
-            <span className="block font-bold text-white">
+            <span className="block font-bold text-[rgb(var(--sp-fg))]">
               {words.slice(cut).map((w, i) => (
                 <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: cut + i }}>
                   {w}&nbsp;
@@ -413,15 +451,31 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
 
           {/* Description and actions, under the headline. */}
         <div className="sp-copy relative z-20 order-last px-5 pb-8 sm:px-8 lg:order-none lg:mt-8 lg:p-0">
-          <p className="text-[0.95rem] leading-relaxed text-white/85">{subheading}</p>
+          <p className="text-[0.95rem] leading-relaxed text-[rgb(var(--sp-fg)/0.85)]">{subheading}</p>
           <div className="mt-5 flex flex-wrap gap-3 lg:flex-col lg:items-stretch xl:flex-row">
-            <Link href={cta.href} className="inline-flex h-12 items-center justify-center gap-2 bg-white px-7 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-indigo-deep transition-colors duration-200 hover:bg-sun focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun">
+            <Link href={cta.href} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[rgb(var(--sp-fg))] px-7 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-[rgb(var(--sp-on-fg))] transition-colors duration-200 hover:bg-sun hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun">
               {cta.label} <ArrowRight className="size-4" aria-hidden />
             </Link>
-            <Link href={secondary.href} className="inline-flex h-12 items-center justify-center border border-white/60 px-6 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-white transition-colors duration-200 hover:border-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun">
+            <Link href={secondary.href} className="inline-flex h-12 items-center justify-center rounded-full border border-[rgb(var(--sp-fg)/0.6)] px-6 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-[rgb(var(--sp-fg))] transition-colors duration-200 hover:border-[rgb(var(--sp-fg))] hover:bg-[rgb(var(--sp-fg)/0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun">
               {secondary.label}
             </Link>
           </div>
+
+          {/* Worn: the product on the model, three photographs fanned like prints on a table. Desktop only. */}
+          {WORN[product.id] && (
+            <div className="mt-12 hidden lg:block">
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[rgb(var(--sp-fg)/0.7)]">On the model</p>
+              <ul key={product.id} className="sp-fan mt-4 flex">
+                {WORN[product.id].photos.map((ph, i) => (
+                  <li key={ph.src} className={`relative ${i ? "-ml-6" : ""}`}>
+                    <Link href={WORN[product.id].href} className="relative block aspect-[3/4] w-[6.5rem] overflow-hidden rounded-xl shadow-[0_18px_30px_-12px_rgb(0_0_0/0.55)] ring-2 ring-[rgb(var(--sp-fg)/0.85)] xl:w-[7.75rem]">
+                      <Image src={ph.src} alt={ph.alt} fill sizes="124px" className="object-cover" style={{ objectPosition: ph.pos ?? "50% 40%" }} />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 
@@ -436,8 +490,8 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
                   type="button"
                   aria-pressed={on}
                   onClick={() => choose(i)}
-                  className={`flex h-12 w-full items-center justify-center gap-2 border px-1.5 text-[0.68rem] font-bold uppercase tracking-[0.08em] sm:px-3 sm:text-[0.8rem] sm:tracking-[0.14em] transition-[background-color,color,border-color] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun ${
-                    on ? "border-white bg-white text-indigo-deep" : "border-white/40 bg-indigo-deep/70 text-white hover:border-white hover:bg-white/10"
+                  className={`flex h-12 w-full items-center justify-center gap-2 rounded-full border px-1.5 text-[0.68rem] font-bold uppercase tracking-[0.08em] sm:px-3 sm:text-[0.8rem] sm:tracking-[0.14em] transition-[background-color,color,border-color] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun ${
+                    on ? "border-[rgb(var(--sp-fg))] bg-[rgb(var(--sp-fg))] text-[rgb(var(--sp-on-fg))]" : "border-[rgb(var(--sp-fg)/0.4)] bg-[rgb(var(--sp-panel)/0.7)] text-[rgb(var(--sp-fg))] hover:border-[rgb(var(--sp-fg))] hover:bg-[rgb(var(--sp-fg)/0.1)]"
                   }`}
                 >
                   <span aria-hidden className={`size-1.5 rounded-full transition-colors duration-200 ${on ? "bg-sun" : "bg-transparent"}`} />
@@ -488,7 +542,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
               draggable={false}
               decoding="async"
               fetchPriority="high"
-              className={`pointer-events-none absolute inset-0 size-full ${cutout ? "object-contain drop-shadow-[var(--sx,0px)_26px_28px_rgb(0_0_0/0.45)]" : "object-cover ring-1 ring-white/15"}`}
+              className={`pointer-events-none absolute inset-0 size-full ${cutout ? "object-contain drop-shadow-[var(--sx,0px)_26px_28px_rgb(0_0_0/0.45)]" : "object-cover ring-1 ring-[rgb(var(--sp-fg)/0.15)]"}`}
               style={fade ? { maskImage: FADE_MASK[fade], WebkitMaskImage: FADE_MASK[fade] } : undefined}
             />
           </div>
@@ -540,7 +594,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       {model && (
         // The row spans the hero, so it lets clicks and drags through to the 3D stage (and its reset button) beneath; only the tabs themselves take them.
         <div role="group" aria-label="View" className="sp-copy pointer-events-none relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
-          <ul className="pointer-events-auto flex w-full max-w-[24rem] border border-white/30 bg-indigo-deep/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
+          <ul className="pointer-events-auto flex w-full max-w-[24rem] overflow-hidden rounded-full border border-[rgb(var(--sp-fg)/0.3)] bg-[rgb(var(--sp-panel)/0.7)] backdrop-blur-sm sm:w-auto sm:max-w-full">
             {(VIEWS_3D[product.id] ?? []).map((v) => {
               const on = view3d?.id === v.id;
               return (
@@ -553,7 +607,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
                       const sp = product.spots.find((s) => s.label === v.point);
                       if (sp) setSpotKey(keyOf(sp));
                     }}
-                    className={`min-h-11 w-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sun sm:px-5 sm:py-0 ${on ? "bg-white text-indigo-deep" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
+                    className={`min-h-11 w-full rounded-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sun sm:px-5 sm:py-0 ${on ? "bg-[rgb(var(--sp-fg))] text-[rgb(var(--sp-on-fg))]" : "text-[rgb(var(--sp-fg)/0.8)] hover:bg-[rgb(var(--sp-fg)/0.1)] hover:text-[rgb(var(--sp-fg))]"}`}
                   >
                     {v.label}
                   </button>
@@ -564,12 +618,12 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         </div>
       )}
       {!model && <div role="group" aria-label="View" className="sp-copy relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
-        <ul className="flex w-full max-w-[24rem] border border-white/30 bg-indigo-deep/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
+        <ul className="flex w-full max-w-[24rem] overflow-hidden rounded-full border border-[rgb(var(--sp-fg)/0.3)] bg-[rgb(var(--sp-panel)/0.7)] backdrop-blur-sm sm:w-auto sm:max-w-full">
           {keyFrames.map((f, i) => {
             const on = ringDist(f, frame, n) <= (product.spin ? Math.floor(n / 8) : 0);
             return (
               <li key={f} className="flex-1 sm:flex-none">
-                <button type="button" aria-pressed={on} onClick={() => goTo(f)} className={`min-h-11 w-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sun sm:px-5 sm:py-0 ${on ? "bg-white text-indigo-deep" : "text-white/80 hover:bg-white/10 hover:text-white"}`}>
+                <button type="button" aria-pressed={on} onClick={() => goTo(f)} className={`min-h-11 w-full rounded-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sun sm:px-5 sm:py-0 ${on ? "bg-[rgb(var(--sp-fg))] text-[rgb(var(--sp-on-fg))]" : "text-[rgb(var(--sp-fg)/0.8)] hover:bg-[rgb(var(--sp-fg)/0.1)] hover:text-[rgb(var(--sp-fg))]"}`}>
                   {product.keyLabels[i]}
                 </button>
               </li>
@@ -581,21 +635,21 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       {/* Detail panel, bottom right: the close-up, its name and what it is. */}
       <div aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[16rem] lg:p-0 xl:w-[23rem] 2xl:right-12 2xl:w-[26rem]">
         {active ? (
-          <div key={keyOf(active)} className="sp-detail flex flex-col gap-4 bg-indigo-deep/75 p-4 ring-1 ring-white/15 backdrop-blur-sm ">
-            <span aria-hidden className="block h-44 w-full shrink-0 bg-no-repeat sm:h-52 lg:h-44 xl:h-52 2xl:h-56" style={active.art ? { backgroundImage: `url(${active.art})`, backgroundSize: "auto 72%", backgroundPosition: "center", backgroundColor: "var(--color-indigo-800)" } : { backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "400% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
+          <div key={keyOf(active)} className="sp-detail flex flex-col gap-3 overflow-hidden rounded-2xl bg-[rgb(var(--sp-panel)/0.55)] p-3 ring-1 ring-[rgb(var(--sp-fg)/0.15)] backdrop-blur-sm ">
+            <span aria-hidden className="block h-36 w-full shrink-0 rounded-xl bg-no-repeat lg:h-28 xl:h-32 2xl:h-36" style={active.art ? { backgroundImage: `url(${active.art})`, backgroundSize: "auto 62%", backgroundPosition: "center", backgroundColor: "rgb(var(--sp-art, var(--sp-panel)))" } : { backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "400% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
             <div className="min-w-0">
-              <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-sun">
+              <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[rgb(var(--sp-accent))]">
                 Detail {activeIdx + 1} of {visibleSpots.length}
               </p>
               <h2 className="mt-1 font-display text-[1.2rem] font-bold leading-tight tracking-tight">{active.label}</h2>
-              <p className="mt-2 text-[0.92rem] leading-relaxed text-white/85">{active.detail ?? DETAILS[active.label] ?? "Select another point to compare the cloth."}</p>
+              <p className="mt-2 text-[0.92rem] leading-relaxed text-[rgb(var(--sp-fg)/0.85)]">{active.detail ?? DETAILS[active.label] ?? "Select another point to compare the cloth."}</p>
             </div>
           </div>
         ) : (
-          <div className="bg-indigo-deep/75 p-4 ring-1 ring-white/15 backdrop-blur-sm">
-            <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-sun">Product detail</p>
+          <div className="rounded-2xl bg-[rgb(var(--sp-panel)/0.55)] p-4 ring-1 ring-[rgb(var(--sp-fg)/0.15)] backdrop-blur-sm">
+            <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[rgb(var(--sp-accent))]">Product detail</p>
             <h2 className="mt-1 font-display text-[1.2rem] font-bold leading-tight tracking-tight">{product.label}</h2>
-            <p className="mt-2 text-[0.92rem] leading-relaxed text-white/85">{model ? (points3d.length ? "Select a numbered point on the garment to see it close up." : "Drag to turn the full look, or choose a view below.") : zoom > 1 ? "Zoom out to see the marked points on the garment." : "Turn the garment to a view with marked points, then select one to see it close up."}</p>
+            <p className="mt-2 text-[0.92rem] leading-relaxed text-[rgb(var(--sp-fg)/0.85)]">{model ? (points3d.length ? "Select a numbered point on the garment to see it close up." : "Drag to turn the full look, or choose a view below.") : zoom > 1 ? "Zoom out to see the marked points on the garment." : "Turn the garment to a view with marked points, then select one to see it close up."}</p>
           </div>
         )}
       </div>

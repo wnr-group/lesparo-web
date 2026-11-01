@@ -607,7 +607,7 @@ export default function Garment3DPremium({
         aria-label="Reset the view"
         onClick={reset}
         onPointerDown={(e) => e.stopPropagation()}
-        className="absolute bottom-3 right-3 z-20 grid size-11 lg:bottom-7 lg:left-1/2 lg:right-auto lg:ml-[14rem] place-items-center border border-white/40 bg-indigo-deep/80 text-white backdrop-blur hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-sun"
+        className="absolute bottom-3 right-3 z-20 grid size-11 lg:bottom-7 lg:left-1/2 lg:right-auto lg:ml-[14rem] place-items-center rounded-full border border-[rgb(var(--sp-fg,255_255_255)/0.4)] bg-[rgb(var(--sp-panel,18_22_76)/0.6)] text-[rgb(var(--sp-fg,255_255_255))] backdrop-blur hover:bg-[rgb(var(--sp-fg,255_255_255)/0.15)] focus-visible:outline-2 focus-visible:outline-sun"
       >
         <RotateCcw className="size-4" aria-hidden />
       </button>

@@ -18,16 +18,163 @@
   background-color: var(--color-indigo-800);
 }
 /*
- * A photographer's set in the brand navy, built only from the indigo scale: one tone from a lifted centre to an
- * almost-black edge (no electric blues, no fade to white), lit by a single warm studio light from the upper left,
- * where the copy sits. The warm light ties the stage to the warm cloth instead of fighting it.
+ * Stage colours, one world per product: each is a photographer's set in a single rich tone, running from a lifted
+ * centre to a deep edge, with a soft key light from the upper left (where the copy sits) and a glow behind the
+ * product. Switching product cross-fades the whole set (the colour stops are registered below, so they animate).
+ * The hero's text, panels and accents read the same variables. Set with data-stage on .sp-stage.
+ *   --sp-1/2/3   centre, middle and edge of the set      --sp-key   key light      --sp-glow   light behind the product
+ *   --sp-fg      text and outlines (r g b)               --sp-on-fg text on a filled --sp-fg button
+ *   --sp-panel   glass panels (r g b)                     --sp-accent small labels and markers (r g b)
+ *   --sp-shade   vignette and floor (r g b)               --sp-art   backing for artwork in the detail card (r g b)
  */
+@property --sp-1 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1b2167;
+}
+@property --sp-2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #12164c;
+}
+@property --sp-3 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #0a0d2e;
+}
+@property --sp-glow {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+/* Brand indigo, for the full look. */
+.sp-stage,
+.sp-stage[data-stage="indigo"] {
+  --sp-1: #2a3390;
+  --sp-2: var(--color-indigo-deep);
+  --sp-3: #0a0d2e;
+  --sp-key: rgb(255 236 214 / 0.07);
+  --sp-glow: rgb(255 238 216 / 0.22);
+  --sp-fg: 255 255 255;
+  --sp-on-fg: 18 22 76;
+  --sp-panel: 18 22 76;
+  --sp-accent: 255 200 44;
+  --sp-shade: 4 6 22;
+  --sp-art: 18 22 76;
+}
+/* Clay: a warm terracotta for the brown polo, tonal with the cloth, so the cream trim leads. */
+.sp-stage[data-stage="clay"] {
+  --sp-1: #b0603f;
+  --sp-2: #7c3a24;
+  --sp-3: #36160c;
+  --sp-key: rgb(255 232 210 / 0.1);
+  --sp-glow: rgb(255 222 190 / 0.28);
+  --sp-on-fg: 92 40 22;
+  --sp-panel: 70 28 15;
+  --sp-art: 70 28 15;
+  --sp-shade: 30 10 4;
+}
+/* Sage: an earthy field green for the brown cargo pants, the classic athletic pairing. */
+.sp-stage[data-stage="sage"] {
+  --sp-1: #84926c;
+  --sp-2: #56624a;
+  --sp-3: #1f251a;
+  --sp-key: rgb(255 248 230 / 0.1);
+  --sp-glow: rgb(250 246 225 / 0.26);
+  --sp-on-fg: 44 52 36;
+  --sp-panel: 36 44 30;
+  --sp-art: 36 44 30;
+  --sp-shade: 10 14 8;
+}
 .sp-stage {
   background:
-    radial-gradient(70% 60% at 18% 0%, rgb(255 236 214 / 0.07), transparent 70%),
-    radial-gradient(85% 75% at 52% 46%, var(--color-indigo-800) 0%, var(--color-indigo-deep) 55%, #0a0d2e 100%);
+    radial-gradient(70% 60% at 18% 0%, var(--sp-key), transparent 70%),
+    radial-gradient(85% 75% at 52% 46%, var(--sp-1) 0%, var(--sp-2) 55%, var(--sp-3) 100%);
+  transition:
+    --sp-1 0.9s var(--ease-atelier),
+    --sp-2 0.9s var(--ease-atelier),
+    --sp-3 0.9s var(--ease-atelier),
+    --sp-glow 0.9s var(--ease-atelier);
 }
-/* The key light behind the product: a warm ivory pool, no ring. */
+
+/* The product's name, huge and tone-on-tone behind it, like a campaign poster. Slides in when the product changes. */
+.sp-bigword {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  translate: -50% -50%;
+  font-family: var(--font-sport);
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(7rem, 4rem + 17vw, 22rem);
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.075);
+  pointer-events: none;
+  user-select: none;
+}
+/* On phones the hero is a tall column and the word would land off-centre behind the controls. */
+@media (max-width: 1023px) {
+  .sp-bigword {
+    display: none;
+  }
+}
+@keyframes sp-bigword-in {
+  from {
+    opacity: 0;
+    translate: -44% -50%;
+  }
+}
+
+/* Worn: a fan of three on-model photographs, bottom left. Cards straighten and lift on hover. */
+.sp-fan > li {
+  transition:
+    rotate 0.5s var(--ease-out-soft),
+    translate 0.5s var(--ease-out-soft);
+}
+.sp-fan > li:nth-child(1) {
+  rotate: -7deg;
+  translate: 0 0.4rem;
+}
+.sp-fan > li:nth-child(2) {
+  rotate: -1deg;
+  z-index: 1;
+}
+.sp-fan > li:nth-child(3) {
+  rotate: 6deg;
+  translate: 0 0.5rem;
+}
+@media (hover: hover) {
+  .sp-fan > li:hover {
+    rotate: 0deg;
+    translate: 0 -0.6rem;
+    z-index: 2;
+  }
+}
+@keyframes sp-fan-in {
+  from {
+    opacity: 0;
+    translate: 0 1.5rem;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sp-bigword {
+    animation: sp-bigword-in 1s var(--ease-out-soft) both;
+  }
+  .sp-fan > li {
+    animation: sp-fan-in 0.7s var(--ease-out-soft) both;
+  }
+  .sp-fan > li:nth-child(2) {
+    animation-delay: 80ms;
+  }
+  .sp-fan > li:nth-child(3) {
+    animation-delay: 160ms;
+  }
+}
+/* The key light behind the product: a soft pool of light, no ring. */
 .sp-halo {
   position: absolute;
   top: 50%;
@@ -37,7 +184,7 @@
   aspect-ratio: 1;
   translate: -50% -50%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(255 238 216 / 0.2) 0%, rgb(255 226 196 / 0.07) 38%, transparent 66%);
+  background: radial-gradient(circle, var(--sp-glow) 0%, transparent 66%);
   pointer-events: none;
 }
 /* Vignette and a whisper of film grain over the whole set, under the copy and controls. */
@@ -48,33 +195,8 @@
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(120% 95% at 50% 45%, transparent 55%, rgb(4 6 22 / 0.45) 100%),
+    radial-gradient(120% 95% at 50% 45%, transparent 55%, rgb(var(--sp-shade) / 0.45) 100%),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-/* The logo bird, large behind the product. */
-.sp-bird {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 0;
-  height: 116%;
-  width: auto;
-  max-width: none;
-  translate: -50% -50%;
-  /* A faint emboss, not a watermark: enough to sign the set without hazing the navy. */
-  opacity: 0.045;
-  pointer-events: none;
-  user-select: none;
-}
-@keyframes sp-bird-float {
-  50% {
-    translate: -50% calc(-50% - 1.2%);
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .sp-bird {
-    animation: sp-bird-float 9s ease-in-out infinite;
-  }
 }
 /* The floor the product stands on. */
 .sp-floor {
@@ -82,7 +204,7 @@
   inset: auto 0 0 0;
   z-index: 0;
   height: 30%;
-  background: linear-gradient(180deg, transparent, rgb(6 8 28 / 0.4));
+  background: linear-gradient(180deg, transparent, rgb(var(--sp-shade) / 0.4));
   pointer-events: none;
 }
 
