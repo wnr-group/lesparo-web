@@ -935,11 +935,12 @@ details.acc[open]::details-content {
  * The list repeats its first message at the end, so the loop restarts without a jump. Pauses on hover or focus;
  * with reduced motion only the first message shows.
  */
+/* Percentages are of the whole list (three messages plus the repeat), so each step is a quarter. */
 @keyframes ticker-3 {
   0%, 28% { translate: 0 0; }
-  33%, 61% { translate: 0 -100%; }
-  66%, 94% { translate: 0 -200%; }
-  100% { translate: 0 -300%; }
+  33%, 61% { translate: 0 -25%; }
+  66%, 94% { translate: 0 -50%; }
+  100% { translate: 0 -75%; }
 }
 .ticker {
   height: 1.5rem;
