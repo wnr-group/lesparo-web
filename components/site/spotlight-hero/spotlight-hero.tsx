@@ -390,7 +390,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         {/* Text column, top left: a small label, a two-weight title, then the description and actions. */}
         <div className="sp-copy relative z-20 px-5 pt-8 sm:px-8 lg:p-0">
           <p className="flex items-center gap-3 text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-white/75">
-            <span aria-hidden className="size-1.5 rounded-full bg-[#ffc82c]" />
+            <span aria-hidden className="size-1.5 rounded-full bg-sun" />
             {eyebrow}
           </p>
           <h1 id="hero-heading" className="mt-5 font-display text-[clamp(1.9rem,1rem+1.7vw,2.9rem)] leading-[1.06] tracking-[-0.03em] text-balance">
@@ -415,10 +415,10 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         <div className="sp-copy relative z-20 order-last px-5 pb-8 sm:px-8 lg:order-none lg:mt-8 lg:p-0">
           <p className="text-[0.95rem] leading-relaxed text-white/85">{subheading}</p>
           <div className="mt-5 flex flex-wrap gap-3 lg:flex-col lg:items-stretch xl:flex-row">
-            <Link href={cta.href} className="inline-flex h-12 items-center justify-center gap-2 bg-white px-7 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-[#0e1b4f] transition-colors duration-200 hover:bg-[#ffc82c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c]">
+            <Link href={cta.href} className="inline-flex h-12 items-center justify-center gap-2 bg-white px-7 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-indigo-deep transition-colors duration-200 hover:bg-sun focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun">
               {cta.label} <ArrowRight className="size-4" aria-hidden />
             </Link>
-            <Link href={secondary.href} className="inline-flex h-12 items-center justify-center border border-white/60 px-6 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-white transition-colors duration-200 hover:border-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c]">
+            <Link href={secondary.href} className="inline-flex h-12 items-center justify-center border border-white/60 px-6 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-white transition-colors duration-200 hover:border-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun">
               {secondary.label}
             </Link>
           </div>
@@ -436,11 +436,11 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
                   type="button"
                   aria-pressed={on}
                   onClick={() => choose(i)}
-                  className={`flex h-12 w-full items-center justify-center gap-2 border px-1.5 text-[0.68rem] font-bold uppercase tracking-[0.08em] sm:px-3 sm:text-[0.8rem] sm:tracking-[0.14em] transition-[background-color,color,border-color] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c] ${
-                    on ? "border-white bg-white text-[#0e1b4f]" : "border-white/40 bg-[#0e1b4f]/70 text-white hover:border-white hover:bg-white/10"
+                  className={`flex h-12 w-full items-center justify-center gap-2 border px-1.5 text-[0.68rem] font-bold uppercase tracking-[0.08em] sm:px-3 sm:text-[0.8rem] sm:tracking-[0.14em] transition-[background-color,color,border-color] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun ${
+                    on ? "border-white bg-white text-indigo-deep" : "border-white/40 bg-indigo-deep/70 text-white hover:border-white hover:bg-white/10"
                   }`}
                 >
-                  <span aria-hidden className={`size-1.5 rounded-full transition-colors duration-200 ${on ? "bg-[#e5a800]" : "bg-transparent"}`} />
+                  <span aria-hidden className={`size-1.5 rounded-full transition-colors duration-200 ${on ? "bg-sun" : "bg-transparent"}`} />
                   {p.label}
                 </button>
               </li>
@@ -462,7 +462,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
           role="group"
           aria-label={`${product.label}. Drag sideways, or use the arrow keys, to turn it. Plus and minus zoom.`}
           tabIndex={0}
-          className={`sp-product relative w-full max-w-[22rem] select-none overflow-hidden outline-offset-[4px] focus-visible:outline-2 focus-visible:outline-[#ffc82c] lg:h-full lg:w-auto lg:max-w-none ${zoom > 1 ? "cursor-move" : "cursor-grab active:cursor-grabbing"} touch-pan-y`}
+          className={`sp-product relative w-full max-w-[22rem] select-none overflow-hidden outline-offset-[4px] focus-visible:outline-2 focus-visible:outline-sun lg:h-full lg:w-auto lg:max-w-none ${zoom > 1 ? "cursor-move" : "cursor-grab active:cursor-grabbing"} touch-pan-y`}
           style={{ aspectRatio: "2 / 3" }}
           onPointerDown={onDown}
           onPointerMove={onMove}
@@ -504,22 +504,22 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
                 onClick={() => setSpotKey(keyOf(p))}
                 onFocus={() => setSpotKey(keyOf(p))}
                 onPointerDown={(e) => e.stopPropagation()}
-                className="sp-pin group absolute grid size-11 -translate-x-1/2 -translate-y-1/2 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#ffc82c]"
+                className="sp-pin group absolute grid size-11 -translate-x-1/2 -translate-y-1/2 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sun"
                 style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}
               >
-                <span aria-hidden className={`grid size-8 place-items-center rounded-full border-2 transition-[transform,background-color,border-color] duration-200 group-hover:scale-110 ${on ? "border-[#ffc82c] bg-[#0e1b4f]/55" : "border-white bg-[#0e1b4f]/35 group-hover:bg-[#0e1b4f]/60"}`}>
-                  <span className={`size-2.5 rounded-full transition-colors duration-200 ${on ? "bg-[#ffc82c]" : "bg-white"}`} />
+                <span aria-hidden className={`grid size-8 place-items-center rounded-full border-2 transition-[transform,background-color,border-color] duration-200 group-hover:scale-110 ${on ? "border-sun bg-indigo-deep/55" : "border-white bg-indigo-deep/35 group-hover:bg-indigo-deep/60"}`}>
+                  <span className={`size-2.5 rounded-full transition-colors duration-200 ${on ? "bg-sun" : "bg-white"}`} />
                 </span>
               </button>
             );
           })}
           </div>
 
-          <div className="absolute bottom-3 right-3 z-20 flex flex-col border border-white/40 bg-[#0e1b4f]/80 backdrop-blur" onPointerDown={(e) => e.stopPropagation()}>
-            <button type="button" aria-label="Zoom in" disabled={zoom >= 2.6} onClick={() => setZ(zoom + 0.6)} className="grid size-10 place-items-center hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-[#ffc82c] disabled:opacity-40">
+          <div className="absolute bottom-3 right-3 z-20 flex flex-col border border-white/40 bg-indigo-deep/80 backdrop-blur" onPointerDown={(e) => e.stopPropagation()}>
+            <button type="button" aria-label="Zoom in" disabled={zoom >= 2.6} onClick={() => setZ(zoom + 0.6)} className="grid size-10 place-items-center hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-sun disabled:opacity-40">
               <Plus className="size-4" aria-hidden />
             </button>
-            <button type="button" aria-label="Zoom out" disabled={zoom <= 1} onClick={() => setZ(zoom - 0.6)} className="grid size-10 place-items-center border-t border-white/30 hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-[#ffc82c] disabled:opacity-40">
+            <button type="button" aria-label="Zoom out" disabled={zoom <= 1} onClick={() => setZ(zoom - 0.6)} className="grid size-10 place-items-center border-t border-white/30 hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-sun disabled:opacity-40">
               <Minus className="size-4" aria-hidden />
             </button>
           </div>
@@ -540,7 +540,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       {model && (
         // The row spans the hero, so it lets clicks and drags through to the 3D stage (and its reset button) beneath; only the tabs themselves take them.
         <div role="group" aria-label="View" className="sp-copy pointer-events-none relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
-          <ul className="pointer-events-auto flex w-full max-w-[24rem] border border-white/30 bg-[#0e1b4f]/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
+          <ul className="pointer-events-auto flex w-full max-w-[24rem] border border-white/30 bg-indigo-deep/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
             {(VIEWS_3D[product.id] ?? []).map((v) => {
               const on = view3d?.id === v.id;
               return (
@@ -553,7 +553,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
                       const sp = product.spots.find((s) => s.label === v.point);
                       if (sp) setSpotKey(keyOf(sp));
                     }}
-                    className={`min-h-11 w-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#ffc82c] sm:px-5 sm:py-0 ${on ? "bg-white text-[#0e1b4f]" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
+                    className={`min-h-11 w-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sun sm:px-5 sm:py-0 ${on ? "bg-white text-indigo-deep" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
                   >
                     {v.label}
                   </button>
@@ -564,12 +564,12 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         </div>
       )}
       {!model && <div role="group" aria-label="View" className="sp-copy relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
-        <ul className="flex w-full max-w-[24rem] border border-white/30 bg-[#0e1b4f]/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
+        <ul className="flex w-full max-w-[24rem] border border-white/30 bg-indigo-deep/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
           {keyFrames.map((f, i) => {
             const on = ringDist(f, frame, n) <= (product.spin ? Math.floor(n / 8) : 0);
             return (
               <li key={f} className="flex-1 sm:flex-none">
-                <button type="button" aria-pressed={on} onClick={() => goTo(f)} className={`min-h-11 w-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#ffc82c] sm:px-5 sm:py-0 ${on ? "bg-white text-[#0e1b4f]" : "text-white/80 hover:bg-white/10 hover:text-white"}`}>
+                <button type="button" aria-pressed={on} onClick={() => goTo(f)} className={`min-h-11 w-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sun sm:px-5 sm:py-0 ${on ? "bg-white text-indigo-deep" : "text-white/80 hover:bg-white/10 hover:text-white"}`}>
                   {product.keyLabels[i]}
                 </button>
               </li>
@@ -581,10 +581,10 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       {/* Detail panel, bottom right: the close-up, its name and what it is. */}
       <div aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[16rem] lg:p-0 xl:w-[23rem] 2xl:right-12 2xl:w-[26rem]">
         {active ? (
-          <div key={keyOf(active)} className="sp-detail flex flex-col gap-4 bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm ">
-            <span aria-hidden className="block h-44 w-full shrink-0 bg-no-repeat sm:h-52 lg:h-44 xl:h-52 2xl:h-56" style={active.art ? { backgroundImage: `url(${active.art})`, backgroundSize: "auto 72%", backgroundPosition: "center", backgroundColor: "#14226b" } : { backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "400% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
+          <div key={keyOf(active)} className="sp-detail flex flex-col gap-4 bg-indigo-deep/75 p-4 ring-1 ring-white/15 backdrop-blur-sm ">
+            <span aria-hidden className="block h-44 w-full shrink-0 bg-no-repeat sm:h-52 lg:h-44 xl:h-52 2xl:h-56" style={active.art ? { backgroundImage: `url(${active.art})`, backgroundSize: "auto 72%", backgroundPosition: "center", backgroundColor: "var(--color-indigo-800)" } : { backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "400% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
             <div className="min-w-0">
-              <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#ffc82c]">
+              <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-sun">
                 Detail {activeIdx + 1} of {visibleSpots.length}
               </p>
               <h2 className="mt-1 font-display text-[1.2rem] font-bold leading-tight tracking-tight">{active.label}</h2>
@@ -592,8 +592,8 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
             </div>
           </div>
         ) : (
-          <div className="bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm">
-            <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#ffc82c]">Product detail</p>
+          <div className="bg-indigo-deep/75 p-4 ring-1 ring-white/15 backdrop-blur-sm">
+            <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-sun">Product detail</p>
             <h2 className="mt-1 font-display text-[1.2rem] font-bold leading-tight tracking-tight">{product.label}</h2>
             <p className="mt-2 text-[0.92rem] leading-relaxed text-white/85">{model ? (points3d.length ? "Select a numbered point on the garment to see it close up." : "Drag to turn the full look, or choose a view below.") : zoom > 1 ? "Zoom out to see the marked points on the garment." : "Turn the garment to a view with marked points, then select one to see it close up."}</p>
           </div>

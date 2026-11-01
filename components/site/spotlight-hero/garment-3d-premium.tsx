@@ -359,13 +359,13 @@ function Stage({ src, points, onHits, floatRef, fitRef, motion }: { src: string 
       {/* Restrained studio light: a soft key from the upper left, a cool fill, and a rim from behind to lift the edge off the navy. */}
       <ambientLight intensity={1.1} />
       <directionalLight position={[-2.2, 3.5, 3.5]} intensity={1.5} color="#fff3e4" />
-      <directionalLight position={[3.2, 1.2, 2]} intensity={0.5} color="#b9c8ff" />
-      <directionalLight position={[0.6, 2.5, -4]} intensity={1.3} color="#dbe6ff" />
+      <directionalLight position={[3.2, 1.2, 2]} intensity={0.5} color="#f4efe8" />
+      <directionalLight position={[0.6, 2.5, -4]} intensity={1.3} color="#e6e9fb" />
       {/* A soft key for the back too, so the garment reads as well from behind as from the front. */}
       <directionalLight position={[-2.2, 3, -3.5]} intensity={1.1} color="#fff3e4" />
       <Environment resolution={128} environmentIntensity={0.5}>
         <Lightformer form="rect" intensity={1.6} position={[0, 4, 3]} scale={[8, 3, 1]} />
-        <Lightformer form="rect" intensity={0.8} position={[-5, 1, 2]} scale={[3, 6, 1]} color="#9fb4ff" />
+        <Lightformer form="rect" intensity={0.8} position={[-5, 1, 2]} scale={[3, 6, 1]} color="#f3e6d8" />
         <Lightformer form="rect" intensity={0.6} position={[5, 1, -2]} scale={[3, 6, 1]} />
       </Environment>
       {size && <ContactShadows position={[size.cx, size.minY - 0.015 * size.h, size.cz]} opacity={0.45} scale={Math.max(size.w, size.d) * 3.2} blur={2.4} far={size.h * 0.4} frames={1} />}
@@ -537,7 +537,7 @@ export default function Garment3DPremium({
       role="group"
       aria-label={`${label}, a 3D model. Drag to turn it. Arrow keys turn it, plus and minus zoom.`}
       tabIndex={0}
-      className={`sp-model-in absolute inset-0 select-none outline-offset-[4px] focus-visible:outline-2 focus-visible:outline-[#ffc82c] ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
+      className={`sp-model-in absolute inset-0 select-none outline-offset-[4px] focus-visible:outline-2 focus-visible:outline-sun ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
       // Vertical swipes scroll the page; only horizontal drags reach the model.
       style={{ touchAction: "pan-y" }}
       onPointerDown={onPointerDown}
@@ -594,10 +594,10 @@ export default function Garment3DPremium({
           onFocus={() => onPick(h.key)}
           onPointerDown={(e) => e.stopPropagation()}
           style={{ opacity: 0, pointerEvents: "none" }}
-          className="group absolute left-0 top-0 z-20 grid size-11 cursor-pointer place-items-center rounded-full transition-opacity duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#ffc82c]"
+          className="group absolute left-0 top-0 z-20 grid size-11 cursor-pointer place-items-center rounded-full transition-opacity duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sun"
         >
-          <span aria-hidden className={`grid size-8 place-items-center rounded-full border-2 transition-[transform,background-color,border-color] duration-200 group-hover:scale-110 ${h.key === activeKey ? "border-[#ffc82c] bg-[#0e1b4f]/55" : "border-white bg-[#0e1b4f]/35 group-hover:bg-[#0e1b4f]/60"}`}>
-            <span className={`size-2.5 rounded-full transition-colors duration-200 ${h.key === activeKey ? "bg-[#ffc82c]" : "bg-white"}`} />
+          <span aria-hidden className={`grid size-8 place-items-center rounded-full border-2 transition-[transform,background-color,border-color] duration-200 group-hover:scale-110 ${h.key === activeKey ? "border-sun bg-indigo-deep/55" : "border-white bg-indigo-deep/35 group-hover:bg-indigo-deep/60"}`}>
+            <span className={`size-2.5 rounded-full transition-colors duration-200 ${h.key === activeKey ? "bg-sun" : "bg-white"}`} />
           </span>
         </button>
       ))}
@@ -607,7 +607,7 @@ export default function Garment3DPremium({
         aria-label="Reset the view"
         onClick={reset}
         onPointerDown={(e) => e.stopPropagation()}
-        className="absolute bottom-3 right-3 z-20 grid size-11 lg:bottom-7 lg:left-1/2 lg:right-auto lg:ml-[14rem] place-items-center border border-white/40 bg-[#0e1b4f]/80 text-white backdrop-blur hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-[#ffc82c]"
+        className="absolute bottom-3 right-3 z-20 grid size-11 lg:bottom-7 lg:left-1/2 lg:right-auto lg:ml-[14rem] place-items-center border border-white/40 bg-indigo-deep/80 text-white backdrop-blur hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-sun"
       >
         <RotateCcw className="size-4" aria-hidden />
       </button>
