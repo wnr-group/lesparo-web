@@ -4,7 +4,7 @@ import Link from "next/link";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BrandFilm } from "@/components/site/brand-film";
-import { SpotlightHero, type MontageFrame, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
+import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
 import { CIRCLE_TILES, RANGE_TILES } from "@/components/site/home-photos";
 import { NewLaunches, ShopByRange, TopCollections } from "@/components/site/home-sections";
 import { BrandStatement, BrandStory } from "@/components/site/brand-sections";
@@ -75,19 +75,6 @@ function turntable(id: string): TurntableSet | undefined {
   return { frames: files.map((f) => `/turntable/${id}/${f}`), spots };
 }
 
-/** Artwork for the hero's modernist frames: public/hero-art/arch, disc and strip (.jpg, .png or .webp), each optional. */
-function heroArt(): Partial<Record<MontageFrame, string>> {
-  const dir = join(process.cwd(), "public", "hero-art");
-  if (!existsSync(dir)) return {};
-  const files = readdirSync(dir);
-  const out: Partial<Record<MontageFrame, string>> = {};
-  for (const id of ["arch", "disc", "strip"] as const) {
-    const f = files.find((n) => new RegExp(`^${id}\\.(jpe?g|png|webp)$`, "i").test(n));
-    if (f) out[id] = `/hero-art/${f}`;
-  }
-  return out;
-}
-
 export default async function HomePage() {
   const [content, tree] = await Promise.all([getHomepageContent(), getCategoryTree()]);
   const fabrics = tree.find((t) => t.slug !== "garments");
@@ -99,7 +86,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ---------------------------------------------------------------- hero */}
-      <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} turntables={{ pants: turntable("pants"), tee: turntable("tee") }} models={{ pants: model3d("pants"), tee: model3d("tee"), look: model3d("look") ?? (model3d("pants") && model3d("tee") ? "/models/look" : undefined) }} montage={heroArt()} />
+      <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} turntables={{ pants: turntable("pants"), tee: turntable("tee") }} models={{ pants: model3d("pants"), tee: model3d("tee"), look: model3d("look") ?? (model3d("pants") && model3d("tee") ? "/models/look" : undefined) }} />
 
 
       {/* ---------------------------------------------------------- categories */}
