@@ -414,11 +414,6 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       <PointerDepth />
       <div aria-hidden className="sp-art">
         <i />
-        <i />
-        <i />
-        <i />
-        <i />
-        <i />
       </div>
       <div aria-hidden className="sp-halo" />
       {/* The product's name, huge and tone-on-tone behind it; keyed so it slides in again on each switch. */}
