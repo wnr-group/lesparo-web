@@ -52,7 +52,7 @@ export default async function WholesalePage(props: PageProps<"/wholesale">) {
           ))}
         </ol>
 
-        <div data-reveal="up" className="mt-12 grid gap-6 bg-[#f2f3f5] p-6 sm:p-8 lg:grid-cols-[1.3fr_1fr] lg:gap-12">
+        <div data-reveal="up" className="mt-12 grid gap-6 bg-mist p-6 sm:p-8 lg:grid-cols-[1.3fr_1fr] lg:gap-12">
           <div>
             <h2 className="font-display text-lg font-bold uppercase tracking-tight">What we supply</h2>
             <ul className="mt-3 space-y-1.5 text-[0.95rem]">

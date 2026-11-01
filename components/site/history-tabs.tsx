@@ -155,7 +155,7 @@ export function HistoryTabs({ items }: { items: HistoryItem[] }) {
         </div>
         <figure key={`f${i}`} className="pb-10 lg:col-span-7">
           <div className="relative">
-            <div className={`hist-photo relative aspect-[4/3] overflow-clip ${cur.photo?.fit === "contain" ? "bg-[#f2f3f5]" : "bg-[#22231f]"}`}>
+            <div className={`hist-photo relative aspect-[4/3] overflow-clip ${cur.photo?.fit === "contain" ? "bg-mist" : "bg-night"}`}>
               {cur.photo ? (
                 <Image src={cur.photo.src} alt={cur.caption ?? cur.title} fill quality={90} sizes="(min-width:1024px) 55vw, 100vw" className={cur.photo.fit === "contain" ? "object-contain p-6" : "object-cover"} style={{ objectPosition: cur.photo.pos }} />
               ) : (
@@ -167,7 +167,7 @@ export function HistoryTabs({ items }: { items: HistoryItem[] }) {
             {/* Today: the part of the LESPARO range that carries this chapter forward, linking into the shop. */}
             {cur.range && (
               <Link href={cur.range.href} className="hist-inset group absolute -bottom-10 left-4 block w-[34%] border-4 border-white bg-white shadow-[0_24px_40px_-20px_rgb(0_0_0/0.45)] sm:left-6 lg:-left-8 lg:w-[30%]">
-                <span className="relative block aspect-[4/5] overflow-clip bg-[#22231f]">
+                <span className="relative block aspect-[4/5] overflow-clip bg-night">
                   {/* unoptimized: a 900px file shown ~300px wide; the optimiser would re-encode it small and soft. */}
                   <Image src={cur.range.src} alt="" fill unoptimized sizes="400px" className="hz object-cover" style={{ objectPosition: cur.range.pos }} />
                 </span>

@@ -18,7 +18,9 @@ export function SmoothScroll() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const instance = new Lenis({
       autoRaf: true,
-      lerp: 0.09,
+      // Quick to follow the wheel (a low lerp feels floaty and slow), and a little more distance per notch.
+      lerp: 0.18,
+      wheelMultiplier: 1.2,
       anchors: { offset: -80 },
       allowNestedScroll: true,
       stopInertiaOnNavigate: true,

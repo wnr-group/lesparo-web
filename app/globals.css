@@ -26,6 +26,33 @@
   --color-sun-soft: #fff4cf;
   --color-brass: #8a6200;
   --color-brass-soft: #fff1c2;
+  /* Full tonal scales built around the brand colours: indigo-700 = indigo, -900 = indigo-deep, -100 = indigo-soft;
+     sun-400 = sun, -100 = sun-soft, -700 = brass. Hovers, tints and dark states come from these, not one-off hex values. */
+  --color-indigo-50: #f1f2fd;
+  --color-indigo-100: #e8eafc;
+  --color-indigo-200: #c9cdf5;
+  --color-indigo-300: #a1a7ea;
+  --color-indigo-400: #6e77d2;
+  --color-indigo-500: #4651b5;
+  --color-indigo-600: #323ca0;
+  --color-indigo-700: #262e86;
+  --color-indigo-800: #1b2167;
+  --color-indigo-900: #12164c;
+  --color-sun-50: #fffbeb;
+  --color-sun-100: #fff4cf;
+  --color-sun-200: #ffe89a;
+  --color-sun-300: #ffda62;
+  --color-sun-400: #ffc82c;
+  --color-sun-500: #f0b000;
+  --color-sun-600: #c99000;
+  --color-sun-700: #8a6200;
+  /* Role colours, all AA on white. Offer is only for prices and sale labels; departments only for wayfinding. */
+  --color-offer: #c2410c;
+  --color-dept-gents: #1d6fa5;
+  --color-dept-kids: #3a7d5a;
+  --color-dept-fabrics: #8a6200;
+  /* Warm charcoal behind photographs and dark panels. */
+  --color-night: #22231f;
   --color-success: #1f7a48;
   --color-success-soft: #e1f5e9;
   --color-warning: #8a5a12;
@@ -35,6 +62,8 @@
 
   --font-display: var(--font-heading), "Bricolage Grotesque", system-ui, sans-serif;
   --font-sans: var(--font-body), "Plus Jakarta Sans", system-ui, sans-serif;
+  /* Athletic italic voice for prices, badges and shopping headlines only; never body copy. */
+  --font-sport: var(--font-promo), "Archivo", system-ui, sans-serif;
 
   --text-display: clamp(2.9rem, 1.5rem + 5.4vw, 6.75rem);
   --text-display--line-height: 0.95;
@@ -48,6 +77,12 @@
 
   --radius-xs: 8px;
   --radius-sm: 12px;
+  --radius-card: 12px;
+  --radius-panel: 2rem;
+
+  --shadow-card: 0 1px 2px rgb(18 22 76 / 0.05);
+  --shadow-lift: 0 22px 44px -26px rgb(18 22 76 / 0.4);
+  --shadow-float: 0 34px 70px -28px rgb(18 22 76 / 0.4);
 
   --ease-atelier: cubic-bezier(0.22, 0.61, 0.36, 1);
   --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
@@ -415,7 +450,8 @@
     bottom: 0.3rem;
     height: 2px;
     border-radius: 2px;
-    background: var(--color-indigo);
+    /* A department's own colour where one is set on the item (see lib/departments.ts). */
+    background: var(--dept, var(--color-indigo));
     transform: scaleX(0);
     transform-origin: right;
     transition: transform 0.45s var(--ease-out-soft);
@@ -637,6 +673,9 @@
   vertical-align: top;
   padding-bottom: 0.12em;
   margin-bottom: -0.12em;
+  /* Room for italic overhang (the sport face), so slanted letters aren't clipped by the mask. */
+  padding-inline-end: 0.1em;
+  margin-inline-end: -0.1em;
 }
 .sw-word {
   display: inline-block;
@@ -744,15 +783,11 @@
   transition: translate 0.35s var(--ease-out-soft);
 }
 
-/* Hero depth: the halo and the large bird drift opposite the pointer, at different rates (see PointerDepth in the hero). */
+/* Hero depth: the halo drifts opposite the pointer (see PointerDepth in the hero). */
 @media (prefers-reduced-motion: no-preference) {
   .sp-halo {
     transform: translate3d(calc(var(--px, 0) * 26px), calc(var(--py, 0) * 18px), 0);
     transition: transform 0.9s var(--ease-out-soft);
-  }
-  .sp-bird {
-    transform: translate3d(calc(var(--px, 0) * -34px), calc(var(--py, 0) * -22px), 0);
-    transition: transform 1.2s var(--ease-out-soft);
   }
 }
 
@@ -794,7 +829,7 @@
   }
   35%,
   65% {
-    background-color: #f2f3f5;
+    background-color: var(--color-mist);
   }
 }
 @keyframes edit-title {
@@ -889,6 +924,68 @@ details.acc::details-content {
 }
 details.acc[open]::details-content {
   block-size: auto;
+}
+
+/*
+ * Announcement ticker (components/site/announcement-bar.tsx): one message at a time rolls up into view and holds.
+ * The list repeats its first message at the end, so the loop restarts without a jump. Pauses on hover or focus;
+ * with reduced motion only the first message shows.
+ */
+/* Percentages are of the whole list (three messages plus the repeat), so each step is a quarter. */
+@keyframes ticker-3 {
+  0%, 28% { translate: 0 0; }
+  33%, 61% { translate: 0 -25%; }
+  66%, 94% { translate: 0 -50%; }
+  100% { translate: 0 -75%; }
+}
+.ticker {
+  height: 1.5rem;
+  overflow: clip;
+}
+.ticker > ul > li {
+  height: 1.5rem;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ticker > ul {
+    animation: ticker-3 15s var(--ease-atelier) infinite;
+  }
+  .ticker:hover > ul,
+  .ticker:focus-within > ul {
+    animation-play-state: paused;
+  }
+}
+
+/* Department wayfinding (lib/departments.ts): components colour themselves with var(--dept, <brand fallback>). */
+.dept-gents {
+  --dept: var(--color-dept-gents);
+}
+.dept-kids {
+  --dept: var(--color-dept-kids);
+}
+.dept-fabrics {
+  --dept: var(--color-dept-fabrics);
+}
+
+/* Mobile tab bar (components/site/mobile-tab-bar.tsx): slides away while scrolling down, back on scrolling up. */
+.tab-bar {
+  transition: translate 0.4s var(--ease-out-soft);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tab-bar[data-hidden="true"] {
+  translate: 0 110%;
+}
+
+/* Product grids: shoppers scan fast, so reveals there are shorter and travel less than in the editorial sections. */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-reveal-on] .grid-quick [data-reveal] {
+    transition:
+      opacity 0.45s var(--ease-out-soft),
+      translate 0.55s var(--ease-out-soft);
+    transition-delay: var(--delay, 0s);
+  }
+  :root[data-reveal-on] .grid-quick [data-reveal="up"]:not([data-revealed]) {
+    translate: 0 0.9rem;
+  }
 }
 
 /* Soft filled inputs for the wholesale enquiry form. */

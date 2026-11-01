@@ -25,7 +25,7 @@ export function DetailPanels() {
           {panels.map((p, i) => (
             <li key={p.title} data-reveal="up" style={{ ["--delay" as string]: `${i * 110}ms` }}>
               <figure className="group">
-                <div className="relative aspect-[4/5] overflow-clip bg-[#22231f]">
+                <div className="relative aspect-[4/5] overflow-clip bg-night">
                   <Image src={p.src} alt="" fill sizes="(min-width:768px) 32vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: p.pos }} />
                   <span aria-hidden className="absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/15" />
                 </div>
@@ -60,7 +60,7 @@ export function StudioLooks() {
           <h2 id="looks" className="edit-title font-display text-[clamp(1.8rem,1.2rem+2.4vw,3.2rem)] font-extrabold uppercase tracking-tight">
             <SplitWords>The studio edit</SplitWords>
           </h2>
-          <Link href="/shop" className="inline-flex h-11 items-center rounded-full bg-[#f2f3f5] px-5 text-sm font-semibold transition-colors hover:bg-ink hover:text-white">
+          <Link href="/shop" className="inline-flex h-11 items-center rounded-full bg-mist px-5 text-sm font-semibold transition-colors hover:bg-ink hover:text-white">
             Shop everything
           </Link>
         </div>
@@ -68,7 +68,7 @@ export function StudioLooks() {
           {looks.map((l, i) => (
             <li key={l.title} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }} className={`edit-item ${i % 2 ? "md:mt-10" : ""}`}>
               <Link href={l.href} className="group block">
-                <span className="relative block aspect-[3/4] overflow-clip bg-[#22231f]">
+                <span className="relative block aspect-[3/4] overflow-clip bg-night">
                   <Image src={l.src} alt="" fill sizes="(min-width:768px) 26vw, 48vw" className="scrub-parallax hz object-cover" style={{ objectPosition: l.pos }} />
                 </span>
                 <span className="mt-3 flex items-center justify-between gap-3">

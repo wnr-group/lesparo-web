@@ -12,6 +12,8 @@ export default function SiteLayout({ children }: LayoutProps<"/">) {
         {children}
       </main>
       <Footer />
+      {/* Room under the footer for the mobile tab bar (components/site/mobile-tab-bar.tsx), in the footer's colour. */}
+      <div aria-hidden className="h-[calc(3.75rem+env(safe-area-inset-bottom))] bg-indigo-deep lg:hidden" />
       <RevealObserver />
       {/* Reads usePathname(): keep it behind a boundary so pages can be re-rendered. */}
       <Suspense>

@@ -6,8 +6,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { deptClass } from "@/lib/departments";
 import { CartLink } from "./cart";
 import { EnquiryListLink } from "./enquiry-list";
+import { MobileTabBar } from "./mobile-tab-bar";
 
 export type NavGroup = { label: string; href: string; columns: { label: string; href: string; links: { label: string; href: string }[] }[] };
 
@@ -48,7 +50,7 @@ function DesktopMenu({ group, pathname }: { group: NavGroup; pathname: string })
   return (
     <li
       ref={ref}
-      className="flex h-full items-center"
+      className={clsx("flex h-full items-center", deptClass(group.href.split("/").pop()))}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       onKeyDown={(e) => {
@@ -77,16 +79,17 @@ function DesktopMenu({ group, pathname }: { group: NavGroup; pathname: string })
           open ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0",
         )}
       >
-        <div className="menu-panel grid w-[min(50rem,92vw)] grid-cols-[1fr_13rem] overflow-clip rounded-[1.1rem] border border-line bg-white shadow-[0_34px_70px_-28px_rgb(18_22_76/0.4)]" data-open={open}>
+        <div className="menu-panel grid w-[min(50rem,92vw)] grid-cols-[1fr_13rem] overflow-clip rounded-[1.1rem] border border-line bg-white shadow-[var(--shadow-float)]" data-open={open}>
           <div className="flex flex-col p-8">
             <div className="grid flex-1 gap-8" style={{ gridTemplateColumns: `repeat(${group.columns.length}, minmax(0, 1fr))` }}>
               {group.columns.map((col, ci) => (
-                <div key={col.href} className="menu-item" style={{ ["--i" as string]: ci }}>
-                  <Link href={col.href} className="group/col flex items-center gap-1.5 font-display text-lg font-extrabold uppercase tracking-tight">
+                <div key={col.href} className={clsx("menu-item", deptClass(col.href.split("/").pop()))} style={{ ["--i" as string]: ci }}>
+                  <Link href={col.href} className="group/col flex items-center gap-2 font-sport text-lg font-extrabold uppercase italic tracking-tight text-[var(--dept,var(--color-ink))]">
+                    <span aria-hidden className="size-2 shrink-0 rounded-full bg-[var(--dept,var(--color-sun))]" />
                     <span className="hline">{col.label}</span>
                     <ArrowUpRight className="size-4 -translate-x-1 opacity-0 transition-[opacity,transform] duration-300 group-hover/col:translate-x-0 group-hover/col:opacity-100" aria-hidden />
                   </Link>
-                  <ul className="mt-3 space-y-1.5 border-t border-ink/10 pt-3">
+                  <ul className="mt-3 space-y-1.5 border-t-2 border-[var(--dept,var(--color-line))] pt-3">
                     {col.links.map((l) => (
                       <li key={l.href}>
                         <Link href={l.href} className="group/l inline-flex items-center gap-1 text-[0.92rem] text-ink-soft transition-[color,transform] duration-300 hover:translate-x-1 hover:text-ink" aria-current={isActive(pathname, l.href) ? "page" : undefined}>
@@ -104,11 +107,11 @@ function DesktopMenu({ group, pathname }: { group: NavGroup; pathname: string })
             </Link>
           </div>
           {FEATURES[group.href.split("/").pop() ?? ""] && (
-            <Link href={group.href} tabIndex={open ? 0 : -1} aria-label={`${group.label}: ${FEATURES[group.href.split("/").pop() ?? ""].caption}`} className="menu-feature group/f relative block min-h-[19rem] overflow-clip bg-[#22231f]">
+            <Link href={group.href} tabIndex={open ? 0 : -1} aria-label={`${group.label}: ${FEATURES[group.href.split("/").pop() ?? ""].caption}`} className="menu-feature group/f relative block min-h-[19rem] overflow-clip bg-night">
               <Image src={FEATURES[group.href.split("/").pop() ?? ""].src} alt="" fill sizes="220px" quality={85} className="object-cover transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover/f:scale-[1.06]" />
               <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
               <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-4 text-white">
-                <span className="font-display text-lg font-extrabold uppercase leading-tight tracking-tight">{FEATURES[group.href.split("/").pop() ?? ""].caption}</span>
+                <span className="font-sport text-lg font-extrabold uppercase italic leading-tight tracking-tight">{FEATURES[group.href.split("/").pop() ?? ""].caption}</span>
                 <ArrowUpRight className="size-5 shrink-0 transition-transform duration-300 group-hover/f:rotate-45" aria-hidden />
               </span>
             </Link>
@@ -119,10 +122,41 @@ function DesktopMenu({ group, pathname }: { group: NavGroup; pathname: string })
   );
 }
 
-function SearchBar({ onClose }: { onClose?: () => void }) {
+function SearchBar({ onClose, inline = false }: { onClose?: () => void; inline?: boolean }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => inputRef.current?.focus(), []);
+  const id = useId();
+  // The popover and drawer search take focus when they open; the always-visible header field waits to be clicked.
+  useEffect(() => {
+    if (!inline) inputRef.current?.focus();
+  }, [inline]);
+  if (inline)
+    return (
+      <form
+        role="search"
+        action="/shop"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const q = inputRef.current?.value.trim() ?? "";
+          router.push(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
+          inputRef.current?.blur();
+        }}
+        className="relative hidden xl:block"
+      >
+        <label htmlFor={id} className="sr-only">
+          Search products
+        </label>
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted" aria-hidden />
+        <input
+          ref={inputRef}
+          id={id}
+          name="q"
+          type="search"
+          placeholder="Search shorts, lungi, towel…"
+          className="h-10 w-52 rounded-full border border-transparent bg-paper pl-10 pr-4 text-[0.85rem] transition-[width,background-color,border-color,box-shadow] duration-300 ease-[var(--ease-out-soft)] placeholder:text-muted hover:border-sand focus:w-64 focus:border-indigo focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo/15 2xl:w-60 2xl:focus:w-72"
+        />
+      </form>
+    );
   return (
     <form
       role="search"
@@ -203,12 +237,13 @@ export function SiteNav({ groups }: Props) {
       </nav>
 
       <div className="flex items-center gap-1 sm:gap-3">
+        <SearchBar inline />
         <button
           type="button"
           onClick={() => setSearch((s) => !s)}
           aria-expanded={search}
           aria-controls="header-search"
-          className="flex size-10 items-center justify-center rounded-full hover:bg-linen"
+          className="flex size-10 items-center justify-center rounded-full hover:bg-linen xl:hidden"
           aria-label="Search products"
         >
           {search ? <X className="size-[18px]" aria-hidden /> : <Search className="size-[18px]" aria-hidden />}
@@ -227,6 +262,8 @@ export function SiteNav({ groups }: Props) {
           </div>
         </div>
       )}
+
+      <MobileTabBar onSearch={() => setSearch(true)} onMenu={() => setDrawer(true)} />
 
       <dialog
         ref={drawerRef}
@@ -259,11 +296,11 @@ export function SiteNav({ groups }: Props) {
                     </summary>
                     <div className="space-y-4 pb-4 pl-1 pt-2 font-sans text-base">
                       {g.columns.map((c) => (
-                        <div key={c.href}>
-                          <Link href={c.href} className="font-medium">
+                        <div key={c.href} className={deptClass(c.href.split("/").pop())}>
+                          <Link href={c.href} className="font-semibold text-[var(--dept,var(--color-ink))]">
                             {c.label}
                           </Link>
-                          <ul className="mt-1.5 space-y-1.5 border-l border-line pl-3 text-ink-soft">
+                          <ul className="mt-1.5 space-y-1.5 border-l-2 border-[var(--dept,var(--color-line))] pl-3 text-ink-soft">
                             {c.links.map((l) => (
                               <li key={l.href}>
                                 <Link href={l.href}>{l.label}</Link>

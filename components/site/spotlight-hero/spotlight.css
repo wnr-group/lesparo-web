@@ -1,5 +1,5 @@
 /*
- * Spotlight hero: a tailor's inspection table in the LESPARO logo navy (#0e1b4f). The product photograph runs the
+ * Spotlight hero: a tailor's inspection table in the LESPARO brand navy (the indigo tokens in app/globals.css). The product photograph runs the
  * full height of the hero in its true colours; around it, a stitched hem, a woven selvedge edge, a running
  * stitch between the numbered points, and a loupe that magnifies the point you choose. Motion is limited to
  * a soft entrance, the moving stitch and the loupe popping in, and none of it runs for reduced motion.
@@ -14,65 +14,63 @@
 }
 /* Woven edge of a length of cloth: navy and sun threads. */
 .sp-selvedge {
-  background-image: repeating-linear-gradient(180deg, #0e1b4f 0 6px, #ffc82c 6px 9px, #0e1b4f 9px 15px, transparent 15px 18px);
-  background-color: #1c2f86;
+  background-image: repeating-linear-gradient(180deg, var(--color-indigo-deep) 0 6px, var(--color-sun) 6px 9px, var(--color-indigo-deep) 9px 15px, transparent 15px 18px);
+  background-color: var(--color-indigo-800);
 }
+/*
+ * The stage: one calm brand indigo with a soft warm light behind the product. The hero's text, panels and accents read the variables below.
+ *   --sp-1/2/3   centre, middle and edge of the indigo   --sp-key   key light      --sp-glow   light behind the product
+ *   --sp-fg      text and outlines (r g b)               --sp-on-fg text on a filled --sp-fg button
+ *   --sp-panel   glass panels (r g b)                     --sp-accent small labels and markers (r g b)
+ *   --sp-shade   vignette and floor (r g b)               --sp-art   backing for artwork in the detail card (r g b)
+ */
 .sp-stage {
+  --sp-1: #2a3390;
+  --sp-2: var(--color-indigo-deep);
+  --sp-3: #0a0d2e;
+  --sp-key: rgb(255 236 214 / 0.07);
+  --sp-glow: rgb(255 238 216 / 0.22);
+  --sp-fg: 255 255 255;
+  --sp-on-fg: 18 22 76;
+  --sp-panel: 18 22 76;
+  --sp-accent: 255 200 44;
+  --sp-shade: 4 6 22;
+  --sp-art: 18 22 76;
   background:
-    radial-gradient(60% 90% at 0% 0%, #2f46aa 0%, transparent 60%),
-    linear-gradient(110deg, #101d5c 0%, #1a2a7a 30%, #3d54b8 52%, #aebaec 76%, #eef1fc 100%);
+    radial-gradient(70% 60% at 18% 0%, var(--sp-key), transparent 70%),
+    radial-gradient(85% 75% at 52% 46%, var(--sp-1) 0%, var(--sp-2) 55%, var(--sp-3) 100%);
 }
-/* A soft halo of light and one fine ring behind the product. */
+/* The key light behind the product: a soft pool of light, no ring. */
 .sp-halo {
   position: absolute;
-  top: 52%;
+  top: 62%;
   left: 50%;
   z-index: 0;
-  width: min(62vw, 56rem);
+  width: min(72vw, 64rem);
   aspect-ratio: 1;
   translate: -50% -50%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(150 175 255 / 0.4) 0%, rgb(110 140 240 / 0.14) 42%, transparent 68%);
+  background: radial-gradient(circle, var(--sp-glow) 0%, transparent 62%);
   pointer-events: none;
 }
-.sp-halo::after {
+/* Vignette and a whisper of film grain over the whole set, under the copy and controls. */
+.sp-stage::after {
   content: "";
   position: absolute;
-  inset: 17%;
-  border-radius: 50%;
-  border: 1px solid rgb(255 255 255 / 0.14);
-}
-/* The logo bird, large behind the product. */
-.sp-bird {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 0;
-  height: 116%;
-  width: auto;
-  max-width: none;
-  translate: -50% -50%;
-  opacity: 0.16;
+  inset: 0;
+  z-index: 1;
   pointer-events: none;
-  user-select: none;
-}
-@keyframes sp-bird-float {
-  50% {
-    translate: -50% calc(-50% - 1.2%);
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .sp-bird {
-    animation: sp-bird-float 9s ease-in-out infinite;
-  }
+  background:
+    radial-gradient(120% 95% at 50% 45%, transparent 55%, rgb(var(--sp-shade) / 0.45) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 /* The floor the product stands on. */
 .sp-floor {
   position: absolute;
   inset: auto 0 0 0;
   z-index: 0;
-  height: 26%;
-  background: linear-gradient(180deg, transparent, rgb(14 27 79 / 0.14));
+  height: 30%;
+  background: linear-gradient(180deg, transparent, rgb(var(--sp-shade) / 0.4));
   pointer-events: none;
 }
 

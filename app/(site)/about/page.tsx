@@ -164,7 +164,7 @@ export default function AboutPage() {
       </section>
 
       {/* =========================================================== range */}
-      <section aria-labelledby="range-heading" className="overflow-x-clip bg-[#f2f3f5] py-20 lg:py-28">
+      <section aria-labelledby="range-heading" className="overflow-x-clip bg-mist py-20 lg:py-28">
         <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
           <p data-reveal="up" className="eyebrow">
             What we make
@@ -176,7 +176,7 @@ export default function AboutPage() {
             {RANGES.map(({ name, href, note, src, pos }, ri) => (
               <li key={name} className="ab-fan" style={{ ["--k" as string]: ri - 1 }}>
                 <Link href={href} className="group flex h-full flex-col overflow-hidden rounded-3xl bg-white ring-1 ring-line transition-shadow duration-500 hover:shadow-[0_24px_50px_-28px_rgb(18_22_76/0.35)]">
-                  <div className="relative aspect-[4/3] overflow-hidden bg-[#22231f] md:aspect-[4/5]">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-night md:aspect-[4/5]">
                     {/* unoptimized: these are already-sized HD crops; the optimiser would re-encode them at quality 75. */}
                     <Image src={src} alt="" fill unoptimized sizes="(min-width:768px) 36vw, 90vw" className="hz object-cover" style={{ objectPosition: pos }} />
                   </div>
@@ -198,7 +198,7 @@ export default function AboutPage() {
       <section aria-labelledby="quality-heading" className="bg-white py-20 lg:py-28">
         <div className="mx-auto grid max-w-page gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:items-center lg:gap-16 lg:px-10">
           <div data-reveal="clip" className="lg:col-span-6">
-            <div className="relative aspect-[4/3] overflow-hidden bg-[#22231f] lg:aspect-[5/4]">
+            <div className="relative aspect-[4/3] overflow-hidden bg-night lg:aspect-[5/4]">
               <Image src="/about/range-fabric.jpg" alt="Woven LESPARO fabric" fill unoptimized sizes="(min-width:1024px) 50vw, 100vw" className="object-cover" />
             </div>
           </div>
@@ -232,7 +232,7 @@ export default function AboutPage() {
       </section>
 
       {/* ===================================================== trademark */}
-      <section id="trademark" aria-labelledby="trademark-heading" className="scroll-mt-24 bg-[#f2f3f5] py-20 lg:py-28">
+      <section id="trademark" aria-labelledby="trademark-heading" className="scroll-mt-24 bg-mist py-20 lg:py-28">
         <div className="mx-auto grid max-w-page gap-10 px-4 sm:px-6 lg:grid-cols-12 lg:items-center lg:gap-16 lg:px-10">
           <div className="lg:col-span-6">
             {/* The registered device mark, unaltered, on a plate that tilts a few degrees toward the pointer. */}

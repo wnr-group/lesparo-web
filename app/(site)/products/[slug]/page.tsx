@@ -10,6 +10,7 @@ import { RelatedProduct } from "@/components/site/product-related";
 import { Container } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
 import { formatPrice } from "@/lib/format";
+import { deptClass } from "@/lib/departments";
 import { getAllPublishedSlugs, getProductBySlug, getRelatedProducts } from "@/lib/catalogue/queries";
 
 export async function generateStaticParams() {
@@ -104,14 +105,14 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
 
         <div className="min-w-0 motion-safe:animate-[rise_0.8s_var(--ease-out-soft)_0.12s_both]">
           {p.category && (
-            <Link href={`/collections/${p.category.slug}`} className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted transition-colors hover:text-indigo">
+            <Link href={`/collections/${p.category.slug}`} className={`${deptClass(p.category.slug) ?? ""} inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-[var(--dept,var(--color-muted))] transition-opacity hover:opacity-75`}>
               {p.category.name}
             </Link>
           )}
           <h1 className="mt-3 font-display text-[clamp(1.9rem,1.3rem+2vw,2.9rem)] font-bold leading-[1.05] tracking-tight">{p.name}</h1>
           {retail && (
             <p className="mt-4 flex flex-wrap items-baseline gap-x-3">
-              <span className="font-display text-[1.7rem] font-semibold tabular-nums tracking-tight">{formatPrice(p.price!, p.currency)}</span>
+              <span className="font-sport text-[2rem] font-extrabold italic tabular-nums tracking-tight">{formatPrice(p.price!, p.currency)}</span>
               <span className="text-xs text-muted">per piece · inclusive of listed taxes where applicable</span>
             </p>
           )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Minus, Plus } from "lucide-react";
+import { ChevronRight, Minus, Plus, X } from "lucide-react";
 import { PointerDepth } from "@/components/site/pointer-fx";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -154,7 +154,7 @@ const ringDist = (a: number, b: number, n: number) => Math.min(Math.abs(a - b), 
  * at a numbered spot to read it and see that cloth under a loupe cut from the same frame. A product with a real
  * turntable set (8 or more frames in public/turntable) spins smoothly; until then four real photographs stand in.
  */
-export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, turntables, models = {} }: { eyebrow: string; heading: string; subheading: string; cta: Cta; secondary: Cta; turntables: Partial<Record<string, TurntableSet>>; models?: Partial<Record<string, string>> }) {
+export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, turntables, models = {}, }: { eyebrow: string; heading: string; subheading: string; cta: Cta; secondary: Cta; turntables: Partial<Record<string, TurntableSet>>; models?: Partial<Record<string, string>> }) {
   const products: Product[] = ["tee", "pants", "look"].map((id) => {
     const real = turntables[id];
     return real
@@ -185,6 +185,8 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const model = models[product.id];
   // The view a 3D model is gliding to (null once the visitor takes hold of it).
   const [view3d, setView3d] = useState<View3DDef & { n: number } | null>(null);
+  // "Take a closer look": the points, views and detail card show only when asked, so the banner stays calm.
+  const [explore, setExplore] = useState(false);
   const points3d = useMemo<Point3D[]>(
     () =>
       (POINTS_3D[product.id] ?? []).flatMap((p) => {
@@ -365,7 +367,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   };
 
   // With a 3D model the points are the model's own; each borrows the close-up of the photo spot with the same name.
-  const visibleSpots = model ? points3d.flatMap((p) => product.spots.find((s) => s.label === p.label) ?? []) : zoom > 1 ? [] : product.spots.filter((s) => ringDist(s.frame, frame, n) <= tol);
+  const visibleSpots = !explore ? [] : model ? points3d.flatMap((p) => product.spots.find((s) => s.label === p.label) ?? []) : zoom > 1 ? [] : product.spots.filter((s) => ringDist(s.frame, frame, n) <= tol);
   const keyOf = (s: Spot) => `${product.id}-${s.frame}-${s.label}`;
   const active = visibleSpots.find((s) => keyOf(s) === spotKey) ?? visibleSpots[0] ?? null;
   const activeIdx = active ? visibleSpots.indexOf(active) : -1;
@@ -373,88 +375,64 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const fade = FADE[product.frames[frame]];
   const keyIndex = product.spin ? Math.min(3, Math.round((frame * 4) / n) % 4) : frame;
   const words = heading.trim().split(/\s+/);
-  const cut = Math.ceil(words.length / 2);
   const keyFrames = product.spin ? [0, 1, 2, 3].map((k) => Math.round((k * n) / 4)) : product.frames.map((_, i) => i);
 
   return (
-    <section aria-labelledby="hero-heading" className="sp-stage relative isolate flex flex-col overflow-hidden text-white lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
-      {/* The stage: a soft halo of light behind the product and a floor. */}
+    <>
+    <section aria-labelledby="hero-heading" data-product={product.id} className="sp-stage relative isolate flex flex-col overflow-hidden text-[rgb(var(--sp-fg))] lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[44rem]">
+      {/* The stage: one calm navy with a soft warm light behind the product, and a floor. */}
       <PointerDepth />
       <div aria-hidden className="sp-halo" />
-      {/* The LESPARO bird from the logo, large and faint behind the product. */}
-      {/* eslint-disable-next-line @next/next/no-img-element -- decorative, fixed-size mark */}
-      <img aria-hidden src="/lesparo-bird.png" alt="" width={1140} height={1464} className="sp-bird" />
       <div aria-hidden className="sp-floor" />
 
-      <div className="sp-leave-text contents lg:absolute lg:left-8 lg:top-10 lg:z-20 lg:flex lg:max-w-[15rem] lg:flex-col xl:left-12 xl:max-w-[25rem]">
-        {/* Text column, top left: a small label, a two-weight title, then the description and actions. */}
-        <div className="sp-copy relative z-20 px-5 pt-8 sm:px-8 lg:p-0">
-          <p className="flex items-center gap-3 text-[0.75rem] font-semibold uppercase tracking-[0.2em] text-white/75">
-            <span aria-hidden className="size-1.5 rounded-full bg-[#ffc82c]" />
-            {eyebrow}
-          </p>
-          <h1 id="hero-heading" className="mt-5 font-display text-[clamp(1.9rem,1rem+1.7vw,2.9rem)] leading-[1.06] tracking-[-0.03em] text-balance">
-            <span className="block font-light text-white/85">
-              {words.slice(0, cut).map((w, i) => (
-                <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: i }}>
-                  {w}&nbsp;
-                </span>
-              ))}
+      {/* Headline, centred above the product: a short label, the title, one action and a text link. */}
+      <div className="sp-leave-text sp-copy relative z-20 mx-auto flex max-w-4xl flex-col items-center px-5 pt-10 text-center sm:px-8 lg:pt-10">
+        <p className="flex items-center gap-2.5 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgb(var(--sp-fg)/0.7)]">
+          <span aria-hidden className="size-1.5 rounded-full bg-sun" />
+          {eyebrow}
+        </p>
+        <h1 id="hero-heading" className="mt-4 font-display text-[clamp(2.1rem,1rem+2.8vw,3.9rem)] font-bold leading-[1.04] tracking-[-0.04em] text-balance">
+          {words.map((w, i) => (
+            <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: i }}>
+              {w}&nbsp;
             </span>
-            <span className="block font-bold text-white">
-              {words.slice(cut).map((w, i) => (
-                <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: cut + i }}>
-                  {w}&nbsp;
-                </span>
-              ))}
-            </span>
-          </h1>
-        </div>
-
-          {/* Description and actions, under the headline. */}
-        <div className="sp-copy relative z-20 order-last px-5 pb-8 sm:px-8 lg:order-none lg:mt-8 lg:p-0">
-          <p className="text-[0.95rem] leading-relaxed text-white/85">{subheading}</p>
-          <div className="mt-5 flex flex-wrap gap-3 lg:flex-col lg:items-stretch xl:flex-row">
-            <Link href={cta.href} className="inline-flex h-12 items-center justify-center gap-2 bg-white px-7 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-[#0e1b4f] transition-colors duration-200 hover:bg-[#ffc82c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c]">
-              {cta.label} <ArrowRight className="size-4" aria-hidden />
-            </Link>
-            <Link href={secondary.href} className="inline-flex h-12 items-center justify-center border border-white/60 px-6 text-[0.78rem] font-bold uppercase tracking-[0.16em] text-white transition-colors duration-200 hover:border-white hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c]">
-              {secondary.label}
-            </Link>
-          </div>
+          ))}
+        </h1>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-7 gap-y-3">
+          <Link href={cta.href} className="inline-flex h-11 items-center justify-center rounded-full bg-[rgb(var(--sp-fg))] px-7 text-[0.92rem] font-semibold text-[rgb(var(--sp-on-fg))] transition-colors duration-200 hover:bg-sun hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun">
+            {cta.label}
+          </Link>
+          <Link href={secondary.href} className="group inline-flex items-center gap-0.5 text-[0.92rem] font-semibold text-[rgb(var(--sp-fg)/0.88)] transition-colors hover:text-[rgb(var(--sp-fg))] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sun">
+            {secondary.label}
+            <ChevronRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden />
+          </Link>
         </div>
       </div>
 
-      {/* Category selector, top right. */}
-      <div role="group" aria-label="Choose a product" className="sp-copy relative z-30 px-5 pt-5 sm:px-8 lg:absolute lg:right-8 lg:top-10 lg:p-0 xl:right-12">
-        <ul className="grid grid-cols-3 gap-2 sm:gap-2.5 lg:w-[30rem]">
-          {products.map((p, i) => {
-            const on = pi === i;
-            return (
-              <li key={p.id}>
-                <button
-                  type="button"
-                  aria-pressed={on}
-                  onClick={() => choose(i)}
-                  className={`flex h-12 w-full items-center justify-center gap-2 border px-1.5 text-[0.68rem] font-bold uppercase tracking-[0.08em] sm:px-3 sm:text-[0.8rem] sm:tracking-[0.14em] transition-[background-color,color,border-color] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffc82c] ${
-                    on ? "border-white bg-white text-[#0e1b4f]" : "border-white/40 bg-[#0e1b4f]/70 text-white hover:border-white hover:bg-white/10"
-                  }`}
-                >
-                  <span aria-hidden className={`size-1.5 rounded-full transition-colors duration-200 ${on ? "bg-[#e5a800]" : "bg-transparent"}`} />
-                  {p.label}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+      {/* Take a closer look: shows the numbered points, the guided views and the detail card. */}
+      <button
+        type="button"
+        aria-pressed={explore}
+        onClick={() => setExplore((e) => !e)}
+        className="sp-copy relative z-30 order-last mx-auto mb-7 inline-flex h-10 items-center gap-2 rounded-full px-5 text-[0.85rem] font-semibold ring-1 ring-[rgb(var(--sp-fg)/0.35)] transition-colors hover:bg-[rgb(var(--sp-fg)/0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun lg:absolute lg:right-8 lg:top-10 lg:order-none lg:m-0 xl:right-12"
+      >
+        {explore ? (
+          <>
+            Done <X className="size-4" aria-hidden />
+          </>
+        ) : (
+          <>
+            Take a closer look <Plus className="size-4" aria-hidden />
+          </>
+        )}
+      </button>
 
       {/* The product viewer. */}
-      <div className={`sp-leave-figure relative z-10 my-6 flex justify-center px-5 lg:absolute lg:my-0 lg:px-0 ${model ? "sp-figure-full" : "lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[6.25rem]"}`}>
+      <div className={`sp-leave-figure relative z-10 my-6 flex justify-center px-5 lg:absolute lg:my-0 lg:px-0 ${model ? "lg:inset-x-0 lg:bottom-[4.5rem] lg:top-[13rem]" : "lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[13rem]"}`}>
         {model ? (
           // Full-bleed on desktop: the 3D stage is the whole hero, so a close-up is never clipped inside a box.
           <div className="sp-product relative aspect-[2/3] w-full max-w-[22rem] overflow-hidden lg:aspect-auto lg:h-full lg:w-full lg:max-w-none">
-            <Viewer key={`${model}-${classic}`} src={model === "/models/look" ? LOOK_PARTS : model} label={product.label} poster={product.frames[0]} points={points3d} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} view={view3d} onGrab={() => setView3d(null)} />
+            <Viewer key={`${model}-${classic}`} src={model === "/models/look" ? LOOK_PARTS : model} label={product.label} poster={product.frames[0]} points={explore ? points3d : []} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} view={view3d} onGrab={() => setView3d(null)} controls={explore} />
           </div>
         ) : (
         <div
@@ -462,7 +440,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
           role="group"
           aria-label={`${product.label}. Drag sideways, or use the arrow keys, to turn it. Plus and minus zoom.`}
           tabIndex={0}
-          className={`sp-product relative w-full max-w-[22rem] select-none overflow-hidden outline-offset-[4px] focus-visible:outline-2 focus-visible:outline-[#ffc82c] lg:h-full lg:w-auto lg:max-w-none ${zoom > 1 ? "cursor-move" : "cursor-grab active:cursor-grabbing"} touch-pan-y`}
+          className={`sp-product relative w-full max-w-[22rem] select-none overflow-hidden outline-offset-[4px] focus-visible:outline-2 focus-visible:outline-sun lg:h-full lg:w-auto lg:max-w-none ${zoom > 1 ? "cursor-move" : "cursor-grab active:cursor-grabbing"} touch-pan-y`}
           style={{ aspectRatio: "2 / 3" }}
           onPointerDown={onDown}
           onPointerMove={onMove}
@@ -488,7 +466,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
               draggable={false}
               decoding="async"
               fetchPriority="high"
-              className={`pointer-events-none absolute inset-0 size-full ${cutout ? "object-contain drop-shadow-[var(--sx,0px)_26px_28px_rgb(0_0_0/0.45)]" : "object-cover ring-1 ring-white/15"}`}
+              className={`pointer-events-none absolute inset-0 size-full ${cutout ? "object-contain drop-shadow-[var(--sx,0px)_26px_28px_rgb(0_0_0/0.45)]" : "object-cover ring-1 ring-[rgb(var(--sp-fg)/0.15)]"}`}
               style={fade ? { maskImage: FADE_MASK[fade], WebkitMaskImage: FADE_MASK[fade] } : undefined}
             />
           </div>
@@ -504,22 +482,22 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
                 onClick={() => setSpotKey(keyOf(p))}
                 onFocus={() => setSpotKey(keyOf(p))}
                 onPointerDown={(e) => e.stopPropagation()}
-                className="sp-pin group absolute grid size-11 -translate-x-1/2 -translate-y-1/2 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#ffc82c]"
+                className="sp-pin group absolute grid size-11 -translate-x-1/2 -translate-y-1/2 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sun"
                 style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}
               >
-                <span aria-hidden className={`grid size-8 place-items-center rounded-full border-2 transition-[transform,background-color,border-color] duration-200 group-hover:scale-110 ${on ? "border-[#ffc82c] bg-[#0e1b4f]/55" : "border-white bg-[#0e1b4f]/35 group-hover:bg-[#0e1b4f]/60"}`}>
-                  <span className={`size-2.5 rounded-full transition-colors duration-200 ${on ? "bg-[#ffc82c]" : "bg-white"}`} />
+                <span aria-hidden className={`grid size-8 place-items-center rounded-full border-2 transition-[transform,background-color,border-color] duration-200 group-hover:scale-110 ${on ? "border-sun bg-indigo-deep/55" : "border-white bg-indigo-deep/35 group-hover:bg-indigo-deep/60"}`}>
+                  <span className={`size-2.5 rounded-full transition-colors duration-200 ${on ? "bg-sun" : "bg-white"}`} />
                 </span>
               </button>
             );
           })}
           </div>
 
-          <div className="absolute bottom-3 right-3 z-20 flex flex-col border border-white/40 bg-[#0e1b4f]/80 backdrop-blur" onPointerDown={(e) => e.stopPropagation()}>
-            <button type="button" aria-label="Zoom in" disabled={zoom >= 2.6} onClick={() => setZ(zoom + 0.6)} className="grid size-10 place-items-center hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-[#ffc82c] disabled:opacity-40">
+          <div className="absolute bottom-3 right-3 z-20 flex flex-col border border-white/40 bg-indigo-deep/80 backdrop-blur" onPointerDown={(e) => e.stopPropagation()}>
+            <button type="button" aria-label="Zoom in" disabled={zoom >= 2.6} onClick={() => setZ(zoom + 0.6)} className="grid size-10 place-items-center hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-sun disabled:opacity-40">
               <Plus className="size-4" aria-hidden />
             </button>
-            <button type="button" aria-label="Zoom out" disabled={zoom <= 1} onClick={() => setZ(zoom - 0.6)} className="grid size-10 place-items-center border-t border-white/30 hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-[#ffc82c] disabled:opacity-40">
+            <button type="button" aria-label="Zoom out" disabled={zoom <= 1} onClick={() => setZ(zoom - 0.6)} className="grid size-10 place-items-center border-t border-white/30 hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-sun disabled:opacity-40">
               <Minus className="size-4" aria-hidden />
             </button>
           </div>
@@ -536,11 +514,32 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         )}
       </div>
 
-      {/* View tabs, bottom centre. */}
-      {model && (
+      {/* Product switcher: a quiet segmented control under the garment. */}
+      <div role="group" aria-label="Choose a product" className="sp-copy relative z-20 flex justify-center px-5 pb-5 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
+        <ul className="flex items-center gap-1 rounded-full bg-[rgb(var(--sp-fg)/0.08)] p-1 ring-1 ring-[rgb(var(--sp-fg)/0.14)] backdrop-blur-md">
+          {products.map((p, i) => {
+            const on = pi === i;
+            return (
+              <li key={p.id}>
+                <button
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => choose(i)}
+                  className={`rounded-full px-4 py-2 text-[0.82rem] font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun sm:px-5 ${on ? "bg-[rgb(var(--sp-fg))] text-[rgb(var(--sp-on-fg))]" : "text-[rgb(var(--sp-fg)/0.75)] hover:text-[rgb(var(--sp-fg))]"}`}
+                >
+                  {p.label}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      {/* View tabs, above the switcher while exploring. */}
+      {model && explore && (
         // The row spans the hero, so it lets clicks and drags through to the 3D stage (and its reset button) beneath; only the tabs themselves take them.
-        <div role="group" aria-label="View" className="sp-copy pointer-events-none relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
-          <ul className="pointer-events-auto flex w-full max-w-[24rem] border border-white/30 bg-[#0e1b4f]/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
+        <div role="group" aria-label="View" className="sp-copy pointer-events-none relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-[5.5rem] lg:p-0">
+          <ul className="pointer-events-auto flex w-full max-w-[24rem] overflow-hidden rounded-full border border-[rgb(var(--sp-fg)/0.3)] bg-[rgb(var(--sp-panel)/0.7)] backdrop-blur-sm sm:w-auto sm:max-w-full">
             {(VIEWS_3D[product.id] ?? []).map((v) => {
               const on = view3d?.id === v.id;
               return (
@@ -553,7 +552,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
                       const sp = product.spots.find((s) => s.label === v.point);
                       if (sp) setSpotKey(keyOf(sp));
                     }}
-                    className={`min-h-11 w-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#ffc82c] sm:px-5 sm:py-0 ${on ? "bg-white text-[#0e1b4f]" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
+                    className={`min-h-11 w-full rounded-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sun sm:px-5 sm:py-0 ${on ? "bg-[rgb(var(--sp-fg))] text-[rgb(var(--sp-on-fg))]" : "text-[rgb(var(--sp-fg)/0.8)] hover:bg-[rgb(var(--sp-fg)/0.1)] hover:text-[rgb(var(--sp-fg))]"}`}
                   >
                     {v.label}
                   </button>
@@ -563,13 +562,13 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
           </ul>
         </div>
       )}
-      {!model && <div role="group" aria-label="View" className="sp-copy relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
-        <ul className="flex w-full max-w-[24rem] border border-white/30 bg-[#0e1b4f]/70 backdrop-blur-sm sm:w-auto sm:max-w-full">
+      {!model && explore && <div role="group" aria-label="View" className="sp-copy relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-[5.5rem] lg:p-0">
+        <ul className="flex w-full max-w-[24rem] overflow-hidden rounded-full border border-[rgb(var(--sp-fg)/0.3)] bg-[rgb(var(--sp-panel)/0.7)] backdrop-blur-sm sm:w-auto sm:max-w-full">
           {keyFrames.map((f, i) => {
             const on = ringDist(f, frame, n) <= (product.spin ? Math.floor(n / 8) : 0);
             return (
               <li key={f} className="flex-1 sm:flex-none">
-                <button type="button" aria-pressed={on} onClick={() => goTo(f)} className={`min-h-11 w-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#ffc82c] sm:px-5 sm:py-0 ${on ? "bg-white text-[#0e1b4f]" : "text-white/80 hover:bg-white/10 hover:text-white"}`}>
+                <button type="button" aria-pressed={on} onClick={() => goTo(f)} className={`min-h-11 w-full rounded-full px-2 py-2 text-center text-[0.7rem] leading-tight sm:whitespace-nowrap sm:text-[0.75rem] font-bold uppercase tracking-[0.14em] transition-colors duration-200 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sun sm:px-5 sm:py-0 ${on ? "bg-[rgb(var(--sp-fg))] text-[rgb(var(--sp-on-fg))]" : "text-[rgb(var(--sp-fg)/0.8)] hover:bg-[rgb(var(--sp-fg)/0.1)] hover:text-[rgb(var(--sp-fg))]"}`}>
                   {product.keyLabels[i]}
                 </button>
               </li>
@@ -579,27 +578,32 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       </div>}
 
       {/* Detail panel, bottom right: the close-up, its name and what it is. */}
+      {explore && (
       <div aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[16rem] lg:p-0 xl:w-[23rem] 2xl:right-12 2xl:w-[26rem]">
         {active ? (
-          <div key={keyOf(active)} className="sp-detail flex flex-col gap-4 bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm ">
-            <span aria-hidden className="block h-44 w-full shrink-0 bg-no-repeat sm:h-52 lg:h-44 xl:h-52 2xl:h-56" style={active.art ? { backgroundImage: `url(${active.art})`, backgroundSize: "auto 72%", backgroundPosition: "center", backgroundColor: "#14226b" } : { backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "400% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
+          <div key={keyOf(active)} className="sp-detail flex flex-col gap-3 overflow-hidden rounded-2xl bg-[rgb(var(--sp-panel)/0.55)] p-3 ring-1 ring-[rgb(var(--sp-fg)/0.15)] backdrop-blur-sm ">
+            <span aria-hidden className="block h-36 w-full shrink-0 rounded-xl bg-no-repeat lg:h-28 xl:h-32 2xl:h-36" style={active.art ? { backgroundImage: `url(${active.art})`, backgroundSize: "auto 62%", backgroundPosition: "center", backgroundColor: "rgb(var(--sp-art, var(--sp-panel)))" } : { backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "400% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
             <div className="min-w-0">
-              <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#ffc82c]">
+              <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[rgb(var(--sp-accent))]">
                 Detail {activeIdx + 1} of {visibleSpots.length}
               </p>
               <h2 className="mt-1 font-display text-[1.2rem] font-bold leading-tight tracking-tight">{active.label}</h2>
-              <p className="mt-2 text-[0.92rem] leading-relaxed text-white/85">{active.detail ?? DETAILS[active.label] ?? "Select another point to compare the cloth."}</p>
+              <p className="mt-2 text-[0.92rem] leading-relaxed text-[rgb(var(--sp-fg)/0.85)]">{active.detail ?? DETAILS[active.label] ?? "Select another point to compare the cloth."}</p>
             </div>
           </div>
         ) : (
-          <div className="bg-[#081038]/85 p-4 ring-1 ring-white/15 backdrop-blur-sm">
-            <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[#ffc82c]">Product detail</p>
+          <div className="rounded-2xl bg-[rgb(var(--sp-panel)/0.55)] p-4 ring-1 ring-[rgb(var(--sp-fg)/0.15)] backdrop-blur-sm">
+            <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[rgb(var(--sp-accent))]">Product detail</p>
             <h2 className="mt-1 font-display text-[1.2rem] font-bold leading-tight tracking-tight">{product.label}</h2>
-            <p className="mt-2 text-[0.92rem] leading-relaxed text-white/85">{model ? (points3d.length ? "Select a numbered point on the garment to see it close up." : "Drag to turn the full look, or choose a view below.") : zoom > 1 ? "Zoom out to see the marked points on the garment." : "Turn the garment to a view with marked points, then select one to see it close up."}</p>
+            <p className="mt-2 text-[0.92rem] leading-relaxed text-[rgb(var(--sp-fg)/0.85)]">{model ? (points3d.length ? "Select a numbered point on the garment to see it close up." : "Drag to turn the full look, or choose a view below.") : zoom > 1 ? "Zoom out to see the marked points on the garment." : "Turn the garment to a view with marked points, then select one to see it close up."}</p>
           </div>
         )}
       </div>
 
+      )}
     </section>
+    {/* The supporting line, just under the banner, so the banner itself stays to a title and one action. */}
+    <p className="mx-auto max-w-2xl px-5 pt-10 text-center text-[1.05rem] leading-relaxed text-ink-soft text-balance sm:px-8 lg:pt-14">{subheading}</p>
+    </>
   );
 }
