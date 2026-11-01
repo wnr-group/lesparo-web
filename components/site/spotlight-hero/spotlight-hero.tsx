@@ -147,29 +147,63 @@ const THEME: Record<string, { stage: string; word: string }> = {
 const ART = "split";
 const ARTS: { id: string; label: string; swatch: string }[] = [
   { id: "split", label: "Split", swatch: "linear-gradient(120deg,#12164c 0 46%,#fff 46% 50%,#ffc82c 50% 54%,#b0603f 54%)" },
+  { id: "split-white", label: "Split, white", swatch: "linear-gradient(120deg,#12164c 0 46%,#ffc82c 46% 54%,#f3f4f9 54%)" },
+  { id: "original", label: "Original blue", swatch: "linear-gradient(110deg,#101d5c,#3d54b8 52%,#eef1fc)" },
+  { id: "midnight", label: "Midnight navy", swatch: "radial-gradient(circle at 50% 45%,#2a3390,#0a0d2e)" },
   { id: "aurora", label: "Aurora", swatch: "radial-gradient(circle at 70% 70%,#3a46c8,transparent 60%),radial-gradient(circle at 80% 20%,#7cc4ff,transparent 55%),#fff" },
   { id: "prism", label: "Prism", swatch: "radial-gradient(circle at 60% 60%,#2f5bff,transparent 60%),radial-gradient(circle at 85% 20%,#7a3cff,transparent 55%),#04061a" },
   { id: "modernist", label: "Modernist", swatch: "linear-gradient(135deg,#7cc4ff 0 33%,#262e86 33% 66%,#ffc82c 66%)" },
   { id: "worlds", label: "Colour worlds", swatch: "linear-gradient(135deg,#b0603f 0 33%,#84926c 33% 66%,#2a3390 66%)" },
 ];
 
-function ArtPicker({ art, onChange }: { art: string; onChange: (id: string) => void }) {
+/**
+ * Colourways for the 3D garment (trial): the body is repainted, light details keep their colour. Only shown for
+ * single garments; the full look keeps its own colours. Preview only: a colour shown here should exist in stock
+ * before the picker is opened to shoppers.
+ */
+const COLOURWAYS: { id: string; label: string; hex: string | null }[] = [
+  { id: "original", label: "Original", hex: null },
+  { id: "navy", label: "Navy", hex: "#1f2a5c" },
+  { id: "black", label: "Black", hex: "#1b1b1e" },
+  { id: "olive", label: "Olive", hex: "#56603d" },
+  { id: "sand", label: "Sand", hex: "#c9b38e" },
+  { id: "white", label: "White", hex: "#efece4" },
+  { id: "maroon", label: "Maroon", hex: "#6e1f2c" },
+  { id: "sky", label: "Sky", hex: "#7fa8d8" },
+];
+
+function Swatches({ label, items, value, onChange }: { label: string; items: { id: string; label: string; swatch: string }[]; value: string; onChange: (id: string) => void }) {
   return (
-    <div role="radiogroup" aria-label="Banner art (trial)" className="absolute left-1/2 top-3 z-40 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/45 p-1.5 pl-3 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white/80 ring-1 ring-white/15 backdrop-blur-md lg:top-10">
-      <span className="mr-1 hidden sm:inline">Art</span>
-      {ARTS.map((a) => (
+    <div role="radiogroup" aria-label={label} className="flex items-center gap-1.5">
+      <span className="w-14 shrink-0 text-right">{label}</span>
+      {items.map((a) => (
         <button
           key={a.id}
           type="button"
           role="radio"
-          aria-checked={art === a.id}
+          aria-checked={value === a.id}
           aria-label={a.label}
           title={a.label}
           onClick={() => onChange(a.id)}
-          className={`size-6 rounded-full ring-1 ring-white/30 transition-transform duration-200 hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun ${art === a.id ? "scale-110 outline-2 outline-offset-2 outline-white" : ""}`}
+          className={`size-6 rounded-full ring-1 ring-white/30 transition-transform duration-200 hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun ${value === a.id ? "scale-110 outline-2 outline-offset-2 outline-white" : ""}`}
           style={{ background: a.swatch }}
         />
       ))}
+    </div>
+  );
+}
+
+/** The trial picker: banner art on one row, the garment's colourway on the other. */
+function ArtPicker({ art, onArt, colour, onColour }: { art: string; onArt: (id: string) => void; colour: string; onColour: (id: string) => void }) {
+  return (
+    <div className="absolute left-1/2 top-3 z-40 flex -translate-x-1/2 flex-col gap-1.5 rounded-2xl bg-black/50 px-3 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-white/80 ring-1 ring-white/15 backdrop-blur-md lg:top-8">
+      <Swatches label="Banner" items={ARTS} value={art} onChange={onArt} />
+      <Swatches
+        label="Garment"
+        items={COLOURWAYS.map((c) => ({ id: c.id, label: c.label, swatch: c.hex ?? "conic-gradient(#5a2e1a 0 50%,#efe6d2 50%)" }))}
+        value={colour}
+        onChange={onColour}
+      />
     </div>
   );
 }
@@ -242,6 +276,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const Viewer = classic ? GarmentClassic : Garment3D;
 
   const [art, setArt] = useState(ART);
+  const [colour, setColour] = useState("original");
   const [picker, setPicker] = useState(false);
   useEffect(() => {
     // Read in the browser after hydration, like ?viewer above.
@@ -253,8 +288,18 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
     const pick = [asked, saved].find((a) => a && ARTS.some((x) => x.id === a));
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (pick) setArt(pick);
+    try {
+      const c = window.localStorage.getItem("lesparo-colour");
+      if (c && COLOURWAYS.some((x) => x.id === c)) setColour(c);
+    } catch {}
     setPicker(process.env.NODE_ENV !== "production" || asked !== null);
   }, []);
+  const chooseColour = (id: string) => {
+    setColour(id);
+    try {
+      window.localStorage.setItem("lesparo-colour", id);
+    } catch {}
+  };
   const chooseArt = (id: string) => {
     setArt(id);
     try {
@@ -470,7 +515,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   const keyFrames = product.spin ? [0, 1, 2, 3].map((k) => Math.round((k * n) / 4)) : product.frames.map((_, i) => i);
 
   return (
-    <section aria-labelledby="hero-heading" data-stage={art === "worlds" ? THEME[product.id]?.stage : art} data-product={product.id} className="sp-stage relative isolate flex flex-col overflow-hidden text-[rgb(var(--sp-fg))] lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
+    <section aria-labelledby="hero-heading" data-stage={art === "worlds" ? THEME[product.id]?.stage : art.startsWith("split") ? "split" : art} data-variant={art === "split-white" ? "white" : undefined} data-product={product.id} className="sp-stage relative isolate flex flex-col overflow-hidden text-[rgb(var(--sp-fg))] lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[41rem]">
       {/* The stage: a soft halo of light behind the product and a floor. */}
       <PointerDepth />
       <div aria-hidden className="sp-art">
@@ -482,12 +527,15 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         <i />
       </div>
       <div aria-hidden className="sp-halo" />
+      {/* The logo bird, large and faint: only the original blue banner shows it. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- decorative, fixed-size mark */}
+      <img aria-hidden src="/lesparo-bird.png" alt="" width={1140} height={1464} className="sp-bird" />
       {/* The product's name, huge and tone-on-tone behind it; keyed so it slides in again on each switch. */}
       <p key={product.id} aria-hidden className="sp-bigword">
         {THEME[product.id]?.word}
       </p>
       <div aria-hidden className="sp-floor" />
-      {picker && <ArtPicker art={art} onChange={chooseArt} />}
+      {picker && <ArtPicker art={art} onArt={chooseArt} colour={colour} onColour={chooseColour} />}
 
       <div className="sp-leave-text contents lg:absolute lg:left-8 lg:top-10 lg:z-20 lg:flex lg:max-w-[15rem] lg:flex-col xl:left-12 xl:max-w-[25rem]">
         {/* Text column, top left: a small label, a two-weight title, then the description and actions. */}
@@ -573,7 +621,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         {model ? (
           // Full-bleed on desktop: the 3D stage is the whole hero, so a close-up is never clipped inside a box.
           <div className="sp-product relative aspect-[2/3] w-full max-w-[22rem] overflow-hidden lg:aspect-auto lg:h-full lg:w-full lg:max-w-none">
-            <Viewer key={`${model}-${classic}`} src={model === "/models/look" ? LOOK_PARTS : model} label={product.label} poster={product.frames[0]} points={points3d} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} view={view3d} onGrab={() => setView3d(null)} />
+            <Viewer key={`${model}-${classic}`} src={model === "/models/look" ? LOOK_PARTS : model} label={product.label} poster={product.frames[0]} points={points3d} activeKey={active ? keyOf(active) : null} onPick={setSpotKey} view={view3d} onGrab={() => setView3d(null)} tint={product.id === "look" ? null : (COLOURWAYS.find((c) => c.id === colour)?.hex ?? null)} />
           </div>
         ) : (
         <div

@@ -233,6 +233,8 @@ export default function Garment3D({
   view = null,
   onGrab = () => {},
 }: {
+  /** Accepted for parity with the premium viewer; the classic viewer always shows the garment's own colour. */
+  tint?: string | null;
   src: string | Part[];
   label: string;
   poster: string;

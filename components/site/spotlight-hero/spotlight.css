@@ -349,6 +349,52 @@
   }
 }
 
+/* Split, white: the right half is a clean white, so the garment's colour carries the right side on its own. */
+.sp-stage[data-stage="split"][data-variant="white"] {
+  --split-c: #f3f4f9;
+}
+
+/*
+ * Original: the first version of this banner, kept for comparison. Royal blue running to a pale lavender on the
+ * right, a lavender halo with a fine ring, and the logo bird large behind the product. No campaign word or grain.
+ */
+.sp-stage[data-stage="original"] {
+  --sp-panel: 14 27 79;
+  --sp-art: 20 34 107;
+  --sp-glow: rgb(150 175 255 / 0.4);
+  background:
+    radial-gradient(60% 90% at 0% 0%, #2f46aa 0%, transparent 60%),
+    linear-gradient(110deg, #101d5c 0%, #1a2a7a 30%, #3d54b8 52%, #aebaec 76%, #eef1fc 100%);
+}
+.sp-stage[data-stage="original"]::after,
+.sp-stage[data-stage="original"] .sp-bigword {
+  display: none;
+}
+.sp-stage[data-stage="original"] .sp-halo::after {
+  content: "";
+  position: absolute;
+  inset: 17%;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 0.14);
+}
+.sp-bird {
+  display: none;
+}
+.sp-stage[data-stage="original"] .sp-bird {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  height: 116%;
+  width: auto;
+  max-width: none;
+  translate: -50% -50%;
+  opacity: 0.16;
+  pointer-events: none;
+  user-select: none;
+}
+
 /* The key light behind the product: a soft pool of light, no ring. */
 .sp-halo {
   position: absolute;

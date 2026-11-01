@@ -4,7 +4,7 @@ import { ContactShadows, Environment, Lightformer, useGLTF, useProgress } from "
 import { Canvas, useFrame } from "@react-three/fiber";
 import { RotateCcw } from "lucide-react";
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Box3, BufferAttribute, Group, MathUtils, Vector3, type BufferGeometry, type Mesh, type MeshStandardMaterial, type Object3D, type PerspectiveCamera } from "three";
+import { Box3, BufferAttribute, Color, Group, MathUtils, Vector3, type BufferGeometry, type Mesh, type MeshStandardMaterial, type Object3D, type PerspectiveCamera } from "three";
 import { useHits, type Hit, type Part, type Point3D, type View3D } from "./garment-3d";
 
 /**
@@ -81,6 +81,60 @@ function smoothNormals(geo: BufferGeometry) {
   geo.setAttribute("normal", new BufferAttribute(out, 3));
 }
 
+/**
+ * Colourway preview: one tint shared by every garment material (the uniforms are shared objects, so setting them
+ * repaints every model on the next frame). The shader repaints the garment's main body colour and keeps light
+ * details (collar, cuffs, drawstring) as they are: a pixel counts as body when its luminance is near the texture's
+ * median, and the cloth's own shading is kept by scaling the tint by the pixel's luminance relative to that median.
+ */
+const TINT = { color: { value: new Color("#ffffff") }, amount: { value: 0 } };
+
+/** The median linear luminance of a texture's painted pixels: the garment's main body tone. */
+function bodyLuminance(image: CanvasImageSource | undefined): number {
+  try {
+    if (!image) return 0.06;
+    const c = document.createElement("canvas");
+    c.width = c.height = 64;
+    const g = c.getContext("2d", { willReadFrequently: true });
+    if (!g) return 0.06;
+    g.drawImage(image, 0, 0, 64, 64);
+    const d = g.getImageData(0, 0, 64, 64).data;
+    const lin = (v: number) => ((v /= 255) <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+    const ls: number[] = [];
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i + 3] < 128) continue;
+      const l = 0.2126 * lin(d[i]) + 0.7152 * lin(d[i + 1]) + 0.0722 * lin(d[i + 2]);
+      // Empty atlas space is pure black; it is not cloth.
+      if (l > 0.002) ls.push(l);
+    }
+    if (!ls.length) return 0.06;
+    ls.sort((a, b) => a - b);
+    return Math.max(0.01, ls[Math.floor(ls.length / 2)]);
+  } catch {
+    return 0.06;
+  }
+}
+
+function addTint(mat: MeshStandardMaterial) {
+  if (!mat.map) return;
+  const base = { value: bodyLuminance(mat.map.image as CanvasImageSource | undefined) };
+  mat.onBeforeCompile = (sh) => {
+    sh.uniforms.uTint = TINT.color;
+    sh.uniforms.uTintAmt = TINT.amount;
+    sh.uniforms.uTintBase = base;
+    sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nuniform vec3 uTint;\nuniform float uTintAmt;\nuniform float uTintBase;").replace(
+      "#include <map_fragment>",
+      `#include <map_fragment>
+      {
+        float L = dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+        float m = (1.0 - smoothstep(uTintBase * 2.4, uTintBase * 5.0, L)) * uTintAmt;
+        vec3 t = uTint * clamp(L / uTintBase, 0.0, 1.8);
+        diffuseColor.rgb = mix(diffuseColor.rgb, t, m);
+      }`,
+    );
+  };
+}
+
 const repaired = new WeakSet<Object3D>();
 /** Smooth shading and a matte cloth material in place of the loader's flat, fully metallic defaults. */
 function repair(scene: Object3D) {
@@ -96,6 +150,7 @@ function repair(scene: Object3D) {
     mat.roughness = 0.9;
     mat.envMapIntensity = 0.55;
     if (mat.map) mat.map.anisotropy = 8;
+    addTint(mat);
     mat.needsUpdate = true;
   });
 }
@@ -388,6 +443,7 @@ export default function Garment3DPremium({
   onPick = () => {},
   view = null,
   onGrab = () => {},
+  tint = null,
 }: {
   src: string | Part[];
   label: string;
@@ -397,7 +453,13 @@ export default function Garment3DPremium({
   onPick?: (key: string) => void;
   view?: View3D | null;
   onGrab?: () => void;
+  /** A colourway to preview (sRGB hex); null shows the garment's own colour. */
+  tint?: string | null;
 }) {
+  useEffect(() => {
+    TINT.color.value.set(tint ?? "#ffffff");
+    TINT.amount.value = tint ? 1 : 0;
+  }, [tint]);
   const [gl, setGl] = useState<boolean | null>(null);
   const [failed, setFailed] = useState(false);
   const [reduced, setReduced] = useState(true);
