@@ -67,11 +67,16 @@ export function ActionButton({
   children,
   confirmText,
   variant = "secondary",
+  icon,
+  label,
 }: {
   action: () => Promise<ActionState>;
-  children: ReactNode;
+  children?: ReactNode;
   confirmText?: string;
   variant?: "primary" | "secondary" | "danger" | "ghost";
+  /** Shows a square icon-only button instead of text; `label` is then its accessible name and tooltip. */
+  icon?: ReactNode;
+  label?: string;
 }) {
   const [pending, start] = useTransition();
   const [result, setResult] = useState<ActionState | null>(null);
@@ -83,26 +88,60 @@ export function ActionButton({
       setResult(await action());
     });
 
+  const confirmControls = (
+    <>
+      <span className="text-sm">{confirmText}</span>
+      <button type="button" onClick={run} className={buttonClass(variant === "danger" ? "danger" : "primary", "sm")}>
+        Confirm
+      </button>
+      <button type="button" onClick={() => setConfirming(false)} className={buttonClass("ghost", "sm")}>
+        Cancel
+      </button>
+    </>
+  );
+  const message = (
+    <>
+      {result?.error && <span className="text-xs text-danger">{result.error}</span>}
+      {result?.ok && <span className="text-xs text-success">Done.</span>}
+    </>
+  );
+
+  // Icon-only: the button never moves. The confirm prompt and any message float to its left instead of pushing the row around.
+  if (icon) {
+    const note = "absolute right-full top-1/2 z-10 mr-2 flex -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-white px-3 py-1 shadow-sm ring-1 ring-line";
+    return (
+      <span className="relative inline-flex">
+        {confirming && <span className={note}>{confirmControls}</span>}
+        {!confirming && (result?.error || result?.ok) && (
+          <span className={note} role="status">
+            {message}
+          </span>
+        )}
+        <button
+          type="button"
+          disabled={pending || confirming}
+          onClick={() => (confirmText ? setConfirming(true) : run())}
+          className={`${buttonClass(variant, "sm")} w-9 justify-center !px-0`}
+          aria-label={label}
+          title={label}
+        >
+          {pending ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : icon}
+        </button>
+      </span>
+    );
+  }
+
   return (
     <span className="inline-flex flex-wrap items-center gap-2">
       {confirming ? (
-        <>
-          <span className="text-sm">{confirmText}</span>
-          <button type="button" onClick={run} className={buttonClass(variant === "danger" ? "danger" : "primary", "sm")}>
-            Confirm
-          </button>
-          <button type="button" onClick={() => setConfirming(false)} className={buttonClass("ghost", "sm")}>
-            Cancel
-          </button>
-        </>
+        confirmControls
       ) : (
         <button type="button" disabled={pending} onClick={() => (confirmText ? setConfirming(true) : run())} className={buttonClass(variant, "sm")}>
           {pending && <Loader2 className="size-3.5 animate-spin" aria-hidden />}
           {children}
         </button>
       )}
-      {result?.error && <span className="text-xs text-danger">{result.error}</span>}
-      {result?.ok && <span className="text-xs text-success">Done.</span>}
+      {message}
     </span>
   );
 }

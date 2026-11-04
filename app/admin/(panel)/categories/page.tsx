@@ -1,10 +1,15 @@
+import { Trash2 } from "lucide-react";
 import Link from "next/link";
+import { ActionButton } from "@/components/admin/forms";
 import { PageHeader, Table } from "@/components/admin/ui";
 import { buttonClass } from "@/components/ui/button";
 import { Badge } from "@/components/ui/primitives";
+import { getStaffSession } from "@/lib/auth/staff";
 import { requestDb } from "@/lib/db";
+import { deleteCategory } from "./actions";
 
 export default async function AdminCategoriesPage() {
+  const isAdmin = (await getStaffSession())?.isAdmin ?? false;
   const db = await requestDb();
   const [all, products] = await Promise.all([
     db.category.findMany({ select: { id: true, name: true, slug: true, parent_id: true, display_order: true, is_published: true, is_featured: true }, orderBy: { display_order: "asc" } }),
@@ -32,7 +37,7 @@ export default async function AdminCategoriesPage() {
           </Link>
         }
       />
-      <Table head={["Category", "Slug", "Products", "Order", "Status"]}>
+      <Table head={["Category", "Slug", "Products", "Order", "Status", ""]}>
         {ordered.map(({ c, depth }) => (
           <tr key={c.id} className="hover:bg-ivory">
             <td className="px-4 py-2.5" style={{ paddingLeft: `${1 + depth * 1.5}rem` }}>
@@ -47,6 +52,11 @@ export default async function AdminCategoriesPage() {
             <td className="space-x-1 px-4 py-2.5">
               {c.is_published ? <Badge tone="success">Published</Badge> : <Badge tone="warning">Hidden</Badge>}
               {c.is_featured && <Badge tone="brass">Featured</Badge>}
+            </td>
+            <td className="px-4 py-2.5 text-right">
+              {isAdmin && (
+                <ActionButton action={deleteCategory.bind(null, c.id, false)} confirmText="Delete permanently?" variant="danger" icon={<Trash2 className="size-4" aria-hidden />} label="Delete category" />
+              )}
             </td>
           </tr>
         ))}

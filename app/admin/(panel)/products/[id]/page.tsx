@@ -1,3 +1,4 @@
+import { Trash2 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
@@ -11,7 +12,7 @@ import { getStaffSession } from "@/lib/auth/staff";
 import { jsonStrings } from "@/lib/catalogue/queries";
 import { requestDb } from "@/lib/db";
 import { publicMediaUrl } from "@/lib/storage";
-import { saveProduct, setArchived, updateImage, uploadImages } from "../actions";
+import { deleteProduct, saveProduct, setArchived, updateImage, uploadImages } from "../actions";
 import { categoryOptions } from "../shared";
 
 export default async function EditProductPage(props: PageProps<"/admin/products/[id]">) {
@@ -51,12 +52,27 @@ export default async function EditProductPage(props: PageProps<"/admin/products/
                 {p.archived_at ? "Restore" : "Archive"}
               </ActionButton>
             )}
+            {!readOnly && (
+              <ActionButton action={deleteProduct.bind(null, id, true)} confirmText="Delete this product and its photos permanently?" variant="danger" icon={<Trash2 className="size-4" aria-hidden />} label="Delete product" />
+            )}
           </>
         }
       />
       {sp.created && <div className="mb-6"><Alert tone="success" title="Product created. Check the details and images below, then publish when ready." /></div>}
       {readOnly && <div className="mb-6"><Alert tone="info" title="Read-only: only administrators can edit products." /></div>}
       <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
+        <div className="space-y-6">
+        <Panel title={`Images (${images.length})`}>
+          {readOnly ? (
+            <p className="text-sm text-muted">Only administrators can manage images.</p>
+          ) : (
+            <ImageManager
+              images={images.map((i) => ({ id: i.id, url: publicMediaUrl(i.storage_path)!, alt: i.alt_text, isPrimary: i.is_primary }))}
+              uploadAction={uploadImages.bind(null, id)}
+              updateAction={updateImage}
+            />
+          )}
+        </Panel>
         <Panel title="Details">
           <fieldset disabled={readOnly} className="contents">
             <ProductEditor
@@ -84,24 +100,14 @@ export default async function EditProductPage(props: PageProps<"/admin/products/
             />
           </fieldset>
         </Panel>
-        <div className="space-y-6">
+        </div>
+        <div className="space-y-6 xl:sticky xl:top-6 xl:self-start">
         <Panel title="Card preview">
           <CardPreview
             initial={{ name: p.name, fabric: p.fabric ?? "", description: p.description ?? "", categoryId: p.category_id ?? "", price: p.price?.toString() ?? "", quoteEnabled: p.quote_enabled, retailEnabled: p.retail_enabled }}
             images={images.map((i) => ({ url: publicMediaUrl(i.storage_path)!, alt: i.alt_text || p.name, width: i.width, height: i.height }))}
             categories={categories.map((c) => ({ id: c.id, name: c.label.split(" › ").pop() ?? c.label, slug: "" }))}
           />
-        </Panel>
-        <Panel title={`Images (${images.length})`}>
-          {readOnly ? (
-            <p className="text-sm text-muted">Only administrators can manage images.</p>
-          ) : (
-            <ImageManager
-              images={images.map((i) => ({ id: i.id, url: publicMediaUrl(i.storage_path)!, alt: i.alt_text, isPrimary: i.is_primary }))}
-              uploadAction={uploadImages.bind(null, id)}
-              updateAction={updateImage}
-            />
-          )}
         </Panel>
         </div>
       </div>

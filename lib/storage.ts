@@ -64,6 +64,8 @@ export async function removeFile(area: StorageArea, relative: string) {
 export function publicMediaUrl(storagePath: string | null | undefined): string | null {
   if (!storagePath) return null;
   if (/^https?:\/\//.test(storagePath)) return storagePath;
+  // Local development: images imported from disk are served from /public (scripts/import-drive-products.ts).
+  if (storagePath.startsWith("/local-products/")) return storagePath;
   const p = objectPath(storagePath);
   return p ? `${process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/+$/, "")}/storage/v1/object/public/${BUCKETS.media}/${p}` : null;
 }

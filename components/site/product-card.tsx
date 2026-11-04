@@ -25,16 +25,17 @@ export function ProductCard({ product, priority = false }: { product: Product; p
         <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-mist">
           {primary ? (
             <>
+              {/* The photo covers the whole card. */}
               <Image
                 src={primary.url}
                 alt={primary.alt}
                 fill
                 priority={priority}
                 sizes={sizes}
-                className={`cutout object-contain p-[2.5%] transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.04] ${secondary ? "group-hover:opacity-0" : ""}`}
+                className={`object-cover object-center transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.04] ${secondary ? "group-hover:opacity-0" : ""}`}
               />
               {secondary && (
-                <Image src={secondary.url} alt="" aria-hidden fill sizes={sizes} className="cutout object-contain p-[2.5%] opacity-0 transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.04] group-hover:opacity-100" />
+                <Image src={secondary.url} alt="" aria-hidden fill sizes={sizes} className="object-cover object-center opacity-0 transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.04] group-hover:opacity-100" />
               )}
             </>
           ) : (

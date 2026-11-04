@@ -17,9 +17,9 @@ export function RelatedProduct({ product }: { product: ProductCard }) {
               alt={primary.alt}
               fill
               sizes="(min-width: 1024px) 23vw, 46vw"
-              className={`cutout object-contain p-[6%] transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.04] ${secondary ? "group-hover:opacity-0" : ""}`}
+              className={`object-cover object-center transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.04] ${secondary ? "group-hover:opacity-0" : ""}`}
             />
-            {secondary && <Image src={secondary.url} alt="" aria-hidden fill sizes="(min-width: 1024px) 23vw, 46vw" className="cutout object-contain p-[6%] opacity-0 transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.04] group-hover:opacity-100" />}
+            {secondary && <Image src={secondary.url} alt="" aria-hidden fill sizes="(min-width: 1024px) 23vw, 46vw" className="object-cover object-center opacity-0 transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.04] group-hover:opacity-100" />}
           </>
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-muted">Image coming soon</div>

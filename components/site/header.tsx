@@ -7,7 +7,7 @@ import { SiteNav, type NavGroup } from "./site-nav";
 
 async function navGroups(): Promise<NavGroup[]> {
   const tree = await getCategoryTree();
-  return tree.map((top) => ({
+  return tree.filter((top) => top.slug !== "fabric-unstitched").map((top) => ({
     label: top.name,
     href: `/collections/${top.slug}`,
     columns: top.children.map((c) => ({
