@@ -81,7 +81,8 @@ function DesktopMenu({ group, pathname }: { group: NavGroup; pathname: string })
       >
         <div className="menu-panel grid w-[min(50rem,92vw)] grid-cols-[1fr_13rem] overflow-clip rounded-[1.1rem] border border-line bg-white shadow-[var(--shadow-float)]" data-open={open}>
           <div className="flex flex-col p-8">
-            <div className="grid flex-1 gap-8" style={{ gridTemplateColumns: `repeat(${group.columns.length}, minmax(0, 1fr))` }}>
+            {/* Up to four columns per row; a larger tree (Gents, Kids, Boys, Women, Hoodies, New Styles) wraps onto a second row. */}
+            <div className="grid flex-1 content-start gap-x-8 gap-y-9" style={{ gridTemplateColumns: `repeat(${Math.min(group.columns.length, 4)}, minmax(0, 1fr))` }}>
               {group.columns.map((col, ci) => (
                 <div key={col.href} className={clsx("menu-item", deptClass(col.href.split("/").pop()))} style={{ ["--i" as string]: ci }}>
                   <Link href={col.href} className="group/col flex items-center gap-2 font-sport text-lg font-extrabold uppercase italic tracking-tight text-[var(--dept,var(--color-ink))]">

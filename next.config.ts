@@ -24,6 +24,10 @@ const nextConfig: NextConfig = {
     serverActions: { bodySizeLimit: "26mb" },
   },
   images: {
+    qualities: [75, 85],
+    // Some home/office networks use DNS64, which resolves Supabase to a NAT64 address (64:ff9b::/96) that Next treats as private,
+    // so the image optimizer refuses it. Relax that for `next dev` only; production keeps the protection.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
     remotePatterns: supabaseUrl ? [{ protocol: "https", hostname: supabaseUrl.hostname, pathname: "/storage/v1/object/public/**" }] : [],
   },
   async redirects() {
