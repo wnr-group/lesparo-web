@@ -1,15 +1,13 @@
-import { Trash2 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { CategoryEditor } from "@/components/admin/category-editor";
-import { ActionButton } from "@/components/admin/forms";
 import { PageHeader, Panel } from "@/components/admin/ui";
 import { Alert } from "@/components/ui/primitives";
 import { getStaffSession } from "@/lib/auth/staff";
 import { requestDb } from "@/lib/db";
 import { publicMediaUrl } from "@/lib/storage";
 import { categoryOptions } from "../../products/shared";
-import { deleteCategory, saveCategory } from "../actions";
+import { saveCategory } from "../actions";
 
 /** Handles both /admin/categories/new and /admin/categories/<id>. */
 export default async function CategoryPage(props: PageProps<"/admin/categories/[id]">) {
@@ -26,15 +24,7 @@ export default async function CategoryPage(props: PageProps<"/admin/categories/[
 
   return (
     <>
-      <PageHeader
-        back={{ href: "/admin/categories", label: "Categories" }}
-        title={c?.name ?? "New category"}
-        actions={
-          c && (
-            <ActionButton action={deleteCategory.bind(null, id, true)} confirmText="Delete this category permanently?" variant="danger" icon={<Trash2 className="size-4" aria-hidden />} label="Delete category" />
-          )
-        }
-      />
+      <PageHeader back={{ href: "/admin/categories", label: "Categories" }} title={c?.name ?? "New category"} />
       <Panel>
         <CategoryEditor
           action={saveCategory.bind(null, isNew ? null : id)}

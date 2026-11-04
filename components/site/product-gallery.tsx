@@ -85,7 +85,7 @@ export function ProductGallery({ images, name, productId }: { images: ProductIma
               fill
               priority={i === 0}
               sizes="(min-width: 1024px) 45vw, 100vw"
-              className={clsx("object-cover object-center transition-opacity duration-500 ease-[var(--ease-atelier)]", i === active ? "opacity-100" : "opacity-0")}
+              className={clsx("cutout object-contain p-[5%] transition-opacity duration-500 ease-[var(--ease-atelier)]", i === active ? "opacity-100" : "opacity-0")}
             />
           ))}
           <button type="button" onClick={() => viewer.current?.showModal()} aria-label="View full screen and zoom" className="absolute inset-0 cursor-zoom-in focus-visible:outline-offset-[-4px]" />

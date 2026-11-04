@@ -1,16 +1,12 @@
-import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ActionButton } from "@/components/admin/forms";
 import { PageHeader, Pagination, Table } from "@/components/admin/ui";
 import { buttonClass } from "@/components/ui/button";
 import { Badge, EmptyState } from "@/components/ui/primitives";
 import type { Prisma } from "@prisma/client";
-import { getStaffSession } from "@/lib/auth/staff";
 import { sanitiseSearch } from "@/lib/catalogue/queries";
 import { requestDb } from "@/lib/db";
 import { publicMediaUrl } from "@/lib/storage";
-import { deleteProduct } from "./actions";
 
 const PAGE_SIZE = 30;
 
@@ -21,7 +17,6 @@ export default async function AdminProductsPage(props: PageProps<"/admin/product
   const category = typeof sp.category === "string" ? sp.category : "";
   const page = Math.max(1, Number(sp.page) || 1);
 
-  const isAdmin = (await getStaffSession())?.isAdmin ?? false;
   const db = await requestDb();
   const categories = await db.category.findMany({ select: { id: true, name: true, parent_id: true }, orderBy: { display_order: "asc" } });
   const where: Prisma.ProductWhereInput = {
@@ -109,7 +104,7 @@ export default async function AdminProductsPage(props: PageProps<"/admin/product
       </form>
 
       {data.length ? (
-        <Table head={["", "Product", "Category", "Fabric", "Ordering", "Status", ""]}>
+        <Table head={["", "Product", "Category", "Fabric", "Ordering", "Status"]}>
           {data.map((p) => {
             const img = p.images.find((i) => i.is_primary) ?? p.images[0];
             return (
@@ -131,11 +126,6 @@ export default async function AdminProductsPage(props: PageProps<"/admin/product
                 <td className="space-x-1 px-4 py-2">
                   {p.archived_at ? <Badge>Archived</Badge> : p.is_published ? <Badge tone="success">Published</Badge> : <Badge tone="warning">Draft</Badge>}
                   {p.is_featured && <Badge tone="brass">Featured</Badge>}
-                </td>
-                <td className="px-4 py-2 text-right">
-                  {isAdmin && (
-                    <ActionButton action={deleteProduct.bind(null, p.id, false)} confirmText="Delete permanently?" variant="danger" icon={<Trash2 className="size-4" aria-hidden />} label="Delete product" />
-                  )}
                 </td>
               </tr>
             );

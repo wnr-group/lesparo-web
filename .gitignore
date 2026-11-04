@@ -46,6 +46,3 @@ next-env.d.ts
 /prisma/dev.db
 /prisma/dev.db-journal
 /storage/
-
-# local-only product images (imported from the client Drive folder)
-/public/local-products/

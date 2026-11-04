@@ -9,7 +9,7 @@ import { CATALOGUE_TAG } from "@/lib/catalogue/queries";
 import { prisma } from "@/lib/db";
 import { fieldErrors } from "@/lib/services/enquiry-form";
 import { sniffFileType } from "@/lib/services/file-sniff";
-import { removeFile, saveFile } from "@/lib/storage";
+import { saveFile } from "@/lib/storage";
 import { categorySchema } from "@/lib/validation/catalogue";
 
 export type ActionState = { ok?: boolean; error?: string; fields?: Record<string, string> };
@@ -19,32 +19,6 @@ async function categorySubtree(root: string): Promise<string[]> {
   const all = await prisma.category.findMany({ select: { id: true, parent_id: true } });
   const walk = (id: string): string[] => [id, ...all.filter((c) => c.parent_id === id).flatMap((c) => walk(c.id))];
   return walk(root);
-}
-
-/** Deletes a category. It must be empty: move or delete its sub-categories and products first. */
-export async function deleteCategory(id: string, thenGoToList: boolean): Promise<ActionState> {
-  try {
-    await requireAdmin();
-    const cid = z.uuid().parse(id);
-    const category = await prisma.category.findUnique({ where: { id: cid }, select: { cover_image_path: true, _count: { select: { children: true, products: true } } } });
-    if (!category) return { error: "Category not found." };
-    const { children, products } = category._count;
-    if (children || products) {
-      const parts = [children && `${children} sub-categor${children === 1 ? "y" : "ies"}`, products && `${products} product${products === 1 ? "" : "s"}`].filter(Boolean).join(" and ");
-      return { error: `This category still has ${parts}. Move or delete them first.` };
-    }
-    await prisma.category.delete({ where: { id: cid } });
-    // Only a cover uploaded for this category is removed; a cover borrowed from a product photo belongs to that product.
-    if (category.cover_image_path?.startsWith("categories/")) await removeFile("media", category.cover_image_path).catch(() => undefined);
-    updateTag(CATALOGUE_TAG);
-    refresh();
-  } catch (err) {
-    if (err instanceof AuthorizationError) return { error: err.message };
-    console.error("[admin/categories]", err);
-    return { error: "Something went wrong. Please try again." };
-  }
-  if (thenGoToList) redirect("/admin/categories");
-  return { ok: true };
 }
 
 export async function saveCategory(id: string | null, _prev: ActionState, fd: FormData): Promise<ActionState> {

@@ -102,14 +102,6 @@ export function ProductEditor({
         }}
       >
       <input type="hidden" name="specs" value={JSON.stringify(specs.filter((s) => s.label.trim() && s.value.trim()))} />
-      {isNew && (
-        <section>
-          <h3 className="mb-2 text-sm font-medium">Images</h3>
-          <p className="mb-3 text-xs text-muted">JPG, PNG or WebP, up to 10 MB each, up to 12. The first is the main image; you can reorder or change them after saving.</p>
-          <FilePicker id="new-images" name="images" multiple accept="image/jpeg,image/png,image/webp" label="Choose images" />
-        </section>
-      )}
-
       <section className="grid gap-4 md:grid-cols-2">
         <div>
           <L htmlFor="name">Name</L>
@@ -199,6 +191,14 @@ export function ProductEditor({
         </button>
         <FieldError name="specs" />
       </section>
+
+      {isNew && (
+        <section>
+          <h3 className="mb-2 text-sm font-medium">Images</h3>
+          <p className="mb-3 text-xs text-muted">JPG, PNG or WebP, up to 10 MB each, up to 12. The first is the main image; you can reorder or change them after saving.</p>
+          <FilePicker id="new-images" name="images" multiple accept="image/jpeg,image/png,image/webp" label="Choose images" />
+        </section>
+      )}
 
       <section className="grid gap-4 md:grid-cols-2">
         <fieldset className="space-y-2 border border-line p-4">
