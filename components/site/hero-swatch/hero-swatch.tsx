@@ -66,8 +66,15 @@ const MODEL_PHOTOS: Record<Item, { src: string; pos: string }[]> = {
   ],
 };
 
-// The stage colours: the coloured planes behind the garment (sky, navy, lavender, rust, sun) on a warm base.
-const STAGE = { bg: "#f3ece1", sky: "#8ac8ff", navy: "#3a4aa6", lav: "#b9a8ec", rust: "#8a4b3c", sun: "#ffc82c" };
+// The stage colours: a sunrise gradient with butter, lemon, amber, orange and terracotta shapes behind the garment.
+const STAGE = {
+  bg: "linear-gradient(135deg, #fff4c9 0%, #ffe08a 34%, #ffbf5a 68%, #ff9a47 100%)",
+  sky: "#ffe86b",
+  navy: "#ff8a2b",
+  lav: "#ffc06e",
+  rust: "#d8541b",
+  sun: "#ffd23f",
+};
 
 /**
  * Hero, design 3. A warm stage with coloured planes behind one large real 3D garment: numbered points with a detail card, guided angles,
@@ -108,6 +115,8 @@ export function HeroSwatch({ eyebrow, heading, subheading, cta, secondary }: { e
     <section aria-labelledby="hero-heading" className="hsw relative isolate overflow-hidden" style={{ background: t.bg, ["--sky" as string]: t.sky, ["--navy" as string]: t.navy, ["--lav" as string]: t.lav, ["--rust" as string]: t.rust, ["--sun" as string]: t.sun }}>
       {/* The coloured planes (they follow the BANNER theme). */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 hidden lg:block">
+        <span className="hsw-plane hsw-stripes" />
+        <span className="hsw-plane hsw-glow" />
         <span className="hsw-plane hsw-sky" />
         <span className="hsw-plane hsw-navy" />
         <span className="hsw-plane hsw-navy2" />
@@ -204,16 +213,18 @@ export function HeroSwatch({ eyebrow, heading, subheading, cta, secondary }: { e
 
       <style>{`
         .hsw-plane { position: absolute; }
-        .hsw-sky { right: 0; top: 0; width: 42%; height: 80%; background: var(--sky); clip-path: polygon(34% 0, 100% 0, 100% 100%, 0 66%); }
-        .hsw-navy { left: 50%; top: 11%; width: 36%; height: 64%; background: var(--navy); opacity: .85; clip-path: polygon(28% 0, 100% 34%, 76% 100%, 0 62%); }
-        .hsw-navy2 { left: 60%; top: 20%; width: 30%; height: 44%; background: var(--navy); opacity: .45; clip-path: polygon(0 20%, 100% 0, 88% 100%, 12% 86%); }
-        .hsw-lav { left: 6%; bottom: 0; width: 42%; height: 36%; background: var(--lav); opacity: .9; clip-path: polygon(0 100%, 100% 8%, 100% 100%); }
-        .hsw-rust { left: 42%; bottom: 0; width: 30%; height: 44%; background: var(--rust); opacity: .8; clip-path: polygon(16% 0, 100% 26%, 84% 100%, 0 100%); }
-        .hsw-sun { right: 2.5%; bottom: -7%; width: clamp(14rem, 22vw, 26rem); aspect-ratio: 1; border-radius: 50%; background: var(--sun); }
-        .hsw-ghost { font-size: clamp(14rem, 25vw, 27rem); color: rgb(12 15 46 / .06); }
+        .hsw-sky { right: -9rem; top: -11rem; width: 40rem; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff59d, var(--sky) 55%, #ffd45a); opacity: .95; }
+        .hsw-navy { left: 53%; top: 13%; width: 33%; height: 60%; border-radius: 3.2rem; background: linear-gradient(160deg, #ffa43b, var(--navy)); opacity: .92; rotate: -14deg; box-shadow: 0 40px 70px -40px rgba(140, 60, 0, .55); }
+        .hsw-navy2 { left: 63%; top: 24%; width: 26%; height: 52%; border-radius: 3rem; background: #fff; opacity: .26; rotate: -14deg; }
+        .hsw-lav { left: -9rem; bottom: -12rem; width: 38rem; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 60% 40%, #ffd89a, var(--lav) 60%, #ffae4a); opacity: .95; }
+        .hsw-rust { left: 41%; bottom: -3.5rem; width: 34%; height: 24%; border-radius: 999px; background: linear-gradient(90deg, #e8631f, var(--rust)); opacity: .85; rotate: -8deg; }
+        .hsw-sun { right: 2.5%; bottom: -8%; width: clamp(14rem, 22vw, 26rem); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #ffe97a, var(--sun) 60%, #ffb92b); box-shadow: 0 30px 60px -30px rgba(160, 70, 0, .6); }
+        .hsw-stripes { position: absolute; inset: 0; background: repeating-linear-gradient(115deg, transparent 0 44px, rgb(255 255 255 / .22) 44px 47px); -webkit-mask-image: linear-gradient(90deg, transparent 22%, #000 62%); mask-image: linear-gradient(90deg, transparent 22%, #000 62%); }
+        .hsw-glow { position: absolute; left: 50%; top: 46%; width: 46rem; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, rgb(255 255 255 / .75), transparent 66%); }
+        .hsw-ghost { font-size: clamp(14rem, 25vw, 27rem); color: rgb(150 60 0 / .1); }
         .hsw-btn { display: inline-flex; align-items: center; gap: .6rem; height: 3.1rem; padding: 0 1.6rem; border-radius: 999px; font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; transition: background-color .3s, transform .3s var(--ease-out-soft); }
         .hsw-btn:active { transform: scale(.97); }
-        .hsw-pill { display: inline-flex; align-items: center; gap: .55rem; height: 3rem; padding: 0 1.6rem; border-radius: 999px; background: rgb(255 255 255 / .75); color: #12164c; font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; box-shadow: inset 0 0 0 1px rgb(138 200 255 / .8); transition: background-color .3s, color .3s, transform .3s var(--ease-out-soft); }
+        .hsw-pill { display: inline-flex; align-items: center; gap: .55rem; height: 3rem; padding: 0 1.6rem; border-radius: 999px; background: rgb(255 255 255 / .75); color: #12164c; font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; box-shadow: inset 0 0 0 1px rgb(255 160 50 / .75); transition: background-color .3s, color .3s, transform .3s var(--ease-out-soft); }
         .hsw-pill:hover { transform: translateY(-2px); background: #fff; }
         .hsw-pill[aria-pressed="true"] { background: #0c0f2e; color: #fff; box-shadow: none; }
         .hsw-pill:focus-visible, .hsw-tab:focus-visible { outline: 2px solid #ffd23f; outline-offset: 2px; }
