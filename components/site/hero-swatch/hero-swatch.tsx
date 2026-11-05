@@ -66,38 +66,15 @@ const MODEL_PHOTOS: Record<Item, { src: string; pos: string }[]> = {
   ],
 };
 
-// Banner themes: the coloured planes behind the garment (sky, navy, lavender, rust, sun) on a base colour.
-const THEMES = [
-  { name: "Sky and navy", bg: "#f3ece1", sky: "#8ac8ff", navy: "#3a4aa6", lav: "#b9a8ec", rust: "#8a4b3c", sun: "#ffc82c" },
-  { name: "Sun", bg: "#fbf1dc", sky: "#ffd166", navy: "#e07a2f", lav: "#ffe8b0", rust: "#b5532a", sun: "#ff9f1c" },
-  { name: "Rose", bg: "#f7ebe9", sky: "#ffb3c1", navy: "#c1456b", lav: "#ffd9e0", rust: "#7a2a45", sun: "#ffc857" },
-  { name: "Mint", bg: "#eaf2ec", sky: "#9be3d0", navy: "#1f7a6b", lav: "#d4f5ea", rust: "#2f5d50", sun: "#ffd166" },
-  { name: "Midnight", bg: "#e6e8f4", sky: "#7f8cff", navy: "#1b2167", lav: "#3b3f8f", rust: "#0c0f2e", sun: "#ffd23f" },
-  { name: "Lilac", bg: "#f0eaf7", sky: "#cdb8ff", navy: "#6a4bc4", lav: "#eadfff", rust: "#4b2e83", sun: "#ffd166" },
-  { name: "Coast", bg: "#eaf3fa", sky: "#8fd3ff", navy: "#0b4f9c", lav: "#cfeaff", rust: "#082e5c", sun: "#ffc82c" },
-  { name: "Earth", bg: "#f2eadc", sky: "#d9c3a0", navy: "#7a5c3a", lav: "#efe3d0", rust: "#4a3524", sun: "#e3a857" },
-];
-
-// Garment colours. A colour preview applied to the 3D render (it re-tints the model; these are not separate catalogue colourways).
-const COLOURS = [
-  { name: "Brown", swatch: "linear-gradient(135deg,#6a2f1c 50%,#efe6d4 50%)", filter: "none" },
-  { name: "Navy", swatch: "#1d2f7a", filter: "hue-rotate(200deg) saturate(1.3) brightness(0.85)" },
-  { name: "Black", swatch: "#1c1c1c", filter: "grayscale(1) brightness(0.32) contrast(1.1)" },
-  { name: "Olive", swatch: "#55693a", filter: "hue-rotate(60deg) saturate(0.8) brightness(0.9)" },
-  { name: "Beige", swatch: "#d8bf98", filter: "sepia(0.3) saturate(0.6) brightness(1.7)" },
-  { name: "White", swatch: "#f1f1ee", filter: "grayscale(1) brightness(2.4) contrast(0.9)" },
-  { name: "Maroon", swatch: "#7a1e2d", filter: "hue-rotate(-20deg) saturate(1.6) brightness(0.85)" },
-  { name: "Sky", swatch: "#7aa7e0", filter: "hue-rotate(175deg) saturate(1.1) brightness(1.5)" },
-];
+// The stage colours: the coloured planes behind the garment (sky, navy, lavender, rust, sun) on a warm base.
+const STAGE = { bg: "#f3ece1", sky: "#8ac8ff", navy: "#3a4aa6", lav: "#b9a8ec", rust: "#8a4b3c", sun: "#ffc82c" };
 
 /**
  * Hero, design 3. A warm stage with coloured planes behind one large real 3D garment: numbered points with a detail card, guided angles,
- * a BANNER picker (the colour theme of the stage) and a GARMENT picker (a colour preview), the three ranges as pills, and real on-model photographs.
+ * the three ranges as pills, and real on-model photographs.
  */
 export function HeroSwatch({ eyebrow, heading, subheading, cta, secondary }: { eyebrow: string; heading: string; subheading: string; cta: Cta; secondary: Cta }) {
   const [item, setItem] = useState<Item>("tee");
-  const [theme, setTheme] = useState(0);
-  const [colour, setColour] = useState(0);
   const [view, setView] = useState<View3D | null>(null);
   const [pick, setPick] = useState<string | null>(null);
   const [turn, setTurn] = useState(0);
@@ -107,7 +84,7 @@ export function HeroSwatch({ eyebrow, heading, subheading, cta, secondary }: { e
   const points = useMemo<Point3D[]>(() => spots.map((s) => ({ key: `${item}-${s.label}`, label: s.label, side: s.side, u: s.u, v: s.v })), [item, spots]);
   const active = spots.find((s) => `${item}-${s.label}` === pick) ?? spots[0] ?? null;
   const activeIdx = active ? spots.indexOf(active) : -1;
-  const t = THEMES[theme];
+  const t = STAGE;
   const words = heading.trim().split(/\s+/);
   const light = words.slice(0, 3).join(" ");
   const bold = words.slice(3);
@@ -174,32 +151,6 @@ export function HeroSwatch({ eyebrow, heading, subheading, cta, secondary }: { e
           </div>
         </div>
 
-        {/* Top centre: the BANNER and GARMENT pickers. */}
-        <div className="relative z-30 mx-auto mt-6 w-fit rounded-2xl bg-[#6f6b66]/90 px-3 py-2.5 text-white shadow-[0_16px_34px_-18px_rgba(0,0,0,0.6)] backdrop-blur-sm lg:absolute lg:left-1/2 lg:top-4 lg:mt-0 lg:-translate-x-1/2">
-          {[
-            { label: "Banner", list: THEMES.map((x) => ({ name: x.name, swatch: `linear-gradient(135deg, ${x.navy} 50%, ${x.sun} 50%)` })), cur: theme, set: setTheme },
-            { label: "Garment", list: COLOURS.map((x) => ({ name: x.name, swatch: x.swatch })), cur: colour, set: setColour },
-          ].map((row) => (
-            <div key={row.label} className="flex items-center gap-2.5 py-0.5">
-              <span className="w-[3.7rem] text-[0.58rem] font-bold uppercase tracking-[0.16em] text-white/85">{row.label}</span>
-              <div className="flex gap-1.5" role="group" aria-label={`${row.label} colour`}>
-                {row.list.map((o, n) => (
-                  <button
-                    key={o.name}
-                    type="button"
-                    title={row.label === "Garment" ? `${o.name} (colour preview)` : `${o.name} theme`}
-                    aria-label={`${row.label}: ${o.name}`}
-                    aria-pressed={row.cur === n}
-                    onClick={() => row.set(n)}
-                    className="hsw-swatch"
-                    style={{ background: o.swatch }}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-
         {/* Top right: the three ranges. */}
         <div className="relative z-30 mt-5 flex flex-wrap gap-2.5 lg:absolute lg:right-8 lg:top-[3.4rem] lg:mt-0" role="group" aria-label="Choose a range">
           {ITEMS.map((i) => (
@@ -212,7 +163,7 @@ export function HeroSwatch({ eyebrow, heading, subheading, cta, secondary }: { e
 
         {/* The 3D garment, with its ring, its points and its colour preview. */}
         <div aria-hidden className="pointer-events-none absolute left-1/2 top-[47%] hidden aspect-square h-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-ink/30 lg:block" />
-        <div className="hsw-viewer relative mx-auto mt-6 h-[28rem] w-full max-w-[26rem] lg:absolute lg:inset-y-[5.6rem] lg:left-[30%] lg:right-[30%] lg:mt-0 lg:h-auto lg:w-auto lg:max-w-none" style={{ ["--tint" as string]: COLOURS[colour].filter }}>
+        <div className="hsw-viewer relative mx-auto mt-6 h-[28rem] w-full max-w-[26rem] lg:absolute lg:inset-y-[5.6rem] lg:left-[30%] lg:right-[30%] lg:mt-0 lg:h-auto lg:w-auto lg:max-w-none">
           <Garment3D key={item} src={cur.src} label={cur.label} poster={cur.poster} points={points} activeKey={active ? `${item}-${active.label}` : null} onPick={setPick} view={view} onGrab={() => setView(null)} controls={false} />
         </div>
 
@@ -265,13 +216,9 @@ export function HeroSwatch({ eyebrow, heading, subheading, cta, secondary }: { e
         .hsw-pill { display: inline-flex; align-items: center; gap: .55rem; height: 3rem; padding: 0 1.6rem; border-radius: 999px; background: rgb(255 255 255 / .75); color: #12164c; font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; box-shadow: inset 0 0 0 1px rgb(138 200 255 / .8); transition: background-color .3s, color .3s, transform .3s var(--ease-out-soft); }
         .hsw-pill:hover { transform: translateY(-2px); background: #fff; }
         .hsw-pill[aria-pressed="true"] { background: #0c0f2e; color: #fff; box-shadow: none; }
-        .hsw-swatch { width: 1.7rem; height: 1.7rem; border-radius: 999px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .35); transition: transform .25s var(--ease-out-soft), box-shadow .25s; }
-        .hsw-swatch:hover { transform: scale(1.12); }
-        .hsw-swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px #6f6b66, 0 0 0 4px #fff; transform: scale(1.06); }
-        .hsw-swatch:focus-visible, .hsw-pill:focus-visible, .hsw-tab:focus-visible { outline: 2px solid #ffd23f; outline-offset: 2px; }
+        .hsw-pill:focus-visible, .hsw-tab:focus-visible { outline: 2px solid #ffd23f; outline-offset: 2px; }
         .hsw-tab { padding: .6rem 1.1rem; border-radius: 999px; font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #3a3f5e; transition: background-color .25s, color .25s; }
         .hsw-tab:hover { background: #12164c; color: #fff; }
-        .hsw-viewer canvas { filter: var(--tint, none); transition: filter .5s; }
         .hsw-cards { position: relative; margin-top: 1.4rem !important; height: 10.5rem; width: 21rem; margin: 0; padding: 0; list-style: none; }
         .hsw-card { position: absolute; top: 0; width: 7.2rem; height: 9.6rem; overflow: hidden; border-radius: .9rem; background: #fff; box-shadow: 0 14px 28px -14px rgba(18,22,76,.55), 0 0 0 2px #262e86; transition: transform .45s var(--ease-out-soft); }
         .hsw-card-0 { left: 0; rotate: -5deg; }
@@ -280,7 +227,7 @@ export function HeroSwatch({ eyebrow, heading, subheading, cta, secondary }: { e
         .hsw-cards:hover .hsw-card { transform: translateY(-4px); }
         .hsw-detail { animation: hsw-in .5s var(--ease-out-soft) both; }
         @keyframes hsw-in { from { opacity: 0; transform: translateY(10px); } }
-        @media (prefers-reduced-motion: reduce) { .hsw-detail { animation: none; } .hsw-viewer canvas { transition: none; } }
+        @media (prefers-reduced-motion: reduce) { .hsw-detail { animation: none; } }
       `}</style>
     </section>
   );
