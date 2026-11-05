@@ -29,11 +29,11 @@ const THUMBS = [
   { src: "/looks/c1.jpg", label: "Track pants", href: "/collections/gents-tracks" },
   { src: "/looks/c4.jpg", label: "Cargo wear", href: "/collections/gents-tracks" },
 ];
-const MS = 5500;
+const MS = 4000;
 
 /**
  * Campaign banner. Three campaign slides in the style of the LESPARO banner brief (lifestyle, bold and energetic, modern minimal), then
- * one slide per catalogue category using that category's own cover photograph. It advances by itself (every 5.5 seconds), pauses only
+ * one slide per catalogue category using that category's own cover photograph. It advances by itself (every 4 seconds), pauses only
  * while a mouse is over it or when the pause button is pressed, and has arrows, a counter and swipe. Reduced motion keeps the automatic
  * advance (with a plain fade) but removes the entrance and drift animation.
  */
