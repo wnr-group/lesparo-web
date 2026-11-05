@@ -68,12 +68,12 @@ const MODEL_PHOTOS: Record<Item, { src: string; pos: string }[]> = {
 
 // The stage colours: a sandal base with yellow, orange and tan shapes: a sun arch behind the garment, side panels and discs.
 const STAGE = {
-  bg: "linear-gradient(180deg, #f3e4c8 0%, #ecd5ac 100%)",
-  sky: "#ff9a2e",
-  navy: "#d9b681",
-  lav: "#ffb347",
+  bg: "linear-gradient(180deg, #fbf3e2 0%, #f6e6c6 100%)",
+  sky: "#ffbd6b",
+  navy: "#f0dcb4",
+  lav: "#ffd08a",
   rust: "#ffd23f",
-  sun: "#f57c1f",
+  sun: "#ffa24a",
 };
 
 /**
@@ -213,15 +213,15 @@ export function HeroSwatch({ eyebrow, heading, subheading, cta, secondary }: { e
 
       <style>{`
         .hsw-plane { position: absolute; }
-        .hsw-stripes { position: absolute; inset: 0; background-image: radial-gradient(rgb(150 100 40 / .22) 1.5px, transparent 1.6px); background-size: 22px 22px; -webkit-mask-image: linear-gradient(90deg, #000, transparent 70%); mask-image: linear-gradient(90deg, #000, transparent 70%); }
-        .hsw-glow { left: 50%; bottom: 0; width: min(38rem, 46%); height: 86%; translate: -50% 0; border-radius: 999px 999px 0 0; background: linear-gradient(180deg, #ffe45c 0%, #ffcf3a 55%, #ffb62e 100%); box-shadow: 0 0 0 1.2rem rgb(255 255 255 / .28), 0 0 0 2.6rem rgb(255 255 255 / .14); }
-        .hsw-sky { right: 0; top: 0; bottom: 0; width: 25%; border-radius: 12rem 0 0 12rem; background: linear-gradient(200deg, #ffa83a, var(--sky) 55%, #f07a1a); }
-        .hsw-navy { left: 0; top: 0; bottom: 0; width: 21%; border-radius: 0 12rem 12rem 0; background: linear-gradient(160deg, #e8cc9c, var(--navy)); opacity: .9; }
+        .hsw-stripes { position: absolute; inset: 0; background-image: radial-gradient(rgb(170 120 50 / .16) 1.5px, transparent 1.6px); background-size: 22px 22px; -webkit-mask-image: linear-gradient(90deg, #000, transparent 70%); mask-image: linear-gradient(90deg, #000, transparent 70%); }
+        .hsw-glow { left: 50%; bottom: 0; width: min(38rem, 46%); height: 86%; translate: -50% 0; border-radius: 999px 999px 0 0; background: linear-gradient(180deg, #fff0a0 0%, #ffe066 55%, #ffd04a 100%); box-shadow: 0 0 0 1.2rem rgb(255 255 255 / .28), 0 0 0 2.6rem rgb(255 255 255 / .14); }
+        .hsw-sky { right: 0; top: 0; bottom: 0; width: 25%; border-radius: 12rem 0 0 12rem; background: linear-gradient(200deg, #ffd08a, var(--sky) 60%, #ffa650); }
+        .hsw-navy { left: 0; top: 0; bottom: 0; width: 21%; border-radius: 0 12rem 12rem 0; background: linear-gradient(160deg, #f8ebcf, var(--navy)); opacity: .9; }
         .hsw-navy2 { right: 8%; top: 12%; width: 9rem; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgb(255 255 255 / .6); }
         .hsw-lav { left: 8%; bottom: -5rem; width: 17rem; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #ffd27a, var(--lav) 65%); }
         .hsw-rust { left: 31%; top: 9%; width: 12rem; height: 3.4rem; border-radius: 999px; background: var(--rust); rotate: -18deg; box-shadow: 0 18px 30px -18px rgba(160, 80, 0, .6); }
         .hsw-sun { right: 14%; bottom: 7%; width: clamp(5rem, 8vw, 9rem); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #ffb060, var(--sun)); box-shadow: 0 20px 36px -18px rgba(150, 60, 0, .7); }
-        .hsw-ghost { font-size: clamp(14rem, 25vw, 27rem); color: rgb(140 80 10 / .13); }
+        .hsw-ghost { font-size: clamp(14rem, 25vw, 27rem); color: rgb(160 100 20 / .08); }
         .hsw-btn { display: inline-flex; align-items: center; gap: .6rem; height: 3.1rem; padding: 0 1.6rem; border-radius: 999px; font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; transition: background-color .3s, transform .3s var(--ease-out-soft); }
         .hsw-btn:active { transform: scale(.97); }
         .hsw-pill { display: inline-flex; align-items: center; gap: .55rem; height: 3rem; padding: 0 1.6rem; border-radius: 999px; background: rgb(255 255 255 / .75); color: #12164c; font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; box-shadow: inset 0 0 0 1px rgb(255 160 50 / .75); transition: background-color .3s, color .3s, transform .3s var(--ease-out-soft); }
