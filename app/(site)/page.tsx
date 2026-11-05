@@ -4,6 +4,7 @@ import Link from "next/link";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BrandFilm } from "@/components/site/brand-film";
+import { HeroBanner } from "@/components/site/hero-banner/hero-banner";
 import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
 import { CIRCLE_TILES, RANGE_TILES } from "@/components/site/home-photos";
 import { NewLaunches, ShopByRange, TopCollections } from "@/components/site/home-sections";
@@ -83,9 +84,19 @@ export default async function HomePage() {
   const kids = await getCategoryBySlug("kids");
   const { products: newest } = await listProducts({ sort: "newest", pageSize: 8, ...(kids ? { categoryIds: kids.subtreeIds } : {}) });
 
+  // One banner slide per category with a cover photo: the garment groups, then the men's ranges, then the fabric lines.
+  const garments = tree.find((t) => t.slug === "garments");
+  const gents = garments?.children.find((c) => c.slug === "gents");
+  // Women has no catalogue photographs yet, so its slide uses the licensed studio photo from the menu (public/menu/SOURCES.txt).
+  const COVER_FALLBACK: Record<string, string> = { women: "/menu/women-studio.jpg" };
+  const bannerCategories = [...(garments?.children ?? []), ...(gents?.children ?? []), ...(fabrics?.children ?? [])]
+    .map((c) => ({ name: c.name, slug: c.slug, coverUrl: c.coverUrl ?? COVER_FALLBACK[c.slug] ?? null }))
+    .filter((c): c is { name: string; slug: string; coverUrl: string } => !!c.coverUrl);
+
   return (
     <>
       {/* ---------------------------------------------------------------- hero */}
+      <HeroBanner categories={bannerCategories} />
       <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} turntables={{ pants: turntable("pants"), tee: turntable("tee") }} models={{ pants: model3d("pants"), tee: model3d("tee"), look: model3d("look") ?? (model3d("pants") && model3d("tee") ? "/models/look" : undefined) }} />
 
 
