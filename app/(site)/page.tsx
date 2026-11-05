@@ -4,7 +4,7 @@ import Link from "next/link";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BrandFilm } from "@/components/site/brand-film";
-import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
+import { SpotlightHero, type FeaturedProduct, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
 import { CIRCLE_TILES, RANGE_TILES } from "@/components/site/home-photos";
 import { NewLaunches, ShopByRange, TopCollections } from "@/components/site/home-sections";
 import { BrandStatement, BrandStory } from "@/components/site/brand-sections";
@@ -81,12 +81,21 @@ export default async function HomePage() {
   const { sections } = content;
   // New launches shows the kids range (newest first); with no kids category it falls back to the newest products overall.
   const kids = await getCategoryBySlug("kids");
+  // One real catalogue product per hero garment, shown under the 3D piece: the newest in that range.
+  async function featuredIn(slug: string, range: string): Promise<FeaturedProduct | undefined> {
+    const cat = await getCategoryBySlug(slug);
+    if (!cat) return undefined;
+    const { products } = await listProducts({ sort: "newest", pageSize: 1, categoryIds: cat.subtreeIds });
+    const pr = products[0];
+    return pr ? { id: pr.id, slug: pr.slug, name: pr.name, price: pr.price, currency: pr.currency, image: pr.images[0]?.url ?? null, range } : undefined;
+  }
+  const [featTee, featPants, featLook] = await Promise.all([featuredIn("gents-t-shirt", "T-shirts"), featuredIn("gents-tracks", "Track pants"), featuredIn("gents", "Gents")]);
   const { products: newest } = await listProducts({ sort: "newest", pageSize: 8, ...(kids ? { categoryIds: kids.subtreeIds } : {}) });
 
   return (
     <>
       {/* ---------------------------------------------------------------- hero */}
-      <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} turntables={{ pants: turntable("pants"), tee: turntable("tee") }} models={{ pants: model3d("pants"), tee: model3d("tee"), look: model3d("look") ?? (model3d("pants") && model3d("tee") ? "/models/look" : undefined) }} />
+      <SpotlightHero featured={{ tee: featTee, pants: featPants, look: featLook }} fabricsHref={fabrics ? `/collections/${fabrics.slug}` : "/shop"} eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} turntables={{ pants: turntable("pants"), tee: turntable("tee") }} models={{ pants: model3d("pants"), tee: model3d("tee"), look: model3d("look") ?? (model3d("pants") && model3d("tee") ? "/models/look" : undefined) }} />
 
 
       {/* ---------------------------------------------------------- categories */}

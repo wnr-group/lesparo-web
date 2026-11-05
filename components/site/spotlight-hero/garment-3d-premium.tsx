@@ -83,7 +83,7 @@ function smoothNormals(geo: BufferGeometry) {
 
 const repaired = new WeakSet<Object3D>();
 /** Smooth shading and a matte cloth material in place of the loader's flat, fully metallic defaults. */
-function repair(scene: Object3D) {
+export function repair(scene: Object3D) {
   if (repaired.has(scene)) return;
   repaired.add(scene);
   scene.traverse((o) => {
@@ -277,7 +277,7 @@ function MotionRig({ fit, apiRef, reduced, hitsRef, markersRef, floatRef }: { fi
     const cam = state.camera as PerspectiveCamera;
     const half = Math.tan(MathUtils.degToRad(cam.fov) / 2);
     // On a wide, full-bleed stage the garment fills less of the height than in the narrow portrait box on a phone.
-    const fill = cam.aspect > 1.2 ? 0.64 : 0.8;
+    const fill = cam.aspect > 1.2 ? 0.71 : 0.8;
     const fitDist = Math.max(f.h / 2 / half, f.w / 2 / (half * cam.aspect)) / fill + f.d / 2;
     const dist = fitDist * c.zoom * (1 + 0.16 * c.sc);
     target.set(c.ax, c.ay - c.sc * 0.04 * f.h, c.az);

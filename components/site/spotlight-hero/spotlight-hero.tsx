@@ -1,11 +1,15 @@
 "use client";
 
-import { ChevronRight, Minus, Plus, X } from "lucide-react";
-import { PointerDepth } from "@/components/site/pointer-fx";
+import { ArrowLeft, ArrowRight, Box, ChevronRight, Minus, Plus, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./spotlight.css";
+import { HeroBanner, PRODUCT_FOR_SLIDE, SLIDE_FOR_PRODUCT, SLIDES } from "./hero-banner-bg";
+import Image from "next/image";
+import { AddToEnquiryButton } from "@/components/site/enquiry-list";
+import { formatPrice } from "@/lib/format";
+
 
 // three.js is only fetched when a product has a .glb in public/models.
 // The premium viewer is the default; add ?viewer=classic to the address to see the earlier orbit-controls one.
@@ -154,7 +158,10 @@ const ringDist = (a: number, b: number, n: number) => Math.min(Math.abs(a - b), 
  * at a numbered spot to read it and see that cloth under a loupe cut from the same frame. A product with a real
  * turntable set (8 or more frames in public/turntable) spins smoothly; until then four real photographs stand in.
  */
-export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, turntables, models = {}, }: { eyebrow: string; heading: string; subheading: string; cta: Cta; secondary: Cta; turntables: Partial<Record<string, TurntableSet>>; models?: Partial<Record<string, string>> }) {
+/** A real catalogue product shown under the 3D garment: its name, price and a way into the enquiry list. */
+export type FeaturedProduct = { id: string; slug: string; name: string; price: number | null; currency: string; image: string | null; range: string };
+
+export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, turntables, models = {}, featured = {}, fabricsHref = "/shop", }: { eyebrow: string; heading: string; subheading: string; cta: Cta; secondary: Cta; turntables: Partial<Record<string, TurntableSet>>; models?: Partial<Record<string, string>>; featured?: Partial<Record<string, FeaturedProduct>>; fabricsHref?: string }) {
   const products: Product[] = ["tee", "pants", "look"].map((id) => {
     const real = turntables[id];
     return real
@@ -307,6 +314,104 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
     setLoaded(0);
     live.current = { ...live.current, pos: 0, vel: 0, moved: false };
   };
+  // The banner and the 3D garment move together: each banner slide goes with a garment, and choosing a garment brings its banner up.
+  const [slide, setSlide] = useState(0);
+  // The hero opens on the banners; "View in 3D" swaps the banner frame for the real garments, and "Back to banners" returns.
+  const [mode, setMode] = useState<"banner" | "3d">("banner");
+  const [seen3d, setSeen3d] = useState(false);
+  const modeRef = useRef(mode);
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
+  const heroRef = useRef<HTMLElement>(null);
+  const [holding, setHolding] = useState(false);
+  const [hovering, setHovering] = useState(false);
+  const holdTimer = useRef<number | undefined>(undefined);
+  const hold = () => {
+    setHolding(true);
+    window.clearTimeout(holdTimer.current);
+    holdTimer.current = window.setTimeout(() => setHolding(false), 20000);
+  };
+  useEffect(() => () => window.clearTimeout(holdTimer.current), []);
+  const goSlide = (n: number, byVisitor = false) => {
+    setSlide(n);
+    const idx = products.findIndex((p) => p.id === PRODUCT_FOR_SLIDE[n]);
+    if (idx >= 0 && idx !== pi) choose(idx);
+    if (byVisitor) hold();
+  };
+  const enter3d = () => {
+    setMode("3d");
+    setSeen3d(true);
+    const idx = products.findIndex((p) => p.id === "tee");
+    if (idx >= 0 && idx !== pi) choose(idx);
+  };
+  const leave3d = () => {
+    setMode("banner");
+    setExplore(false);
+    setView3d(null);
+  };
+  const goSlideRef = useRef(goSlide);
+  useEffect(() => {
+    goSlideRef.current = goSlide;
+  });
+  const slideRef = useRef(slide);
+  useEffect(() => {
+    slideRef.current = slide;
+  }, [slide]);
+  const exploreRef = useRef(explore);
+  useEffect(() => {
+    exploreRef.current = explore;
+  }, [explore]);
+  // Autoplay: one 6-second timer per slide. It waits while the mouse is over the hero, while the visitor is looking closer or in 3D, and for
+  // 20 seconds after they choose something. It restarts from zero when it resumes, matching the progress line.
+  useEffect(() => {
+    if (hovering || holding || explore || mode === "3d") return;
+    const id = window.setTimeout(() => {
+      if (document.hidden) return;
+      goSlideRef.current((slide + 1) % PRODUCT_FOR_SLIDE.length);
+    }, 6000);
+    return () => window.clearTimeout(id);
+  }, [slide, hovering, holding, explore, mode]);
+
+  const stepSlide = (d: number) => goSlideRef.current((slide + d + PRODUCT_FOR_SLIDE.length) % PRODUCT_FOR_SLIDE.length, true);
+  const stepRef = useRef(stepSlide);
+  useEffect(() => {
+    stepRef.current = stepSlide;
+  });
+  // Keyboard: left and right arrows move the banner while it is showing.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (modeRef.current !== "banner" || exploreRef.current) return;
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      const r = heroRef.current?.getBoundingClientRect();
+      if (!r || r.bottom < 120 || r.top > innerHeight - 120) return;
+      stepRef.current(e.key === "ArrowRight" ? 1 : -1);
+    };
+    addEventListener("keydown", onKey);
+    return () => removeEventListener("keydown", onKey);
+  }, []);
+  const swipeX = useRef(0);
+
+  // Scrolling the hero away turns the 3D garment (it glides to each angle), unless the visitor is looking closer.
+  const turnStep = useRef({ az: 0, n: 0 });
+  useEffect(() => {
+    if (!model || !matchMedia("(min-width: 1024px) and (prefers-reduced-motion: no-preference)").matches) return;
+    const onScroll = () => {
+      const el = heroRef.current;
+      if (!el || exploreRef.current || modeRef.current !== "3d") return;
+      const r = el.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, -r.top / (r.height * 0.8)));
+      const az = Math.round((p * Math.PI * 1.1) / 0.4) * 0.4;
+      if (az === turnStep.current.az) return;
+      turnStep.current = { az, n: turnStep.current.n + 1 };
+      setView3d({ id: "scroll", label: "", point: "", az, zoom: 1, aimY: 0, n: turnStep.current.n });
+    };
+    addEventListener("scroll", onScroll, { passive: true });
+    return () => removeEventListener("scroll", onScroll);
+  }, [model]);
+
   const goTo = (f: number) => {
     live.current.pos = f;
     live.current.vel = 0;
@@ -379,42 +484,74 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
 
   return (
     <>
-    <section aria-labelledby="hero-heading" data-product={product.id} className="sp-stage relative isolate flex flex-col overflow-hidden text-[rgb(var(--sp-fg))] lg:block lg:h-[calc(100svh-var(--hdr))] lg:min-h-[44rem]">
+    <section ref={heroRef} aria-labelledby="hero-heading" data-mode={mode} data-product={product.id} onPointerEnter={(e) => e.pointerType === "mouse" && setHovering(true)} onPointerLeave={(e) => e.pointerType === "mouse" && setHovering(false)} onTouchStart={(e) => (swipeX.current = e.touches[0].clientX)} onTouchEnd={(e) => { const dx = e.changedTouches[0].clientX - swipeX.current; if (mode === "banner" && Math.abs(dx) > 60) stepSlide(dx < 0 ? 1 : -1); }} className="sp-stage relative isolate block h-[31rem] overflow-hidden text-[rgb(var(--sp-fg))] sm:h-[34rem] lg:h-[calc(100svh-var(--hdr))] lg:min-h-[44rem]">
       {/* The stage: one calm navy with a soft warm light behind the product, and a floor. */}
-      <PointerDepth />
+      <HeroBanner index={slide} onSelect={(n) => goSlide(n, true)} exploring={explore || mode === "3d"} stage3d={mode === "3d"} progress={holding ? "hold" : hovering ? "paused" : "run"} onStep={stepSlide} />
       <div aria-hidden className="sp-halo" />
       <div aria-hidden className="sp-floor" />
 
+      {/* Wide screens: fill the sides of the stage with a ghost wordmark, three facts and two real range cards. */}
       {/* Headline, centred above the product: a short label, the title, one action and a text link. */}
-      <div className="sp-leave-text sp-copy relative z-20 mx-auto flex max-w-4xl flex-col items-center px-5 pt-10 text-center sm:px-8 lg:pt-10">
-        <p className="flex items-center gap-2.5 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgb(var(--sp-fg)/0.7)]">
+      <div className={`sp-leave-text sp-copy sp-title relative z-20 mx-auto flex max-w-4xl flex-col items-center px-5 pt-10 text-center transition-[opacity,color] duration-500 sm:px-8 lg:items-start lg:text-left ${mode === "banner" ? "lg:text-white" : ""} ${explore ? "lg:pointer-events-none lg:opacity-0" : ""}`}>
+        <p className={`sp-eyebrow flex items-center gap-2.5 text-[0.72rem] font-semibold uppercase tracking-[0.22em] ${mode === "banner" ? "lg:rounded-full lg:bg-white/12 lg:px-3.5 lg:py-1.5 lg:text-white/90 lg:ring-1 lg:ring-white/25 lg:backdrop-blur-md" : ""} text-[rgb(var(--sp-fg)/0.7)]`}>
           <span aria-hidden className="size-1.5 rounded-full bg-sun" />
           {eyebrow}
         </p>
-        <h1 id="hero-heading" className="mt-4 font-display text-[clamp(2.1rem,1rem+2.8vw,3.9rem)] font-bold leading-[1.04] tracking-[-0.04em] text-balance">
+        <h1 id="hero-heading" className="mt-4 font-display text-[clamp(2.1rem,1rem+2.8vw,3.9rem)] font-bold leading-[1.04] tracking-[-0.04em] text-balance lg:mt-6 lg:text-[clamp(2.8rem,1rem+3.2vw,4.7rem)] lg:leading-[0.98]">
           {words.map((w, i) => (
             <span key={i} className="sp-word inline-block" style={{ ["--w" as string]: i }}>
               {w}&nbsp;
             </span>
           ))}
         </h1>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-7 gap-y-3">
-          <Link href={cta.href} className="inline-flex h-11 items-center justify-center rounded-full bg-[rgb(var(--sp-fg))] px-7 text-[0.92rem] font-semibold text-[rgb(var(--sp-on-fg))] transition-colors duration-200 hover:bg-sun hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun">
-            {cta.label}
+        {/* This slide's line, so each banner has its own message under the fixed headline. */}
+        <p key={slide} className={`sp-tag mt-3 hidden font-sport text-[1.05rem] font-extrabold uppercase italic tracking-tight text-[#ffd23f] ${mode === "banner" ? "lg:block" : ""}`}>
+          {SLIDES[slide].caption[0]} {SLIDES[slide].caption[1]}
+        </p>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 lg:mt-7 lg:justify-start">
+          <Link
+            href={mode === "banner" ? (SLIDES[slide].cta.href === "/collections/fabrics" ? fabricsHref : SLIDES[slide].cta.href) : cta.href}
+            className={`sp-cta-primary inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[rgb(var(--sp-fg))] px-7 text-[0.92rem] font-semibold text-[rgb(var(--sp-on-fg))] transition-colors duration-200 hover:bg-sun hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun ${mode === "banner" ? "lg:h-12 lg:bg-[#ffd23f] lg:text-[#0c0f2e] lg:shadow-[0_14px_30px_-14px_rgba(0,0,0,0.6)] lg:hover:bg-white" : ""}`}
+          >
+            {mode === "banner" ? SLIDES[slide].cta.label : cta.label}
           </Link>
-          <Link href={secondary.href} className="group inline-flex items-center gap-0.5 text-[0.92rem] font-semibold text-[rgb(var(--sp-fg)/0.88)] transition-colors hover:text-[rgb(var(--sp-fg))] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sun">
+          <Link href={secondary.href} className={`sp-cta-secondary group inline-flex items-center gap-0.5 text-[0.92rem] font-semibold text-[rgb(var(--sp-fg)/0.88)] transition-colors hover:text-[rgb(var(--sp-fg))] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sun ${mode === "banner" ? "lg:text-white lg:underline lg:decoration-white/40 lg:decoration-2 lg:underline-offset-[6px] lg:hover:decoration-white" : ""}`}>
             {secondary.label}
             <ChevronRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden />
           </Link>
         </div>
       </div>
 
-      {/* Take a closer look: shows the numbered points, the guided views and the detail card. */}
+      {/* View in 3D: swaps the banner frame for the real garments. */}
+      {mode === "banner" && (
+        <button
+          type="button"
+          onClick={enter3d}
+          className="sp-copy sp-view3d-btn relative z-30 order-last mx-auto mb-7 inline-flex h-10 items-center gap-2 rounded-full bg-white/90 px-5 text-[0.85rem] font-semibold text-ink shadow-md ring-1 ring-[rgb(var(--sp-fg)/0.2)] transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun sp-3d-btn lg:absolute lg:right-10 lg:top-9 lg:order-none lg:m-0 lg:h-12 lg:cursor-pointer lg:gap-2.5 lg:bg-white lg:px-6 lg:text-[0.95rem] lg:font-bold lg:text-[#12164c] lg:shadow-[0_18px_40px_-14px_rgba(0,0,0,0.65)] lg:ring-0 lg:hover:-translate-y-0.5 lg:hover:bg-[#ffd23f] xl:right-14"
+        >
+          <Box className="size-5" aria-hidden />
+          View in 3D
+          <ArrowRight className="size-4" aria-hidden />
+        </button>
+      )}
+      {mode === "3d" && (
+        <button
+          type="button"
+          onClick={leave3d}
+          className="sp-copy sp-back-btn relative z-30 order-last mx-auto mb-3 inline-flex h-10 items-center gap-2 rounded-full bg-white/90 px-5 text-[0.85rem] font-semibold text-ink shadow-md ring-1 ring-[rgb(var(--sp-fg)/0.2)] transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun lg:absolute lg:right-[14.5rem] lg:top-10 lg:order-none lg:m-0 xl:right-[17rem]"
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+          Back to banners
+        </button>
+      )}
+
+      {/* Take a closer look (3D only): shows the numbered points, the guided views and the detail card. */}
+      {mode === "3d" && (
       <button
         type="button"
         aria-pressed={explore}
         onClick={() => setExplore((e) => !e)}
-        className="sp-copy relative z-30 order-last mx-auto mb-7 inline-flex h-10 items-center gap-2 rounded-full px-5 text-[0.85rem] font-semibold ring-1 ring-[rgb(var(--sp-fg)/0.35)] transition-colors hover:bg-[rgb(var(--sp-fg)/0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun lg:absolute lg:right-8 lg:top-10 lg:order-none lg:m-0 xl:right-12"
+        className="sp-copy sp-explore-btn relative z-30 order-last mx-auto mb-7 inline-flex h-10 items-center gap-2 rounded-full px-5 text-[0.85rem] font-semibold ring-1 ring-[rgb(var(--sp-fg)/0.35)] transition-colors hover:bg-[rgb(var(--sp-fg)/0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun lg:absolute lg:bg-white/85 lg:backdrop-blur lg:right-8 lg:top-10 lg:order-none lg:m-0 xl:right-12"
       >
         {explore ? (
           <>
@@ -426,9 +563,11 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
           </>
         )}
       </button>
+      )}
 
-      {/* The product viewer. */}
-      <div className={`sp-leave-figure relative z-10 my-6 flex justify-center px-5 lg:absolute lg:my-0 lg:px-0 ${model ? "lg:inset-x-0 lg:bottom-[4.5rem] lg:top-[13rem]" : "lg:inset-x-0 lg:bottom-[5.25rem] lg:top-[13rem]"}`}>
+      {/* The product viewer: mounted the first time 3D is opened, shown only in 3D mode. */}
+      {seen3d && (
+      <div className={`sp-leave-figure sp-viewer relative z-10 my-6 flex justify-center px-5 lg:absolute lg:my-0 lg:px-0 ${model ? "lg:left-[44%] lg:right-[5%] lg:bottom-[4.5rem] lg:top-[4rem]" : "lg:left-[44%] lg:right-[5%] lg:bottom-[5.25rem] lg:top-[6rem]"} ${mode === "3d" ? "" : "max-lg:hidden lg:pointer-events-none lg:opacity-0"}`}>
         {model ? (
           // Full-bleed on desktop: the 3D stage is the whole hero, so a close-up is never clipped inside a box.
           <div className="sp-product relative aspect-[2/3] w-full max-w-[22rem] overflow-hidden lg:aspect-auto lg:h-full lg:w-full lg:max-w-none">
@@ -514,8 +653,10 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         )}
       </div>
 
+      )}
+
       {/* Product switcher: a quiet segmented control under the garment. */}
-      <div role="group" aria-label="Choose a product" className="sp-copy relative z-20 flex justify-center px-5 pb-5 lg:absolute lg:inset-x-0 lg:bottom-7 lg:p-0">
+      <div role="group" aria-label="Choose a product" className={`sp-copy sp-switcher relative z-20 flex justify-center px-5 pb-5 ${mode === "3d" ? "" : "hidden"} lg:absolute lg:bottom-7 lg:left-[44%] lg:right-[5%] lg:p-0`}>
         <ul className="flex items-center gap-1 rounded-full bg-[rgb(var(--sp-fg)/0.08)] p-1 ring-1 ring-[rgb(var(--sp-fg)/0.14)] backdrop-blur-md">
           {products.map((p, i) => {
             const on = pi === i;
@@ -524,7 +665,11 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
                 <button
                   type="button"
                   aria-pressed={on}
-                  onClick={() => choose(i)}
+                  onClick={() => {
+                    choose(i);
+                    setSlide(SLIDE_FOR_PRODUCT[p.id] ?? 0);
+                    hold();
+                  }}
                   className={`rounded-full px-4 py-2 text-[0.82rem] font-semibold transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun sm:px-5 ${on ? "bg-[rgb(var(--sp-fg))] text-[rgb(var(--sp-on-fg))]" : "text-[rgb(var(--sp-fg)/0.75)] hover:text-[rgb(var(--sp-fg))]"}`}
                 >
                   {p.label}
@@ -538,8 +683,8 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       {/* View tabs, above the switcher while exploring. */}
       {model && explore && (
         // The row spans the hero, so it lets clicks and drags through to the 3D stage (and its reset button) beneath; only the tabs themselves take them.
-        <div role="group" aria-label="View" className="sp-copy pointer-events-none relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-[5.5rem] lg:p-0">
-          <ul className="pointer-events-auto flex w-full max-w-[24rem] overflow-hidden rounded-full border border-[rgb(var(--sp-fg)/0.3)] bg-[rgb(var(--sp-panel)/0.7)] backdrop-blur-sm sm:w-auto sm:max-w-full">
+        <div role="group" aria-label="View" className="sp-copy sp-viewtabs pointer-events-none relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:bottom-[5.5rem] lg:left-[44%] lg:right-[5%] lg:p-0">
+          <ul className="pointer-events-auto flex w-full max-w-[24rem] overflow-hidden rounded-full border border-[rgb(var(--sp-fg)/0.3)] bg-white/95 shadow-md sm:w-auto sm:max-w-full">
             {(VIEWS_3D[product.id] ?? []).map((v) => {
               const on = view3d?.id === v.id;
               return (
@@ -562,8 +707,8 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
           </ul>
         </div>
       )}
-      {!model && explore && <div role="group" aria-label="View" className="sp-copy relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:inset-x-0 lg:bottom-[5.5rem] lg:p-0">
-        <ul className="flex w-full max-w-[24rem] overflow-hidden rounded-full border border-[rgb(var(--sp-fg)/0.3)] bg-[rgb(var(--sp-panel)/0.7)] backdrop-blur-sm sm:w-auto sm:max-w-full">
+      {!model && explore && <div role="group" aria-label="View" className="sp-copy sp-viewtabs relative z-20 flex justify-center px-5 pb-6 lg:absolute lg:bottom-[5.5rem] lg:left-[44%] lg:right-[5%] lg:p-0">
+        <ul className="flex w-full max-w-[24rem] overflow-hidden rounded-full border border-[rgb(var(--sp-fg)/0.3)] bg-white/95 shadow-md sm:w-auto sm:max-w-full">
           {keyFrames.map((f, i) => {
             const on = ringDist(f, frame, n) <= (product.spin ? Math.floor(n / 8) : 0);
             return (
@@ -577,11 +722,26 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         </ul>
       </div>}
 
+      {/* A real catalogue product from the range being shown (wide screens; the detail card takes this place while looking closer). */}
+      {mode === "3d" && !explore && featured[product.id] && (
+        <div className="sp-copy absolute bottom-7 left-[max(2rem,calc(50vw-40.25rem))] z-20 hidden w-[min(27vw,22rem)] items-center gap-3 rounded-2xl bg-white p-2.5 pr-3 shadow-[0_24px_50px_-26px_rgba(18,22,76,0.55)] ring-1 ring-[rgb(var(--sp-fg)/0.1)] lg:flex">
+          <span className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-mist">{featured[product.id]!.image && <Image src={featured[product.id]!.image!} alt="" fill sizes="64px" className="object-cover" />}</span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[0.64rem] font-bold uppercase tracking-[0.16em] text-[rgb(var(--sp-accent))]">In stock · {featured[product.id]!.range}</span>
+            <Link href={`/products/${featured[product.id]!.slug}`} className="block truncate text-[0.95rem] font-semibold text-ink hover:text-indigo">
+              {featured[product.id]!.name}
+            </Link>
+            <span className="block text-[0.82rem] text-muted">{featured[product.id]!.price !== null ? `${formatPrice(featured[product.id]!.price!, featured[product.id]!.currency)} · bulk rates on enquiry` : "Bulk rates on enquiry"}</span>
+          </span>
+          <AddToEnquiryButton product={{ id: featured[product.id]!.id, slug: featured[product.id]!.slug, name: featured[product.id]!.name }} variant="icon" />
+        </div>
+      )}
+
       {/* Detail panel, bottom right: the close-up, its name and what it is. */}
       {explore && (
-      <div aria-live="polite" className="sp-copy relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:bottom-7 lg:right-8 lg:w-[16rem] lg:p-0 xl:w-[23rem] 2xl:right-12 2xl:w-[26rem]">
+      <div aria-live="polite" className="sp-copy sp-detail-wrap relative z-20 px-5 pb-7 sm:px-8 lg:absolute lg:left-[max(2rem,calc(50vw-40.25rem))] lg:top-1/2 lg:w-[min(27vw,24rem)] lg:-translate-y-1/2 lg:p-0">
         {active ? (
-          <div key={keyOf(active)} className="sp-detail flex flex-col gap-3 overflow-hidden rounded-2xl bg-[rgb(var(--sp-panel)/0.55)] p-3 ring-1 ring-[rgb(var(--sp-fg)/0.15)] backdrop-blur-sm ">
+          <div key={keyOf(active)} className="sp-detail flex flex-col gap-3 overflow-hidden rounded-2xl bg-white p-3 shadow-[0_30px_60px_-30px_rgba(18,22,76,0.5)] ring-1 ring-[rgb(var(--sp-fg)/0.12)]">
             <span aria-hidden className="block h-36 w-full shrink-0 rounded-xl bg-no-repeat lg:h-28 xl:h-32 2xl:h-36" style={active.art ? { backgroundImage: `url(${active.art})`, backgroundSize: "auto 62%", backgroundPosition: "center", backgroundColor: "rgb(var(--sp-art, var(--sp-panel)))" } : { backgroundImage: `url(${detailSrc(product.frames[active.frame])})`, backgroundSize: "400% auto", backgroundPosition: `${active.x * 100}% ${active.y * 100}%` }} />
             <div className="min-w-0">
               <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[rgb(var(--sp-accent))]">
@@ -592,7 +752,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
             </div>
           </div>
         ) : (
-          <div className="rounded-2xl bg-[rgb(var(--sp-panel)/0.55)] p-4 ring-1 ring-[rgb(var(--sp-fg)/0.15)] backdrop-blur-sm">
+          <div className="rounded-2xl bg-white p-4 shadow-[0_30px_60px_-30px_rgba(18,22,76,0.5)] ring-1 ring-[rgb(var(--sp-fg)/0.12)]">
             <p className="text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-[rgb(var(--sp-accent))]">Product detail</p>
             <h2 className="mt-1 font-display text-[1.2rem] font-bold leading-tight tracking-tight">{product.label}</h2>
             <p className="mt-2 text-[0.92rem] leading-relaxed text-[rgb(var(--sp-fg)/0.85)]">{model ? (points3d.length ? "Select a numbered point on the garment to see it close up." : "Drag to turn the full look, or choose a view below.") : zoom > 1 ? "Zoom out to see the marked points on the garment." : "Turn the garment to a view with marked points, then select one to see it close up."}</p>
