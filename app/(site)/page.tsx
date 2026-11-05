@@ -1,10 +1,8 @@
 import { ArrowRight, ArrowUpRight, RefreshCw, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
 import { BrandFilm } from "@/components/site/brand-film";
-import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
+import { HeroSwatch } from "@/components/site/hero-swatch/hero-swatch";
 import { CIRCLE_TILES, RANGE_TILES } from "@/components/site/home-photos";
 import { NewLaunches, ShopByRange, TopCollections } from "@/components/site/home-sections";
 import { BrandStatement, BrandStory } from "@/components/site/brand-sections";
@@ -52,29 +50,6 @@ function CategoryTile({ category, square, sizes }: { category: CategoryNode; squ
   );
 }
 
-/** A real 3D garment: public/models/<id>.glb (pants.glb, tee.glb). When present it replaces the photo viewer. */
-function model3d(id: string): string | undefined {
-  return existsSync(join(process.cwd(), "public", "models", `${id}.glb`)) ? `/models/${id}.glb` : undefined;
-}
-
-/**
- * A product with a real 360-degree turntable set: 8 or more frames in public/turntable/<id>/ (sorted by file
- * name), plus an optional hotspots.json of { frame, x, y, label }. Products without one use stand-in photos.
- */
-function turntable(id: string): TurntableSet | undefined {
-  const dir = join(process.cwd(), "public", "turntable", id);
-  if (!existsSync(dir)) return undefined;
-  const files = readdirSync(dir)
-    .filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
-    .sort();
-  if (files.length < 8) return undefined;
-  let spots: TurntableSet["spots"] = [];
-  try {
-    spots = JSON.parse(readFileSync(join(dir, "hotspots.json"), "utf8"));
-  } catch {}
-  return { frames: files.map((f) => `/turntable/${id}/${f}`), spots };
-}
-
 export default async function HomePage() {
   const [content, tree] = await Promise.all([getHomepageContent(), getCategoryTree()]);
   const fabrics = tree.find((t) => t.slug !== "garments");
@@ -86,7 +61,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ---------------------------------------------------------------- hero */}
-      <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} turntables={{ pants: turntable("pants"), tee: turntable("tee") }} models={{ pants: model3d("pants"), tee: model3d("tee"), look: model3d("look") ?? (model3d("pants") && model3d("tee") ? "/models/look" : undefined) }} />
+      <HeroSwatch eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} />
 
 
       {/* ---------------------------------------------------------- categories */}
