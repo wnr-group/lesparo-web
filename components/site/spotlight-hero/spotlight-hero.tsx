@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Box, ChevronRight, Minus, Plus, X } from "lucide-react";
+import { ArrowLeft, ChevronRight, Minus, Plus, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -316,9 +316,9 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
   };
   // The banner and the 3D garment move together: each banner slide goes with a garment, and choosing a garment brings its banner up.
   const [slide, setSlide] = useState(0);
-  // The hero opens on the banners; "View in 3D" swaps the banner frame for the real garments, and "Back to banners" returns.
+  // The hero shows the banners; the 3D view is no longer reachable from the banner (the "View in 3D" option was removed).
   const [mode, setMode] = useState<"banner" | "3d">("banner");
-  const [seen3d, setSeen3d] = useState(false);
+  const [seen3d] = useState(false);
   const modeRef = useRef(mode);
   useEffect(() => {
     modeRef.current = mode;
@@ -338,12 +338,6 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
     const idx = products.findIndex((p) => p.id === PRODUCT_FOR_SLIDE[n]);
     if (idx >= 0 && idx !== pi) choose(idx);
     if (byVisitor) hold();
-  };
-  const enter3d = () => {
-    setMode("3d");
-    setSeen3d(true);
-    const idx = products.findIndex((p) => p.id === "tee");
-    if (idx >= 0 && idx !== pi) choose(idx);
   };
   const leave3d = () => {
     setMode("banner");
@@ -522,18 +516,6 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         </div>
       </div>
 
-      {/* View in 3D: swaps the banner frame for the real garments. */}
-      {mode === "banner" && (
-        <button
-          type="button"
-          onClick={enter3d}
-          className="sp-copy sp-view3d-btn relative z-30 order-last mx-auto mb-7 inline-flex h-10 items-center gap-2 rounded-full bg-white/90 px-5 text-[0.85rem] font-semibold text-ink shadow-md ring-1 ring-[rgb(var(--sp-fg)/0.2)] transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sun sp-3d-btn lg:absolute lg:right-10 lg:top-9 lg:order-none lg:m-0 lg:h-12 lg:cursor-pointer lg:gap-2.5 lg:bg-white lg:px-6 lg:text-[0.95rem] lg:font-bold lg:text-[#12164c] lg:shadow-[0_18px_40px_-14px_rgba(0,0,0,0.65)] lg:ring-0 lg:hover:-translate-y-0.5 lg:hover:bg-[#ffd23f] xl:right-14"
-        >
-          <Box className="size-5" aria-hidden />
-          View in 3D
-          <ArrowRight className="size-4" aria-hidden />
-        </button>
-      )}
       {mode === "3d" && (
         <button
           type="button"
