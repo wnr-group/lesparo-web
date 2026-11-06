@@ -54,13 +54,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
               {product.quoteEnabled && <AddToEnquiryButton product={{ id: product.id, slug: product.slug, name: product.name }} variant="icon" />}
             </div>
           )}
-          {product.sizes.length > 0 && (
-            // Sports-retail size strip: slides up over the photo on hover (pointer devices only).
-            <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] translate-y-full bg-ink/90 px-3 py-2 text-center text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-sm transition-transform duration-500 ease-[var(--ease-out-soft)] [@media(hover:hover)]:group-hover:translate-y-0 [@media(hover:none)]:hidden">
-              {product.sizes.slice(0, 6).join(" · ")}
-            </div>
-          )}
-          {product.quoteEnabled && <span className="absolute bottom-2 left-2 z-[4] rounded-full bg-sun px-2.5 py-0.5 text-[0.58rem] font-extrabold uppercase tracking-[0.12em] text-ink transition-opacity duration-300 [@media(hover:hover)]:group-hover:opacity-0">Wholesale</span>}
+          {product.quoteEnabled && <span className="absolute bottom-2 left-2 z-[4] rounded-full bg-sun px-2.5 py-0.5 text-[0.58rem] font-extrabold uppercase tracking-[0.12em] text-ink transition-opacity duration-300">Wholesale</span>}
         </div>
       </ViewTransition>
 
