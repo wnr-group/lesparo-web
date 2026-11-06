@@ -55,8 +55,8 @@ export function ProductCard({ product, priority = false }: { product: Product; p
 
           {buyable && (
             // Hover or focus on pointer devices; always visible on touch screens, where there is no hover.
-            <div className="absolute inset-x-3 bottom-3 z-10 transition-[opacity,transform] duration-300 [@media(hover:hover)]:translate-y-3 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:translate-y-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:translate-y-0 [@media(hover:hover)]:group-hover:opacity-100">
-              <QuickAddButton product={buyable} />
+            <div className="absolute bottom-3 right-3 z-10 transition-[opacity,transform] duration-300 [@media(hover:hover)]:translate-y-3 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:translate-y-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:translate-y-0 [@media(hover:hover)]:group-hover:opacity-100">
+              <QuickAddButton product={buyable} iconOnly />
             </div>
           )}
         </div>
@@ -80,6 +80,8 @@ export function ProductCard({ product, priority = false }: { product: Product; p
           {product.fabric ?? product.category?.name ?? "LESPARO"}
           {product.sizes.length > 0 && ` · ${product.sizes.length} sizes`}
         </p>
+        {/* The real description when the catalogue has one; otherwise a short placeholder line until it is written. */}
+        <p className="mt-1.5 line-clamp-2 text-[0.8rem] leading-snug text-ink-soft">{product.description?.trim() || `${product.category?.name ?? "Garment"} from LESPARO, Erode. Details coming soon.`}</p>
         <p className="mt-auto flex flex-wrap items-baseline gap-x-2.5 gap-y-1 pt-2.5">
           {retail ? (
             <span className="font-sport text-[1.3rem] font-extrabold tabular-nums tracking-tight text-indigo-deep">{formatPrice(product.price!, product.currency)}</span>
