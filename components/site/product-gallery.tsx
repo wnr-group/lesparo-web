@@ -5,9 +5,10 @@ import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState, ViewTransition } from "react";
 import type { ProductImage } from "@/lib/catalogue/queries";
+import { ImagePlaceholder } from "./image-placeholder";
 
 /** Warm studio neutral. The catalogue photos are shot on white, so `cutout` (multiply) drops the white and the garment sits on this. */
-const STAGE = "bg-[#f4f1ec]";
+const STAGE = "bg-[#eceef5] rounded-[1.25rem]";
 
 export function ProductGallery({ images, name, productId }: { images: ProductImage[]; name: string; productId: string }) {
   const [active, setActive] = useState(0);
@@ -17,7 +18,7 @@ export function ProductGallery({ images, name, productId }: { images: ProductIma
   const count = images.length;
 
   if (!count) {
-    return <div className={clsx("flex aspect-[4/5] items-center justify-center font-display text-xl font-semibold text-muted", STAGE)}>Image coming soon</div>;
+    return <div className={clsx("relative aspect-[4/5] lg:aspect-auto lg:h-[calc(100dvh-9rem)] lg:min-h-[30rem]", STAGE)}><ImagePlaceholder label="Photo coming soon" /></div>;
   }
 
   const go = (d: number) => {
@@ -85,7 +86,7 @@ export function ProductGallery({ images, name, productId }: { images: ProductIma
               fill
               priority={i === 0}
               sizes="(min-width: 1024px) 45vw, 100vw"
-              className={clsx("cutout object-contain p-[5%] transition-opacity duration-500 ease-[var(--ease-atelier)]", i === active ? "opacity-100" : "opacity-0")}
+              className={clsx("object-cover object-center transition-opacity duration-500 ease-[var(--ease-atelier)]", i === active ? "opacity-100" : "opacity-0")}
             />
           ))}
           <button type="button" onClick={() => viewer.current?.showModal()} aria-label="View full screen and zoom" className="absolute inset-0 cursor-zoom-in focus-visible:outline-offset-[-4px]" />
@@ -113,7 +114,7 @@ export function ProductGallery({ images, name, productId }: { images: ProductIma
         onClose={() => setZoomed(false)}
         onKeyDown={onKeys}
         aria-label={`${name}, full screen`}
-        className={clsx("m-0 h-dvh max-h-none w-dvw max-w-none p-0 text-ink backdrop:bg-black/60", STAGE)}
+        className={clsx("m-0 h-dvh max-h-none w-dvw max-w-none !rounded-none p-0 text-ink backdrop:bg-black/60", STAGE)}
       >
         <div
           className={clsx("relative h-full w-full overflow-hidden", zoomed ? "cursor-zoom-out" : "cursor-zoom-in")}
