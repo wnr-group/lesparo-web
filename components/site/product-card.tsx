@@ -5,6 +5,7 @@ import type { ProductCard as Product } from "@/lib/catalogue/queries";
 import { deptClass } from "@/lib/departments";
 import { formatPrice } from "@/lib/format";
 import { QuickAddButton } from "./cart";
+import { ImagePlaceholder } from "./image-placeholder";
 import { AddToEnquiryButton } from "./enquiry-list";
 
 /**
@@ -39,7 +40,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
               )}
             </>
           ) : (
-            <div className="flex h-full items-center justify-center text-sm text-muted">Image coming soon</div>
+            <ImagePlaceholder />
           )}
           {product.category && (
             <span className={`${deptClass(product.category.slug) ?? ""} absolute left-0 top-0 z-[5] rounded-br-lg bg-white px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-[var(--dept,var(--color-indigo))]`}>
@@ -53,6 +54,13 @@ export function ProductCard({ product, priority = false }: { product: Product; p
               {product.quoteEnabled && <AddToEnquiryButton product={{ id: product.id, slug: product.slug, name: product.name }} variant="icon" />}
             </div>
           )}
+          {product.sizes.length > 0 && (
+            // Sports-retail size strip: slides up over the photo on hover (pointer devices only).
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] translate-y-full bg-ink/90 px-3 py-2 text-center text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-sm transition-transform duration-500 ease-[var(--ease-out-soft)] [@media(hover:hover)]:group-hover:translate-y-0 [@media(hover:none)]:hidden">
+              {product.sizes.slice(0, 6).join(" · ")}
+            </div>
+          )}
+          {product.quoteEnabled && <span className="absolute bottom-2 left-2 z-[4] rounded-full bg-sun px-2.5 py-0.5 text-[0.58rem] font-extrabold uppercase tracking-[0.12em] text-ink transition-opacity duration-300 [@media(hover:hover)]:group-hover:opacity-0">Wholesale</span>}
         </div>
       </ViewTransition>
 
@@ -65,12 +73,12 @@ export function ProductCard({ product, priority = false }: { product: Product; p
       )}
 
       <div className="mt-2.5 flex flex-1 flex-col px-1.5 pb-1">
-        <h3 className="line-clamp-2 min-h-[2.6em] text-[0.92rem] font-semibold leading-[1.3] tracking-tight text-ink">
+        <h3 className="line-clamp-2 min-h-[2.6em] font-sport text-[0.9rem] font-bold uppercase leading-[1.3] tracking-[0.02em] text-ink">
           <Link href={`/products/${product.slug}`} className="after:absolute after:inset-0 after:content-['']">
             <span className="hline">{product.name}</span>
           </Link>
         </h3>
-        {product.fabric && <p className="mt-0.5 truncate text-[0.76rem] text-muted">{product.fabric}</p>}
+        <p className="mt-0.5 truncate text-[0.74rem] text-muted">{product.fabric ?? product.category?.name ?? "LESPARO"}{product.sizes.length > 0 && ` · ${product.sizes.length} sizes`}</p>
         {/* Pinned to the bottom of the card, so prices line up across a row whatever the lines above them hold. */}
         <p className="mt-auto flex flex-wrap items-baseline gap-x-2 gap-y-1 pt-2.5">
           {retail ? (

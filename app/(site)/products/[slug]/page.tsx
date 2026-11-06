@@ -1,4 +1,4 @@
-import { ArrowRight, Check, ChevronRight, Plus } from "lucide-react";
+import { ArrowRight, Check, ChevronRight, Plus, RotateCcw, ShieldCheck, Truck, Store } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -11,6 +11,7 @@ import { Container } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
 import { formatPrice } from "@/lib/format";
 import { deptClass } from "@/lib/departments";
+import { DELIVERY_POINTS, PLACEHOLDER_CARE, PLACEHOLDER_FEATURES, PLACEHOLDER_SIZE_NOTE, placeholderDescription } from "@/lib/catalogue/placeholder-content";
 import { getAllPublishedSlugs, getProductBySlug, getRelatedProducts } from "@/lib/catalogue/queries";
 
 export async function generateStaticParams() {
@@ -49,7 +50,10 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
   if (!p) notFound();
   const related = await getRelatedProducts(p.categoryId, p.id);
 
-  const features = p.specs.filter((s) => s.label === "Feature");
+  // Real content wins; where a product has none yet, neutral placeholders keep the page complete (see lib/catalogue/placeholder-content.ts).
+  const realFeatures = p.specs.filter((s) => s.label === "Feature");
+  const features = realFeatures.length ? realFeatures.map((f) => f.value) : PLACEHOLDER_FEATURES;
+  const description = p.description || placeholderDescription(p);
   const specs = [
     p.fabric && { label: "Fabric", value: p.fabric },
     ...p.specs.filter((s) => s.label !== "Feature"),
@@ -109,20 +113,26 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
               {p.category.name}
             </Link>
           )}
-          <h1 className="mt-3 font-display text-[clamp(1.9rem,1.3rem+2vw,2.9rem)] font-bold leading-[1.05] tracking-tight">{p.name}</h1>
+          <h1 className="mt-3 font-sport text-[clamp(1.9rem,1.3rem+2vw,2.9rem)] font-extrabold uppercase italic leading-[1.02] tracking-tight">{p.name}</h1>
           {retail && (
             <p className="mt-4 flex flex-wrap items-baseline gap-x-3">
               <span className="font-sport text-[2rem] font-extrabold italic tabular-nums tracking-tight">{formatPrice(p.price!, p.currency)}</span>
               <span className="text-xs text-muted">per piece · inclusive of listed taxes where applicable</span>
             </p>
           )}
-          {p.description && <p className="mt-5 max-w-prose leading-relaxed text-ink-soft">{p.description}</p>}
+          <p className="mt-5 max-w-prose leading-relaxed text-ink-soft">{description}</p>
 
           {p.sizes.length > 0 && !retail && (
-            <p className="mt-6 text-sm">
-              <span className="text-muted">Available sizes</span>
-              <span className="ml-3 font-medium">{p.sizes.join(" · ")}</span>
-            </p>
+            <div className="mt-6">
+              <p className="text-[0.72rem] font-bold uppercase tracking-[0.16em] text-muted">Available sizes</p>
+              <ul className="mt-2.5 flex flex-wrap gap-2">
+                {p.sizes.map((z) => (
+                  <li key={z} className="grid h-10 min-w-12 place-items-center rounded-md px-3 text-sm font-semibold text-ink ring-1 ring-line">
+                    {z}
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
 
           {retail && (
@@ -149,7 +159,20 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
             </section>
           )}
 
-          <div className="mt-9 border-t border-line">
+          <ul className="mt-8 grid grid-cols-3 gap-2 text-center">
+            {[
+              { icon: ShieldCheck, label: "Quality checked" },
+              { icon: Truck, label: "Ships across India" },
+              { icon: RotateCcw, label: "Easy support" },
+            ].map(({ icon: Icon, label }) => (
+              <li key={label} className="flex flex-col items-center gap-1.5 rounded-lg bg-mist px-2 py-3">
+                <Icon className="size-5 text-indigo" aria-hidden />
+                <span className="text-[0.68rem] font-semibold uppercase leading-tight tracking-[0.08em] text-ink-soft">{label}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-8 border-t border-line">
             {specs.length > 0 && (
               <Disclosure title="Product details" open>
                 <dl className="text-sm">
@@ -162,18 +185,43 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
                 </dl>
               </Disclosure>
             )}
-            {features.length > 0 && (
-              <Disclosure title="Features">
-                <ul className="space-y-2.5 text-sm text-ink-soft">
-                  {features.map((f) => (
-                    <li key={f.value} className="flex gap-3">
-                      <Check className="mt-0.5 size-4 shrink-0 text-indigo" aria-hidden />
-                      {f.value}
-                    </li>
-                  ))}
-                </ul>
-              </Disclosure>
-            )}
+            <Disclosure title="Features" open={specs.length === 0}>
+              <ul className="space-y-2.5 text-sm text-ink-soft">
+                {features.map((f) => (
+                  <li key={f} className="flex gap-3">
+                    <Check className="mt-0.5 size-4 shrink-0 text-indigo" aria-hidden />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </Disclosure>
+            <Disclosure title="Fabric & care">
+              {p.fabric && <p className="mb-3 text-sm font-medium text-ink">{p.fabric}</p>}
+              <ul className="space-y-2 text-sm text-ink-soft">
+                {PLACEHOLDER_CARE.map((c) => (
+                  <li key={c} className="flex gap-3">
+                    <span aria-hidden className="mt-2 size-1 shrink-0 rounded-full bg-sun-500" />
+                    {c}
+                  </li>
+                ))}
+              </ul>
+            </Disclosure>
+            <Disclosure title="Size guide">
+              <p className="text-sm leading-relaxed text-ink-soft">{p.sizes.length ? `Sizes: ${p.sizes.join(", ")}. ` : ""}{PLACEHOLDER_SIZE_NOTE}</p>
+            </Disclosure>
+            <Disclosure title="Delivery, returns & wholesale">
+              <dl className="space-y-3 text-sm">
+                {DELIVERY_POINTS.map((d) => (
+                  <div key={d.title}>
+                    <dt className="flex items-center gap-2 font-semibold text-ink">
+                      {d.title === "Wholesale" && <Store className="size-4 text-indigo" aria-hidden />}
+                      {d.title}
+                    </dt>
+                    <dd className="mt-0.5 text-ink-soft">{d.body}</dd>
+                  </div>
+                ))}
+              </dl>
+            </Disclosure>
             <Disclosure title="Questions?">
               <p className="text-sm leading-relaxed text-ink-soft">
                 Call{" "}

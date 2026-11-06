@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState, ViewTransition } from "react";
 import type { ProductImage } from "@/lib/catalogue/queries";
+import { ImagePlaceholder } from "./image-placeholder";
 
 /** Warm studio neutral. The catalogue photos are shot on white, so `cutout` (multiply) drops the white and the garment sits on this. */
 const STAGE = "bg-[#f4f1ec]";
@@ -17,7 +18,7 @@ export function ProductGallery({ images, name, productId }: { images: ProductIma
   const count = images.length;
 
   if (!count) {
-    return <div className={clsx("flex aspect-[4/5] items-center justify-center font-display text-xl font-semibold text-muted", STAGE)}>Image coming soon</div>;
+    return <div className={clsx("relative aspect-[4/5] lg:aspect-auto lg:h-[calc(100dvh-9rem)] lg:min-h-[30rem]", STAGE)}><ImagePlaceholder label="Photo coming soon" /></div>;
   }
 
   const go = (d: number) => {
