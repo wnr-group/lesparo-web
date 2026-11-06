@@ -8,7 +8,7 @@ import type { ProductImage } from "@/lib/catalogue/queries";
 import { ImagePlaceholder } from "./image-placeholder";
 
 /** Warm studio neutral. The catalogue photos are shot on white, so `cutout` (multiply) drops the white and the garment sits on this. */
-const STAGE = "bg-[#f4f1ec]";
+const STAGE = "bg-[#eceef5] rounded-[1.25rem]";
 
 export function ProductGallery({ images, name, productId }: { images: ProductImage[]; name: string; productId: string }) {
   const [active, setActive] = useState(0);
@@ -114,7 +114,7 @@ export function ProductGallery({ images, name, productId }: { images: ProductIma
         onClose={() => setZoomed(false)}
         onKeyDown={onKeys}
         aria-label={`${name}, full screen`}
-        className={clsx("m-0 h-dvh max-h-none w-dvw max-w-none p-0 text-ink backdrop:bg-black/60", STAGE)}
+        className={clsx("m-0 h-dvh max-h-none w-dvw max-w-none !rounded-none p-0 text-ink backdrop:bg-black/60", STAGE)}
       >
         <div
           className={clsx("relative h-full w-full overflow-hidden", zoomed ? "cursor-zoom-out" : "cursor-zoom-in")}

@@ -61,6 +61,16 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
     p.sku && { label: "Reference", value: p.sku },
   ].filter(Boolean) as { label: string; value: string }[];
 
+  // Key highlights: only facts we hold, plus placeholders for what the catalogue does not record yet.
+  const highlights = [
+    { label: "Product type", value: p.category?.name ?? "Garment" },
+    { label: "Country of origin", value: "India" },
+    { label: "Fabric", value: p.fabric ?? "To be updated" },
+    { label: "Sizes", value: p.sizes.length ? p.sizes.join(", ") : "To be updated" },
+    { label: "Packing", value: p.packing ?? "To be updated" },
+    { label: "Reference", value: p.sku ?? "To be updated" },
+  ];
+
   // Structured data: verified facts, plus the retail price only when the admin has switched retail on.
   const retail = p.retailEnabled && p.price !== null;
   const jsonLd = {
@@ -113,14 +123,25 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
               {p.category.name}
             </Link>
           )}
-          <h1 className="mt-3 font-sport text-[clamp(1.9rem,1.3rem+2vw,2.9rem)] font-extrabold uppercase italic leading-[1.02] tracking-tight">{p.name}</h1>
+          <h1 className="mt-2.5 text-[clamp(1.5rem,1.2rem+1.1vw,2.1rem)] font-semibold leading-[1.15] tracking-tight text-indigo-deep">{p.name}</h1>
           {retail && (
-            <p className="mt-4 flex flex-wrap items-baseline gap-x-3">
-              <span className="font-sport text-[2rem] font-extrabold italic tabular-nums tracking-tight">{formatPrice(p.price!, p.currency)}</span>
-              <span className="text-xs text-muted">per piece · inclusive of listed taxes where applicable</span>
+            <p className="mt-3 flex flex-wrap items-baseline gap-x-3">
+              <span className="font-sport text-[1.9rem] font-extrabold tabular-nums tracking-tight text-indigo-deep">{formatPrice(p.price!, p.currency)}</span>
+              <span className="text-[0.82rem] font-semibold text-offer">Inclusive of taxes</span>
+              <span className="text-xs text-muted">per piece</span>
             </p>
           )}
           <p className="mt-5 max-w-prose leading-relaxed text-ink-soft">{description}</p>
+
+          {p.quoteEnabled && (
+            <a href="#wholesale-heading" className="mt-5 flex items-center gap-3 rounded-xl bg-gradient-to-r from-indigo-100 to-indigo-50 px-4 py-3 text-sm text-indigo-deep ring-1 ring-indigo-100 transition-colors hover:from-indigo-200">
+              <Store className="size-5 shrink-0 text-indigo" aria-hidden />
+              <span>
+                Buying for a shop? <strong className="font-semibold">Get bulk and wholesale rates</strong> on this style.
+              </span>
+              <ArrowRight className="ml-auto size-4 shrink-0" aria-hidden />
+            </a>
+          )}
 
           {p.sizes.length > 0 && !retail && (
             <div className="mt-6">
@@ -159,20 +180,34 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
             </section>
           )}
 
-          <ul className="mt-8 grid grid-cols-3 gap-2 text-center">
+          <section aria-labelledby="highlights" className="mt-9">
+            <h2 id="highlights" className="text-[1.05rem] font-semibold text-indigo-deep">
+              Key highlights
+            </h2>
+            <dl className="mt-4 grid grid-cols-2 gap-x-8">
+              {highlights.map((h) => (
+                <div key={h.label} className="border-b border-line py-3">
+                  <dt className="text-[0.8rem] text-muted">{h.label}</dt>
+                  <dd className="mt-0.5 text-[0.92rem] font-semibold text-indigo-deep">{h.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+
+          <ul className="mt-6 grid grid-cols-3 gap-2 text-center">
             {[
               { icon: ShieldCheck, label: "Quality checked" },
               { icon: Truck, label: "Ships across India" },
               { icon: RotateCcw, label: "Easy support" },
             ].map(({ icon: Icon, label }) => (
-              <li key={label} className="flex flex-col items-center gap-1.5 rounded-lg bg-mist px-2 py-3">
+              <li key={label} className="flex flex-col items-center gap-1.5 rounded-xl bg-indigo-50 px-2 py-4 ring-1 ring-indigo-100">
                 <Icon className="size-5 text-indigo" aria-hidden />
                 <span className="text-[0.68rem] font-semibold uppercase leading-tight tracking-[0.08em] text-ink-soft">{label}</span>
               </li>
             ))}
           </ul>
 
-          <div className="mt-8 border-t border-line">
+          <div className="mt-8 overflow-hidden rounded-2xl bg-white ring-1 ring-line [&>details]:px-5 [&>details:last-child]:border-b-0">
             {specs.length > 0 && (
               <Disclosure title="Product details" open>
                 <dl className="text-sm">
