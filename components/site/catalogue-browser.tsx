@@ -86,7 +86,7 @@ export async function CatalogueBrowser({
             </Link>
           }
         >
-          Try a different word or fewer filters — or tell us what you need and our team will help.{" "}
+          Try a different word or fewer filters, or tell us what you need and our team will help.{" "}
           <Link href="/wholesale#enquire" className="underline">
             Send an enquiry
           </Link>

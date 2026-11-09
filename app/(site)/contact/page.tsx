@@ -7,7 +7,7 @@ import { BUSINESS, formattedAddress } from "@/lib/business";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Contact LESPARO — Abija Exports, NMS Compound, Erode Fort, Erode 638001. Phone 094430 22044, customer care 93425 46046.",
+  description: "Contact LESPARO (Abija Exports), NMS Compound, Erode Fort, Erode 638001. Phone 094430 22044, customer care 93425 46046.",
   alternates: { canonical: "/contact" },
 };
 
