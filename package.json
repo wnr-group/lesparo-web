@@ -23,7 +23,8 @@
     "descriptions:dummy": "tsx --env-file=.env.local scripts/seed-dummy-descriptions.ts",
     "db:seed": "npm run catalogue:import && npm run admin:seed && npm run prices:dummy && npm run descriptions:dummy",
     "db:studio": "node --env-file=.env.local ./node_modules/prisma/build/index.js studio",
-    "jobs:run": "tsx --conditions=react-server --env-file=.env.local scripts/run-integration-jobs.ts",
+    "abija:test": "tsx --env-file=.env.local scripts/abija-test-enquiry.ts",
+    "jobs:run":"tsx --conditions=react-server --env-file=.env.local scripts/run-integration-jobs.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

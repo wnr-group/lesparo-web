@@ -59,6 +59,32 @@ describe("wholesale enquiry validation", () => {
     expect(parseEnquiryForm(form({ phone: "call me" })).success).toBe(false);
   });
 
+  it("keeps the optional address and drops it when blank", () => {
+    expect(parseEnquiryForm(form({ address: "  12 Mill Road, Erode, Tamil Nadu " })).data?.address).toBe("12 Mill Road, Erode, Tamil Nadu");
+    expect(parseEnquiryForm(form({ address: "" })).data?.address).toBeUndefined();
+    expect(parseEnquiryForm(form()).data?.address).toBeUndefined();
+    expect(parseEnquiryForm(form({ address: "x".repeat(301) })).success).toBe(false);
+  });
+
+  it("takes the estimated enquiry value as a plain number (the Abija CRM needs a number)", () => {
+    const v = (value: string) => parseEnquiryForm(form({ targetBudget: value }));
+    expect(v("50000").data?.targetBudget).toBe("50000");
+    expect(v("50,000").data?.targetBudget).toBe("50000");
+    expect(v("₹ 1,25,000").data?.targetBudget).toBe("125000");
+    expect(v("Rs. 4000").data?.targetBudget).toBe("4000");
+    expect(v("2500.50").data?.targetBudget).toBe("2500.50");
+    expect(v("").data?.targetBudget).toBeUndefined();
+    expect(parseEnquiryForm(form()).data?.targetBudget).toBeUndefined();
+  });
+
+  it("rejects an estimated value that is not a number", () => {
+    for (const bad of ["5 lakh", "180 per piece", "USD 5000", "to be discussed", "-100", "1e9"]) {
+      const r = parseEnquiryForm(form({ targetBudget: bad }));
+      expect(r.success, bad).toBe(false);
+      expect(r.error?.issues.some((i) => i.path[0] === "targetBudget")).toBe(true);
+    }
+  });
+
   it("flags the honeypot field", () => {
     const r = parseEnquiryForm(form({ website: "http://spam.example" }));
     expect(r.success).toBe(false);

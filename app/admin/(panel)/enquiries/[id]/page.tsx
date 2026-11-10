@@ -96,7 +96,7 @@ export default async function EnquiryDetailPage(props: PageProps<"/admin/enquiri
             <p className="whitespace-pre-wrap text-sm leading-relaxed">{e.message}</p>
             {e.target_budget && (
               <p className="mt-4 text-sm">
-                <span className="text-muted">Target price / budget:</span> {e.target_budget}
+                <span className="text-muted">Estimated enquiry value:</span> {/^\d+(\.\d+)?$/.test(e.target_budget) ? `₹${Number(e.target_budget).toLocaleString("en-IN")}` : e.target_budget}
               </p>
             )}
           </Panel>
@@ -153,6 +153,7 @@ export default async function EnquiryDetailPage(props: PageProps<"/admin/enquiri
               {[
                 ["Name", e.customer_name],
                 ["Company", e.company_name],
+                ["Address", e.address],
                 ["Country", e.country],
               ].map(([k, v]) => (
                 <div key={k} className="grid grid-cols-[6rem_1fr] gap-2">
