@@ -9,11 +9,16 @@ export const RANGE_TILES: PhotoTile[] = [
   { name: "Tees", href: "/shop", src: "/looks/tee-knee.jpg", pos: "50% 30%" },
 ];
 
-/** The round shortcuts above it. */
-export const CIRCLE_TILES: PhotoTile[] = [
-  { name: "Track pants", href: "/collections/gents-tracks", src: "/looks/c1.jpg", pos: "50% 70%" },
-  { name: "Cargo wear", href: "/collections/gents-tracks", src: "/looks/c4.jpg", pos: "50% 55%" },
-  { name: "Training pants", href: "/collections/gents-tracks", src: "/looks/c2.jpg", pos: "50% 60%" },
-  { name: "Everyday tees", href: "/shop", src: "/looks/c5.jpg", pos: "50% 30%" },
-  { name: "Training tees", href: "/shop", src: "/collections/kids.jpg", pos: "50% 25%" },
-];
+/**
+ * The round shortcuts above it: one photograph per garment category, keyed by the category slug. The names and links come from the
+ * catalogue (see app/(site)/page.tsx), so a category without an entry here simply has no circle. The images are 480px square crops in
+ * public/range, cut from LESPARO studio and catalogue photographs (Women is the licensed stock photo in public/menu, see SOURCES.txt).
+ */
+export const CATEGORY_CIRCLES: Record<string, { src: string; pos: string }> = {
+  gents: { src: "/range/gents.webp", pos: "50% 50%" },
+  kids: { src: "/range/kids.webp", pos: "50% 50%" },
+  boys: { src: "/range/boys.webp", pos: "50% 50%" },
+  women: { src: "/range/women.webp", pos: "50% 50%" },
+  hoodies: { src: "/range/hoodies.webp", pos: "50% 50%" },
+  "new-styles": { src: "/range/new-styles.webp", pos: "50% 50%" },
+};

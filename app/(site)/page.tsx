@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BrandFilm } from "@/components/site/brand-film";
 import { HeroBanner } from "@/components/site/hero-banner/hero-banner";
-import { CIRCLE_TILES, RANGE_TILES } from "@/components/site/home-photos";
+import { CATEGORY_CIRCLES, RANGE_TILES, type PhotoTile } from "@/components/site/home-photos";
 import { NewLaunches, ShopByRange, TopCollections } from "@/components/site/home-sections";
 import { BrandStatement, BrandStory } from "@/components/site/brand-sections";
 import { BuyerFaq, DetailPanels, StudioLooks } from "@/components/site/more-sections";
@@ -58,25 +58,24 @@ export default async function HomePage() {
   const kids = await getCategoryBySlug("kids");
   const { products: newest } = await listProducts({ sort: "newest", pageSize: 8, ...(kids ? { categoryIds: kids.subtreeIds } : {}) });
 
-  // One banner slide per category with a cover photo: the garment groups, then the men's ranges, then the fabric lines.
   const garments = tree.find((t) => t.slug === "garments");
-  const gents = garments?.children.find((c) => c.slug === "gents");
-  // Women has no catalogue photographs yet, so its slide uses the licensed studio photo from the menu (public/menu/SOURCES.txt).
-  const COVER_FALLBACK: Record<string, string> = { women: "/menu/women-studio.jpg" };
-  const bannerCategories = [...(garments?.children ?? []), ...(gents?.children ?? []), ...(fabrics?.children ?? [])]
-    .map((c) => ({ name: c.name, slug: c.slug, coverUrl: c.coverUrl ?? COVER_FALLBACK[c.slug] ?? null }))
-    .filter((c): c is { name: string; slug: string; coverUrl: string } => !!c.coverUrl);
+
+  // "Explore the range": one round shortcut per garment category. Names and links come from the catalogue; photos from CATEGORY_CIRCLES.
+  const circleTiles: PhotoTile[] = (garments?.children ?? []).flatMap((c) => {
+    const photo = CATEGORY_CIRCLES[c.slug];
+    return photo ? [{ name: c.name, href: `/collections/${c.slug}`, src: photo.src, pos: photo.pos }] : [];
+  });
 
   return (
     <>
       {/* ---------------------------------------------------------------- hero */}
-      <HeroBanner categories={bannerCategories} />
+      <HeroBanner />
 
 
       {/* ---------------------------------------------------------- categories */}
       {sections.categories && (
         <>
-          <TopCollections items={CIRCLE_TILES} />
+          <TopCollections items={circleTiles} />
           <ShopByRange items={RANGE_TILES} />
           <NewLaunches products={newest} />
         </>
