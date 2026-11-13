@@ -56,8 +56,8 @@ export function Table({ head, children, empty }: { head: string[]; children: Rea
       <table className="w-full min-w-[40rem] text-left text-sm">
         <thead className="border-b border-line bg-ivory text-[0.7rem] uppercase tracking-[0.12em] text-muted">
           <tr>
-            {head.map((h) => (
-              <th key={h} scope="col" className="px-4 py-3.5 font-semibold">
+            {head.map((h, i) => (
+              <th key={`${i}-${h}`} scope="col" className="px-4 py-3.5 font-semibold">
                 {h}
               </th>
             ))}

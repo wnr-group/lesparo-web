@@ -180,7 +180,7 @@ export default async function HomePage() {
                   <p className="eyebrow !text-sun">Wholesale</p>
                   <h2 className="mt-4 font-display text-headline font-bold">Supplying showrooms, retailers and wholesalers.</h2>
                   <p className="mt-6 max-w-lg leading-relaxed text-white/75">
-                    LESPARO supplies textile showrooms across Tamil Nadu, Kerala and Karnataka. Tell us what you need — products, quantities, sizes and colours — and our sales team will come back to
+                    LESPARO supplies textile showrooms across Tamil Nadu, Kerala and Karnataka. Tell us what you need (products, quantities, sizes and colours) and our sales team will come back to
                     you with a quotation.
                   </p>
                   <div className="mt-10 flex flex-wrap items-center gap-3">

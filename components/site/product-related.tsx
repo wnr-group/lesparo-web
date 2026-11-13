@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ProductCard } from "@/lib/catalogue/queries";
 import { formatPrice } from "@/lib/format";
+import { ImagePlaceholder } from "./image-placeholder";
 
 /** Quiet editorial tile for "more from this category": photograph on warm stone, name and price beneath, second view on hover. */
 export function RelatedProduct({ product }: { product: ProductCard }) {
@@ -22,7 +23,7 @@ export function RelatedProduct({ product }: { product: ProductCard }) {
             {secondary && <Image src={secondary.url} alt="" aria-hidden fill sizes="(min-width: 1024px) 23vw, 46vw" className="object-cover object-center opacity-0 transition-[opacity,transform] duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.04] group-hover:opacity-100" />}
           </>
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-muted">Image coming soon</div>
+          <ImagePlaceholder compact />
         )}
       </div>
       <div className="mt-4 flex items-start justify-between gap-4">
