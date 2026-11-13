@@ -884,7 +884,8 @@
       animation-range: cover 33% cover 67%;
     }
     .edit-item {
-      width: min(26vw, 26rem);
+      /* Also capped by the window height (3:4 photos), so title, cards and labels always fit inside the pinned area. */
+      width: min(26vw, 26rem, calc((100svh - var(--hdr) - 12.5rem) * 0.75));
       flex: none;
     }
     .edit-title {
