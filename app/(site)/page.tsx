@@ -1,6 +1,5 @@
-import { ArrowRight, ArrowUpRight, RefreshCw, ShieldCheck } from "lucide-react";
+import { ArrowRight, RefreshCw, ShieldCheck } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { BrandFilm } from "@/components/site/brand-film";
 import { HeroBanner } from "@/components/site/hero-banner/hero-banner";
 import { CATEGORY_CIRCLES, RANGE_TILES, type PhotoTile } from "@/components/site/home-photos";
@@ -8,10 +7,9 @@ import { NewLaunches, ShopByRange, TopCollections } from "@/components/site/home
 import { BrandStatement, BrandStory } from "@/components/site/brand-sections";
 import { BuyerFaq, DetailPanels, StudioLooks } from "@/components/site/more-sections";
 import { ButtonLink } from "@/components/ui/button";
-import { Container, SectionHeading } from "@/components/ui/primitives";
+import { Container } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
-import { deptClass } from "@/lib/departments";
-import { getCategoryBySlug, getCategoryTree, getHomepageContent, listProducts, type CategoryNode } from "@/lib/catalogue/queries";
+import { getCategoryBySlug, getCategoryTree, getHomepageContent, listProducts } from "@/lib/catalogue/queries";
 
 const STEPS = [
   ["Browse", "Add products to your enquiry list as you explore the catalogue."],
@@ -20,39 +18,8 @@ const STEPS = [
   ["Quotation", "Receive pricing and supply details for your order."],
 ];
 
-function CategoryTile({ category, square, sizes }: { category: CategoryNode; square?: boolean; sizes: string }) {
-  return (
-    <Link href={`/collections/${category.slug}`} className="group flex h-full flex-col">
-      <div className={`relative overflow-hidden rounded-2xl bg-mist transition-colors duration-500 group-hover:bg-linen ${square ? "aspect-square" : "aspect-[4/5]"}`}>
-        {category.coverUrl && (
-          <Image
-            src={category.coverUrl}
-            alt=""
-            fill
-            sizes={sizes}
-            className="object-contain p-[8%] cutout transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-[1.06] group-focus-visible:scale-[1.06] group-active:scale-[1.04]"
-          />
-        )}
-      </div>
-      <div className="flex flex-1 items-center justify-between gap-3 px-0.5 pt-4">
-        <div className="min-w-0">
-          <h3 className="flex items-center gap-2 font-display text-xl font-bold tracking-tight transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:translate-x-1 group-focus-visible:translate-x-1 group-active:translate-x-1 sm:text-2xl">
-            <span aria-hidden className={`${deptClass(category.slug) ?? ""} size-2 shrink-0 rounded-full bg-[var(--dept,var(--color-sun))]`} />
-            {category.name}
-          </h3>
-          <p className="mt-0.5 truncate text-sm text-muted">{category.children.map((g) => g.name).join(" · ") || "View range"}</p>
-        </div>
-        <span className="hidden size-10 shrink-0 items-center justify-center rounded-full bg-paper ring-1 ring-line transition-colors duration-300 group-hover:bg-indigo group-hover:text-white group-hover:ring-indigo sm:flex">
-          <ArrowUpRight className="size-4 transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:rotate-45" aria-hidden />
-        </span>
-      </div>
-    </Link>
-  );
-}
-
 export default async function HomePage() {
   const [content, tree] = await Promise.all([getHomepageContent(), getCategoryTree()]);
-  const fabrics = tree.find((t) => t.slug !== "garments");
   const { sections } = content;
   // New launches: the newest products that have a photo from Gents, Hoodies and Boys (3 + 3 + 2). A card reading "Image coming soon"
   // does not belong on the home page, so products without a photo are skipped.
@@ -88,30 +55,6 @@ export default async function HomePage() {
           <NewLaunches products={newest} />
         </>
       )}
-
-      {/* ------------------------------------------------------------- fabrics */}
-      {sections.fabrics && fabrics && (
-        <section className="relative isolate overflow-hidden py-20 lg:py-28">
-          {/* Oversized outline type drifts sideways behind the tiles as the section scrolls past. */}
-          <p
-            aria-hidden
-            className="ghost-drift pointer-events-none absolute bottom-[8%] left-0 -z-10 select-none whitespace-nowrap font-display text-[clamp(6rem,4rem+12vw,15rem)] font-bold leading-none tracking-[-0.05em] text-transparent [-webkit-text-stroke:1.5px_var(--color-sand)]"
-          >
-            {fabrics.children.map((c) => c.name).join(" · ")}
-          </p>
-          <Container>
-            <SectionHeading eyebrow={fabrics.name} title="Lungi, kavi, towel and kerchief" intro="Woven fabric lines from the family’s original trade, continued under LESPARO." />
-            <ul className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
-              {fabrics.children.map((c, i) => (
-                <li key={c.id} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }}>
-                  <CategoryTile category={c} square sizes="(min-width:768px) 22vw, 45vw" />
-                </li>
-              ))}
-            </ul>
-          </Container>
-        </section>
-      )}
-
 
       {/* ------------------------------------------------------- campaign film: Move Freely */}
       <BrandFilm open src="/videos/active-life.mp4" title="LESPARO: Move freely" />
