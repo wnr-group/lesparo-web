@@ -49,12 +49,20 @@ let ip = 0;
 const client = () => `10.0.0.${++ip}`;
 
 beforeAll(async () => {
-  const url = `file:${join(dir, "test.db").replace(/\\/g, "/")}`;
+  // The project runs on Postgres: point TEST_DATABASE_URL at a throwaway database (see tests/integration/admin-auth.test.ts).
+  const url = process.env.TEST_DATABASE_URL ?? `file:${join(dir, "test.db").replace(/\\/g, "/")}`;
   process.env.DATABASE_URL = url;
   Object.assign(process.env, { NEXT_PUBLIC_SITE_URL: "http://localhost:3000", RATE_LIMIT_SALT: "test-salt-123456", RAZORPAY_KEY_ID: "rzp_test_dummy", RAZORPAY_KEY_SECRET: KEY_SECRET, RAZORPAY_WEBHOOK_SECRET: WEBHOOK_SECRET });
   execSync("npx prisma migrate deploy", { env: { ...process.env, DATABASE_URL: url }, stdio: "pipe" });
   prisma = (await import("@/lib/db")).prisma;
   svc = await import("@/lib/services/payments");
+  if (process.env.TEST_DATABASE_URL) {
+    // A reused database still holds the last run's webhook event ids and orders: start from none.
+    await prisma.paymentEvent.deleteMany();
+    await prisma.payment.deleteMany();
+    await prisma.retailOrder.deleteMany();
+    await prisma.rateLimit.deleteMany();
+  }
 }, 120_000);
 
 afterAll(async () => {

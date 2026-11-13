@@ -1,30 +1,32 @@
 import "server-only";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { requestDb } from "@/lib/db";
-import { SESSION_COOKIE, verifySession } from "./session";
+import { createClient } from "@/lib/supabase/server";
+import { resolveStaffSession, type StaffRole, type StaffSession } from "./staff-core";
 
-export type StaffRole = "admin" | "sales";
+export type { StaffRole, StaffSession };
 
-export type StaffSession = {
-  userId: string;
-  email: string | null;
-  roles: StaffRole[];
-  isAdmin: boolean;
-};
-
-/** Resolves the current user's staff role from the database (never from client state). */
+/**
+ * Resolves the current admin from Supabase Auth plus the staff_users profile (never from client state).
+ * supabase.auth.getUser() is verified by the Supabase Auth server on every call, so a forged, revoked or expired
+ * token is rejected; the role is then read from the database. Cached per request, so a page and the actions it
+ * calls share one lookup.
+ */
 export const getStaffSession = cache(async (): Promise<StaffSession | null> => {
-  const userId = await verifySession((await cookies()).get(SESSION_COOKIE)?.value);
-  if (!userId) return null;
+  let user;
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user) return null;
+    user = data.user;
+  } catch {
+    return null;
+  }
 
   const db = await requestDb();
-  const user = await db.staffUser.findUnique({ where: { id: userId }, select: { id: true, email: true, role: true } });
-  if (!user || (user.role !== "admin" && user.role !== "sales")) return null;
-
-  const roles = [user.role as StaffRole];
-  return { userId: user.id, email: user.email, roles, isAdmin: roles.includes("admin") };
+  const profile = await db.staffUser.findUnique({ where: { auth_user_id: user.id }, select: { id: true, email: true, role: true } });
+  return resolveStaffSession(user, profile);
 });
 
 /** For pages: redirects to sign-in when the visitor is not staff. */
