@@ -137,7 +137,10 @@ model WholesaleEnquiry {
   email                 String
   phone                 String
   country               String?
+  /// Postal address or city the buyer gives. Sent to the Abija CRM as `address`.
+  address               String?
   message               String
+  /// Estimated enquiry value in rupees, digits only for new enquiries (older rows may hold free text). Sent to Abija as `value`.
   target_budget         String?
   /// new | under_review | info_required | quotation_prepared | quotation_sent | accepted | rejected | closed
   status                String                 @default("new")

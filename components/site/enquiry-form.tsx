@@ -15,7 +15,7 @@ type Line = { key: string; productId: string; productName: string; quantity: str
 const STEPS = ["What you need", "About you", "Details"] as const;
 const STEP_HINTS = ["Products and quantities", "Who we reply to", "Requirement and reference files"] as const;
 const STEP_TITLES = ["What are you looking for?", "Who should we reply to?", "Anything else we should know?"] as const;
-const STEP_FIELDS: Record<number, string[]> = { 0: ["items"], 1: ["customerName", "companyName", "email", "phone", "country", "targetBudget"], 2: ["message", "attachments", "consent"] };
+const STEP_FIELDS: Record<number, string[]> = { 0: ["items"], 1: ["customerName", "companyName", "email", "phone", "address", "country", "targetBudget"], 2: ["message", "attachments", "consent"] };
 
 const newLine = (productId = ""): Line => ({ key: crypto.randomUUID(), productId, productName: "", quantity: "", specifications: "" });
 
@@ -313,17 +313,22 @@ export function EnquiryForm({
         <Field id={`${uid}-company`} label="Company" error={err("companyName")}>
           <input {...aria(`${uid}-company`, "companyName")} autoComplete="organization" className="field field-soft" />
         </Field>
-        <Field id={`${uid}-email`} label="Business email" required error={err("email")}>
-          <input {...aria(`${uid}-email`, "email")} type="email" autoComplete="email" className="field field-soft" />
-        </Field>
         <Field id={`${uid}-phone`} label="Phone with country code" required error={err("phone")} hint="e.g. +91 94430 22044">
           <input {...aria(`${uid}-phone`, "phone")} type="tel" autoComplete="tel" className="field field-soft" />
         </Field>
+        <Field id={`${uid}-email`} label="Business email" required error={err("email")}>
+          <input {...aria(`${uid}-email`, "email")} type="email" autoComplete="email" className="field field-soft" />
+        </Field>
+        <div className="sm:col-span-2">
+          <Field id={`${uid}-address`} label="Address" error={err("address")} hint="Street, city and state, e.g. Erode, Tamil Nadu">
+            <input {...aria(`${uid}-address`, "address")} autoComplete="street-address" className="field field-soft" />
+          </Field>
+        </div>
+        <Field id={`${uid}-budget`} label="Estimated enquiry value (₹)" error={err("targetBudget")} hint="Approximate total value of this order, numbers only, e.g. 50000">
+          <input {...aria(`${uid}-budget`, "targetBudget")} inputMode="decimal" autoComplete="off" placeholder="50000" className="field field-soft" />
+        </Field>
         <Field id={`${uid}-country`} label="Country / market" error={err("country")}>
           <input {...aria(`${uid}-country`, "country")} autoComplete="country-name" className="field field-soft" placeholder="India" />
-        </Field>
-        <Field id={`${uid}-budget`} label="Target price or budget" error={err("targetBudget")}>
-          <input {...aria(`${uid}-budget`, "targetBudget")} className="field field-soft" />
         </Field>
       </fieldset>
 

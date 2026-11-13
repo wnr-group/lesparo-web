@@ -11,7 +11,7 @@ export type EnquiryFormState =
   | { status: "error"; message: string; fields: FieldErrors; values: Record<string, string> }
   | { status: "success"; enquiryNumber: string; warning?: string };
 
-const ECHO_FIELDS = ["customerName", "companyName", "email", "phone", "country", "targetBudget", "message"] as const;
+const ECHO_FIELDS = ["customerName", "companyName", "email", "phone", "country", "address", "targetBudget", "message"] as const;
 
 /** React resets uncontrolled fields after an action; echo text values back so nothing typed is lost. */
 function echo(fd: FormData) {
