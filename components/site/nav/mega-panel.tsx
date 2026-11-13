@@ -4,6 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import type { NavPanel } from "./types";
 
+/** A different soft background fills in behind each category link on hover. Full class names so Tailwind keeps them. */
+const LINK_TINTS = ["hover:bg-sun-200", "hover:bg-indigo-200", "hover:bg-[#cdeadb]", "hover:bg-[#ffd8c7]", "hover:bg-[#cfe6f6]", "hover:bg-[#e6d5f4]"];
+
 const COLS = { 1: "grid-cols-1", 2: "grid-cols-2", 3: "grid-cols-3" } as const;
 
 /**
@@ -32,14 +35,14 @@ export function MegaPanel({ panel, active, pathname, onNavigate }: { panel: NavP
           <div key={col.title}>
             <p className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-muted">{col.title}</p>
             <ul className="mt-4">
-              {col.links.map((l) => (
+              {col.links.map((l, i) => (
                 <li key={l.href + l.label}>
                   <Link
                     href={l.href}
                     onClick={onNavigate}
                     tabIndex={tabIndex}
                     aria-current={pathname === l.href.split("?")[0] ? "page" : undefined}
-                    className="block py-2 text-[1rem] text-ink transition-[color,transform] duration-300 hover:translate-x-1 hover:text-indigo aria-[current=page]:font-semibold"
+                    className={clsx("-mx-3 block rounded-lg px-3 py-2 text-[1rem] text-ink transition-[color,background-color] duration-300 hover:text-indigo focus-visible:bg-linen aria-[current=page]:font-semibold", LINK_TINTS[i % LINK_TINTS.length])}
                   >
                     {l.label}
                   </Link>
