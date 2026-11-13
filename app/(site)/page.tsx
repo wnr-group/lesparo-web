@@ -54,9 +54,17 @@ export default async function HomePage() {
   const [content, tree] = await Promise.all([getHomepageContent(), getCategoryTree()]);
   const fabrics = tree.find((t) => t.slug !== "garments");
   const { sections } = content;
-  // New launches shows the kids range (newest first); with no kids category it falls back to the newest products overall.
-  const kids = await getCategoryBySlug("kids");
-  const { products: newest } = await listProducts({ sort: "newest", pageSize: 8, ...(kids ? { categoryIds: kids.subtreeIds } : {}) });
+  // New launches: the newest products that have a photo from Gents, Hoodies and Boys (3 + 3 + 2). A card reading "Image coming soon"
+  // does not belong on the home page, so products without a photo are skipped.
+  const launches = await Promise.all(
+    [["gents", 3], ["hoodies", 3], ["boys", 2]].map(async ([slug, take]) => {
+      const cat = await getCategoryBySlug(slug as string);
+      if (!cat) return [];
+      const { products } = await listProducts({ sort: "newest", pageSize: 40, categoryIds: cat.subtreeIds });
+      return products.filter((p) => p.images.length > 0).slice(0, take as number);
+    }),
+  );
+  const newest = launches.flat();
 
   const garments = tree.find((t) => t.slug === "garments");
 
