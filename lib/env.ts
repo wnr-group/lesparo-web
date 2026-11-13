@@ -14,13 +14,22 @@ const optional = <T extends z.ZodType>(t: T) => z.preprocess(blankToUndefined, t
 const schema = z.object({
   NEXT_PUBLIC_SITE_URL: z.url(),
   RATE_LIMIT_SALT: z.string().min(8),
-  CRM_PROVIDER: z.enum(["none", "mock"]).default("none"),
+  // "abija" sends enquiries to the Abija Exports CRM. Stays off (none) until the test results are approved. See docs/integrations.md.
+  CRM_PROVIDER: z.enum(["none", "mock", "abija"]).default("none"),
+  // Abija Exports "New Enquiry" API. Both are required when CRM_PROVIDER=abija. The key is server-only.
+  ABIJA_ENQUIRY_API_URL: optional(z.url().refine((u) => new URL(u).protocol === "https:", "must be an https URL")),
+  ABIJA_ENQUIRY_API_KEY: optional(z.string().min(8)),
   EMAIL_PROVIDER: z.enum(["none", "mock"]).default("none"),
   SALES_NOTIFICATION_EMAIL: optional(z.email()),
   // Razorpay: online payment stays off until both the key pair is set. The webhook secret is needed to receive payment events.
   RAZORPAY_KEY_ID: optional(z.string().min(1)),
   RAZORPAY_KEY_SECRET: optional(z.string().min(1)),
   RAZORPAY_WEBHOOK_SECRET: optional(z.string().min(1)),
+}).superRefine((env, ctx) => {
+  if (env.CRM_PROVIDER !== "abija") return;
+  for (const name of ["ABIJA_ENQUIRY_API_URL", "ABIJA_ENQUIRY_API_KEY"] as const) {
+    if (!env[name]) ctx.addIssue({ code: "custom", path: [name], message: "required when CRM_PROVIDER=abija" });
+  }
 });
 
 export type ServerEnv = z.infer<typeof schema>;

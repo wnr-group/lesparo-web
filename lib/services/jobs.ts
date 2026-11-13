@@ -35,6 +35,7 @@ async function loadCrmEnquiry(enquiryId: string): Promise<CrmEnquiry> {
     enquiryNumber: data.enquiry_number,
     contact: { name: data.customer_name, email: data.email, phone: data.phone, country: data.country },
     company: data.company_name ? { name: data.company_name } : null,
+    address: data.address,
     message: data.message,
     targetBudget: data.target_budget,
     items: data.items.map((i) => ({ productName: i.product_name_snapshot, quantity: i.quantity, specifications: i.specifications })),

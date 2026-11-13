@@ -7,7 +7,10 @@ export type CrmEnquiry = {
   enquiryNumber: string;
   contact: { name: string; email: string; phone: string; country?: string | null };
   company?: { name: string } | null;
+  /** Postal address or city the buyer gave. */
+  address?: string | null;
   message: string;
+  /** Estimated enquiry value in rupees (digits for new enquiries; older rows may be free text). */
   targetBudget?: string | null;
   items: { productName: string; quantity: number | null; specifications: string | null }[];
   source: "website";

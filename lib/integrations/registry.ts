@@ -1,5 +1,6 @@
 import "server-only";
 import { serverEnv } from "@/lib/env";
+import { AbijaCrm } from "./crm/abija";
 import { MockCrm } from "./crm/mock";
 import type { CrmAdapter } from "./crm/types";
 import { MockEmail } from "./email/mock";
@@ -12,8 +13,13 @@ let email: EmailAdapter | null | undefined;
 /** Returns null when no CRM is configured — callers record the job as `blocked`. */
 export function getCrm(): CrmAdapter | null {
   if (crm !== undefined) return crm;
-  const provider = serverEnv().CRM_PROVIDER;
-  crm = provider === "mock" ? new MockCrm() : null;
+  const env = serverEnv();
+  if (env.CRM_PROVIDER === "abija") {
+    // serverEnv() has already checked that both values are present when the provider is abija.
+    crm = new AbijaCrm({ url: env.ABIJA_ENQUIRY_API_URL!, apiKey: env.ABIJA_ENQUIRY_API_KEY! });
+  } else {
+    crm = env.CRM_PROVIDER === "mock" ? new MockCrm() : null;
+  }
   return crm;
 }
 

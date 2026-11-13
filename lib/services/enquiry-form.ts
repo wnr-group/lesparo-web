@@ -20,6 +20,7 @@ export function formDataToEnquiryInput(fd: FormData) {
     email: str("email"),
     phone: str("phone"),
     country: str("country"),
+    address: str("address"),
     message: str("message"),
     targetBudget: str("targetBudget"),
     website: str("website"),

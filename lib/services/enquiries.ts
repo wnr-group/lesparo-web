@@ -72,6 +72,7 @@ async function createEnquiry(input: EnquiryInput) {
         email: input.email,
         phone: input.phone,
         country: input.country || null,
+        address: input.address || null,
         message: input.message,
         target_budget: input.targetBudget || null,
         consent_at: new Date(),

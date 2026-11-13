@@ -57,6 +57,21 @@ export const enquiryItemSchema = z
     path: ["productName"],
   });
 
+/**
+ * Estimated total value of the enquiry in rupees, as a plain number (the Abija CRM's `value` must be numeric).
+ * Accepts "50000", "50,000" and "₹ 50,000"; blank means not given. Stored as digits.
+ */
+const estimatedValue = z
+  .preprocess(
+    (v) => {
+      if (typeof v !== "string") return v;
+      const s = v.replace(/[₹,\s]|\brs\.?|\binr\b/gi, "");
+      return s === "" ? undefined : s;
+    },
+    z.string().regex(/^\d{1,12}(\.\d{1,2})?$/, "Enter the value as a number in rupees, for example 50000.").optional(),
+  )
+  .transform((v) => (v ? v : undefined));
+
 export const enquirySchema = z.object({
   idempotencyKey: z.uuid(),
   customerName: trimmed(120).min(2, "Please enter your name."),
@@ -66,8 +81,9 @@ export const enquirySchema = z.object({
     .min(7, "Enter a phone number with country code.")
     .regex(/^\+?[0-9 ()-]{7,}$/, "Use digits, spaces and an optional leading +."),
   country: optionalText(80),
+  address: optionalText(300),
   message: trimmed(4000).min(10, "Tell us a little about your requirement (at least 10 characters)."),
-  targetBudget: optionalText(120),
+  targetBudget: estimatedValue,
   items: z.array(enquiryItemSchema).min(1, "Add at least one product or requirement.").max(20, "Up to 20 lines per enquiry."),
   consent: z.literal(true, { error: "Please confirm we may contact you about this enquiry." }),
   // Honeypot: real users never fill this.
