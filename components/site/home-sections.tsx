@@ -6,22 +6,42 @@ import type { PhotoTile } from "@/components/site/home-photos";
 import { ProductCard } from "@/components/site/product-card";
 import type { ProductCard as Product } from "@/lib/catalogue/queries";
 
-/** A row of small round shortcuts: quick routes before the big tiles. */
+/** Section title used by the three home sections: bold sport type with a short accent bar, optionally a link on the right. */
+function SectionTitle({ id, children, href, linkLabel }: { id: string; children: string; href?: string; linkLabel?: string }) {
+  return (
+    <div className="flex items-end justify-between gap-4">
+      <div>
+        <h2 id={id} className="font-sport text-[clamp(1.8rem,1.2rem+2.2vw,3rem)] font-extrabold uppercase italic leading-none tracking-tight text-ink">
+          <SplitWords>{children}</SplitWords>
+        </h2>
+        <span aria-hidden className="mt-3 block h-1 w-14 rounded-full bg-sun" />
+      </div>
+      {href && (
+        <Link href={href} className="group inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-ink underline-offset-4 hover:underline">
+          {linkLabel ?? "View all"} <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
+        </Link>
+      )}
+    </div>
+  );
+}
+
+/** "Explore the range": a grid of portrait photo cards, one per garment category, with the name underneath. */
 export function TopCollections({ items }: { items: PhotoTile[] }) {
   return (
-    <section aria-labelledby="top-collections" className="pt-12 lg:pt-16">
+    <section aria-labelledby="top-collections" className="pt-14 lg:pt-20">
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
-        <h2 id="top-collections" className="text-center font-sport text-[clamp(1.8rem,1.2rem+2vw,2.8rem)] font-extrabold uppercase italic tracking-tight text-ink">
-          <SplitWords>Explore the range</SplitWords>
-        </h2>
-        <ul className="mt-8 flex gap-5 overflow-x-auto pb-2 [scrollbar-width:none] sm:justify-center lg:gap-9 [&::-webkit-scrollbar]:hidden">
-          {items.map((c) => (
-            <li key={c.name} className="shrink-0">
-              <Link href={c.href} className="group flex w-24 flex-col items-center gap-3 sm:w-32 lg:w-36">
-                <span className="relative size-24 overflow-hidden rounded-full bg-night ring-1 ring-line transition-[box-shadow,transform] duration-500 ease-[var(--ease-out-soft)] group-hover:-translate-y-1 group-hover:ring-2 group-hover:ring-ink sm:size-32 lg:size-36">
-                  <Image src={c.src} alt="" fill sizes="144px" className="object-cover transition-transform duration-700 group-hover:scale-110" style={{ objectPosition: c.pos }} />
+        <SectionTitle id="top-collections" href="/collections">Explore the range</SectionTitle>
+        <ul className="mt-8 grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 lg:grid-cols-6 lg:gap-x-5">
+          {items.map((c, i) => (
+            <li key={c.name} data-reveal="up" style={{ ["--delay" as string]: `${i * 60}ms` }}>
+              <Link href={c.href} className="group block">
+                <span className="relative block aspect-[4/5] overflow-hidden rounded-2xl bg-mist">
+                  <Image src={c.src} alt="" fill sizes="(min-width:1024px) 16vw, (min-width:640px) 30vw, 46vw" className="object-cover transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-105" style={{ objectPosition: c.pos }} />
                 </span>
-                <span className="text-center text-[0.82rem] font-semibold leading-tight text-ink sm:text-sm">{c.name}</span>
+                <span className="mt-3 flex items-center justify-between gap-2">
+                  <span className="font-display text-base font-bold tracking-tight text-ink sm:text-lg">{c.name}</span>
+                  <ArrowUpRight className="size-4 shrink-0 text-muted transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden />
+                </span>
               </Link>
             </li>
           ))}
@@ -31,23 +51,23 @@ export function TopCollections({ items }: { items: PhotoTile[] }) {
   );
 }
 
-/** A bento grid of studio photographs: one large tile and three smaller ones, titles over the image. */
+/** "Shop by category": four equal photo cards with the name over the image and a Shop now line beneath. */
 export function ShopByRange({ items }: { items: PhotoTile[] }) {
-  const layout = ["col-span-2 aspect-[4/3] lg:row-span-2 lg:aspect-auto", "col-span-2 aspect-[16/9] lg:aspect-auto", "aspect-square lg:aspect-auto", "aspect-square lg:aspect-auto"];
   return (
-    <section aria-label="Shop by range" className="py-12 lg:py-20">
+    <section aria-labelledby="shop-by-category" className="py-14 lg:py-20">
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
-        <ul className="grid grid-cols-2 gap-3 lg:h-[min(46rem,82vh)] lg:grid-cols-4 lg:grid-rows-2 lg:gap-4">
+        <SectionTitle id="shop-by-category">Shop by category</SectionTitle>
+        <ul className="mt-8 grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">
           {items.slice(0, 4).map((c, i) => (
-            <li key={c.name} data-reveal="up" style={{ ["--delay" as string]: `${i * 90}ms` }} className={layout[i]}>
-              <Link href={c.href} className={`group relative block h-full w-full overflow-clip bg-night text-white ${i === 0 ? "scrub-mask" : ""}`}>
-                <Image src={c.src} alt="" fill sizes="(min-width:1024px) 50vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: c.pos }} />
-                <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent transition-opacity duration-500 group-hover:from-black/85" />
-                <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:-translate-y-1.5 sm:p-6">
-                  <span className="font-sport text-[clamp(1.4rem,0.8rem+2vw,2.8rem)] font-extrabold uppercase italic leading-none tracking-tight">{c.name}</span>
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white text-ink transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:rotate-45 sm:size-12">
-                    <ArrowUpRight className="size-5" aria-hidden />
-                  </span>
+            <li key={c.name} data-reveal="up" style={{ ["--delay" as string]: `${i * 80}ms` }}>
+              <Link href={c.href} className="group block">
+                <span className="relative block aspect-[3/4] overflow-hidden rounded-2xl bg-night">
+                  <Image src={c.src} alt="" fill sizes="(min-width:1024px) 24vw, 48vw" className="object-cover transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:scale-105" style={{ objectPosition: c.pos }} />
+                  <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <span className="absolute inset-x-0 bottom-0 p-4 font-sport text-[clamp(1.3rem,0.9rem+1.4vw,2rem)] font-extrabold uppercase italic leading-none tracking-tight text-white sm:p-5">{c.name}</span>
+                </span>
+                <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-ink">
+                  Shop now <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />
                 </span>
               </Link>
             </li>
@@ -58,23 +78,13 @@ export function ShopByRange({ items }: { items: PhotoTile[] }) {
   );
 }
 
-/** A tinted band with a bold heading and a row of the newest products that scrolls sideways. */
+/** The newest products in a row that scrolls sideways on small screens. */
 export function NewLaunches({ products }: { products: Product[] }) {
   if (!products.length) return null;
   return (
-    <section aria-labelledby="new-launches" className="bg-mist py-12 lg:py-16">
+    <section aria-labelledby="new-launches" className="bg-mist py-14 lg:py-20">
       <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <span className="rotate-[-6deg] rounded-md bg-sun px-3 py-1.5 font-sport text-[0.72rem] font-extrabold uppercase italic leading-tight tracking-wider text-ink shadow-[var(--shadow-card)]">New arrival</span>
-            <h2 id="new-launches" className="font-sport text-[clamp(1.8rem,1.2rem+2.4vw,3.2rem)] font-extrabold uppercase italic tracking-tight text-ink">
-              <SplitWords>Our new launches</SplitWords>
-            </h2>
-          </div>
-          <Link href="/shop?sort=newest" className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold shadow-sm transition-colors hover:bg-ink hover:text-white">
-            View all <ArrowRight className="size-4" aria-hidden />
-          </Link>
-        </div>
+        <SectionTitle id="new-launches" href="/shop?sort=newest">Our new launches</SectionTitle>
         <ul className="-mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:mx-0 lg:gap-5 lg:px-0 [&::-webkit-scrollbar]:hidden">
           {products.map((p) => (
             <li key={p.id} className="w-[62%] shrink-0 snap-start sm:w-[34%] lg:w-[calc((100%-3.75rem)/4)]">
