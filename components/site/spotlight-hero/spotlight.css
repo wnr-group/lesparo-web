@@ -25,20 +25,23 @@
  *   --sp-shade   vignette and floor (r g b)               --sp-art   backing for artwork in the detail card (r g b)
  */
 .sp-stage {
-  --sp-1: #2a3390;
-  --sp-2: var(--color-indigo-deep);
-  --sp-3: #0a0d2e;
-  --sp-key: rgb(255 236 214 / 0.07);
-  --sp-glow: rgb(255 238 216 / 0.22);
-  --sp-fg: 255 255 255;
-  --sp-on-fg: 18 22 76;
-  --sp-panel: 18 22 76;
-  --sp-accent: 255 200 44;
-  --sp-shade: 4 6 22;
-  --sp-art: 18 22 76;
+  --sp-1: #f7ecd2;
+  --sp-2: #e4e8fa;
+  --sp-3: #f3dde2;
+  --sp-key: rgb(255 255 255 / 0.55);
+  --sp-glow: rgb(255 255 255 / 0.85);
+  --sp-fg: 12 15 46;
+  --sp-on-fg: 255 255 255;
+  --sp-panel: 255 255 255;
+  --sp-accent: 38 46 134;
+  --sp-shade: 150 160 210;
+  --sp-art: 255 255 255;
   background:
-    radial-gradient(70% 60% at 18% 0%, var(--sp-key), transparent 70%),
-    radial-gradient(85% 75% at 52% 46%, var(--sp-1) 0%, var(--sp-2) 55%, var(--sp-3) 100%);
+    radial-gradient(55% 55% at 8% 12%, #f8e9c6 0%, transparent 70%),
+    radial-gradient(50% 55% at 94% 8%, #cdd8f7 0%, transparent 70%),
+    radial-gradient(55% 55% at 86% 96%, #f7d6dc 0%, transparent 70%),
+    radial-gradient(50% 55% at 4% 94%, #d6ebf8 0%, transparent 70%),
+    #faf7f2;
 }
 /* The key light behind the product: a soft pool of light, no ring. */
 .sp-halo {
@@ -61,7 +64,7 @@
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(120% 95% at 50% 45%, transparent 55%, rgb(var(--sp-shade) / 0.45) 100%),
+    radial-gradient(120% 95% at 50% 45%, transparent 60%, rgb(var(--sp-shade) / 0.18) 100%),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 /* The floor the product stands on. */
@@ -201,3 +204,18 @@
     inset: 0;
   }
 }
+
+/* Wide-screen side content: keeps the stage balanced around the product. */
+.sp-ghost { position: absolute; left: 50%; bottom: 4%; z-index: 0; translate: -50% 0; margin: 0; font-family: var(--font-display); font-size: clamp(9rem, 20vw, 21rem); font-weight: 800; letter-spacing: -0.05em; line-height: 0.8; color: rgb(255 255 255 / 0.55); pointer-events: none; user-select: none; white-space: nowrap; }
+.sp-side { position: absolute; z-index: 5; flex-direction: column; margin: 0; padding: 0; list-style: none; top: 50%; translate: 0 -42%; }
+.sp-side-l { left: max(2rem, calc(50vw - 40.25rem)); gap: 1.6rem; max-width: 16rem; }
+.sp-side-l li { display: flex; flex-direction: column; gap: 0.2rem; padding-left: 1rem; border-left: 2px solid rgb(var(--sp-accent) / 0.55); }
+.sp-fact-t { font-weight: 700; font-size: 0.95rem; color: rgb(var(--sp-fg)); }
+.sp-fact-d { font-size: 0.8rem; line-height: 1.4; color: rgb(var(--sp-fg) / 0.65); }
+.sp-side-r { right: max(2rem, calc(50vw - 40.25rem)); gap: 1.1rem; align-items: flex-end; }
+.sp-card { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem 0.5rem 0.5rem; border-radius: 1.1rem; background: rgb(255 255 255 / 0.82); box-shadow: 0 18px 40px -22px rgb(38 46 134 / 0.55); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.sp-card:hover { transform: translateY(-4px); }
+.sp-card-a { rotate: -2deg; }
+.sp-card-b { rotate: 2deg; margin-right: 1.5rem; }
+.sp-card-img { position: relative; width: 4.2rem; height: 5.2rem; overflow: hidden; border-radius: 0.8rem; background: #e8e6df; }
+.sp-card-t { font-weight: 700; font-size: 0.9rem; color: rgb(var(--sp-fg)); }

@@ -817,6 +817,15 @@
  * while the row of looks slides sideways with the scroll, and the background eases from white to sand and back.
  * Everywhere else (phones, reduced motion, older browsers) it stays the plain wrapping grid.
  */
+/* Height of the announcement bar plus header: the pinned studio edit sticks just below it. (Was only defined inside the old spotlight hero stylesheet, so without that hero the pin silently did nothing.) */
+:root {
+  --hdr: 6.2rem;
+}
+@media (min-width: 1024px) {
+  :root {
+    --hdr: 6.7rem;
+  }
+}
 @keyframes edit-slide {
   to {
     translate: calc(-100% + 100vw - var(--edit-ml)) 0;
@@ -844,8 +853,9 @@
 }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) and (min-width: 1024px) and (hover: hover) {
+    /* Pinned for one extra screen of scrolling (200vh track): the slide runs exactly while the section is pinned (cover 33% to 67%). */
     .edit-track {
-      height: 300vh;
+      height: 200vh;
       view-timeline: --edit block;
       animation: edit-bg linear both;
       animation-timeline: --edit;
@@ -871,16 +881,17 @@
       padding-right: 2.5rem;
       animation: edit-slide linear both;
       animation-timeline: --edit;
-      animation-range: cover 24% cover 76%;
+      animation-range: cover 33% cover 67%;
     }
     .edit-item {
-      width: min(26vw, 26rem);
+      /* Also capped by the window height (3:4 photos), so title, cards and labels always fit inside the pinned area. */
+      width: min(26vw, 26rem, calc((100svh - var(--hdr) - 12.5rem) * 0.75));
       flex: none;
     }
     .edit-title {
       animation: edit-title linear both;
       animation-timeline: --edit;
-      animation-range: cover 5% cover 28%;
+      animation-range: cover 8% cover 33%;
     }
   }
 }

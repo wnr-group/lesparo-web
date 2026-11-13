@@ -3,9 +3,11 @@
 import { ChevronRight, Minus, Plus, X } from "lucide-react";
 import { PointerDepth } from "@/components/site/pointer-fx";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./spotlight.css";
+
 
 // three.js is only fetched when a product has a .glb in public/models.
 // The premium viewer is the default; add ?viewer=classic to the address to see the earlier orbit-controls one.
@@ -385,6 +387,27 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
       <div aria-hidden className="sp-halo" />
       <div aria-hidden className="sp-floor" />
 
+      {/* Wide screens: fill the sides of the stage with a ghost wordmark, three facts and two real range cards. */}
+      <p aria-hidden className="sp-ghost hidden lg:block">LESPARO</p>
+      <ul className="sp-side sp-side-l sp-copy hidden lg:flex">
+        {[["Own mill", "Knitting and weaving in Erode"], ["Gents, kids and fabrics", "One supplier, three ranges"], ["Showrooms across the south", "Tamil Nadu, Kerala and Karnataka"]].map(([t, d]) => (
+          <li key={t}>
+            <span className="sp-fact-t">{t}</span>
+            <span className="sp-fact-d">{d}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="sp-side sp-side-r sp-copy hidden lg:flex">
+        {[["Track pants", "/collections/gents-tracks", "/looks/pants-front.jpg", "50% 62%"], ["Tees and polos", "/shop", "/looks/beige-tee.jpg", "50% 30%"]].map(([t, href, src, pos], i) => (
+          <Link key={t} href={href} className={"sp-card " + (i ? "sp-card-b" : "sp-card-a")}>
+            <span className="sp-card-img">
+              <Image src={src} alt="" fill sizes="120px" className="object-cover" style={{ objectPosition: pos }} />
+            </span>
+            <span className="sp-card-t">{t}</span>
+          </Link>
+        ))}
+      </div>
+
       {/* Headline, centred above the product: a short label, the title, one action and a text link. */}
       <div className="sp-leave-text sp-copy relative z-20 mx-auto flex max-w-4xl flex-col items-center px-5 pt-10 text-center sm:px-8 lg:pt-10">
         <p className="flex items-center gap-2.5 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgb(var(--sp-fg)/0.7)]">
@@ -407,6 +430,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
             <ChevronRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden />
           </Link>
         </div>
+
       </div>
 
       {/* Take a closer look: shows the numbered points, the guided views and the detail card. */}

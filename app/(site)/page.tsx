@@ -1,11 +1,9 @@
 import { ArrowRight, ArrowUpRight, RefreshCw, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
 import { BrandFilm } from "@/components/site/brand-film";
-import { SpotlightHero, type TurntableSet } from "@/components/site/spotlight-hero/spotlight-hero";
-import { CIRCLE_TILES, RANGE_TILES } from "@/components/site/home-photos";
+import { HeroBanner } from "@/components/site/hero-banner/hero-banner";
+import { CATEGORY_CIRCLES, RANGE_TILES, type PhotoTile } from "@/components/site/home-photos";
 import { NewLaunches, ShopByRange, TopCollections } from "@/components/site/home-sections";
 import { BrandStatement, BrandStory } from "@/components/site/brand-sections";
 import { BuyerFaq, DetailPanels, StudioLooks } from "@/components/site/more-sections";
@@ -52,47 +50,40 @@ function CategoryTile({ category, square, sizes }: { category: CategoryNode; squ
   );
 }
 
-/** A real 3D garment: public/models/<id>.glb (pants.glb, tee.glb). When present it replaces the photo viewer. */
-function model3d(id: string): string | undefined {
-  return existsSync(join(process.cwd(), "public", "models", `${id}.glb`)) ? `/models/${id}.glb` : undefined;
-}
-
-/**
- * A product with a real 360-degree turntable set: 8 or more frames in public/turntable/<id>/ (sorted by file
- * name), plus an optional hotspots.json of { frame, x, y, label }. Products without one use stand-in photos.
- */
-function turntable(id: string): TurntableSet | undefined {
-  const dir = join(process.cwd(), "public", "turntable", id);
-  if (!existsSync(dir)) return undefined;
-  const files = readdirSync(dir)
-    .filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
-    .sort();
-  if (files.length < 8) return undefined;
-  let spots: TurntableSet["spots"] = [];
-  try {
-    spots = JSON.parse(readFileSync(join(dir, "hotspots.json"), "utf8"));
-  } catch {}
-  return { frames: files.map((f) => `/turntable/${id}/${f}`), spots };
-}
-
 export default async function HomePage() {
   const [content, tree] = await Promise.all([getHomepageContent(), getCategoryTree()]);
   const fabrics = tree.find((t) => t.slug !== "garments");
   const { sections } = content;
-  // New launches shows the kids range (newest first); with no kids category it falls back to the newest products overall.
-  const kids = await getCategoryBySlug("kids");
-  const { products: newest } = await listProducts({ sort: "newest", pageSize: 8, ...(kids ? { categoryIds: kids.subtreeIds } : {}) });
+  // New launches: the newest products that have a photo from Gents, Hoodies and Boys (3 + 3 + 2). A card reading "Image coming soon"
+  // does not belong on the home page, so products without a photo are skipped.
+  const launches = await Promise.all(
+    [["gents", 3], ["hoodies", 3], ["boys", 2]].map(async ([slug, take]) => {
+      const cat = await getCategoryBySlug(slug as string);
+      if (!cat) return [];
+      const { products } = await listProducts({ sort: "newest", pageSize: 40, categoryIds: cat.subtreeIds });
+      return products.filter((p) => p.images.length > 0).slice(0, take as number);
+    }),
+  );
+  const newest = launches.flat();
+
+  const garments = tree.find((t) => t.slug === "garments");
+
+  // "Explore the range": one round shortcut per garment category. Names and links come from the catalogue; photos from CATEGORY_CIRCLES.
+  const circleTiles: PhotoTile[] = (garments?.children ?? []).flatMap((c) => {
+    const photo = CATEGORY_CIRCLES[c.slug];
+    return photo ? [{ name: c.name, href: `/collections/${c.slug}`, src: photo.src, pos: photo.pos }] : [];
+  });
 
   return (
     <>
       {/* ---------------------------------------------------------------- hero */}
-      <SpotlightHero eyebrow={content.hero.eyebrow || "Abija Exports · Erode, Tamil Nadu"} heading={content.hero.heading} subheading={content.hero.subheading} cta={{ label: "Shop now", href: "/collections/gents-tracks" }} secondary={{ label: "Wholesale enquiry", href: "/wholesale#enquire" }} turntables={{ pants: turntable("pants"), tee: turntable("tee") }} models={{ pants: model3d("pants"), tee: model3d("tee"), look: model3d("look") ?? (model3d("pants") && model3d("tee") ? "/models/look" : undefined) }} />
+      <HeroBanner />
 
 
       {/* ---------------------------------------------------------- categories */}
       {sections.categories && (
         <>
-          <TopCollections items={CIRCLE_TILES} />
+          <TopCollections items={circleTiles} />
           <ShopByRange items={RANGE_TILES} />
           <NewLaunches products={newest} />
         </>
@@ -197,7 +188,7 @@ export default async function HomePage() {
                   <p className="eyebrow !text-sun">Wholesale</p>
                   <h2 className="mt-4 font-display text-headline font-bold">Supplying showrooms, retailers and wholesalers.</h2>
                   <p className="mt-6 max-w-lg leading-relaxed text-white/75">
-                    LESPARO supplies textile showrooms across Tamil Nadu, Kerala and Karnataka. Tell us what you need — products, quantities, sizes and colours — and our sales team will come back to
+                    LESPARO supplies textile showrooms across Tamil Nadu, Kerala and Karnataka. Tell us what you need (products, quantities, sizes and colours) and our sales team will come back to
                     you with a quotation.
                   </p>
                   <div className="mt-10 flex flex-wrap items-center gap-3">

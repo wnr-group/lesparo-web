@@ -122,6 +122,33 @@ export async function setArchived(id: string, archived: boolean): Promise<Action
   }
 }
 
+/**
+ * Permanently deletes a product and its photos. A product that is on an order or an enquiry cannot be deleted (it would break that
+ * history); it has to be archived instead. `thenGoToList` is for the edit page, where the product no longer exists afterwards.
+ */
+export async function deleteProduct(id: string, thenGoToList: boolean): Promise<ActionState> {
+  try {
+    await requireAdmin();
+    const pid = z.uuid().parse(id);
+    const product = await prisma.product.findUnique({
+      where: { id: pid },
+      select: { images: { select: { storage_path: true } }, _count: { select: { enquiry_items: true, order_items: true } } },
+    });
+    if (!product) return { error: "Product not found." };
+    if (product._count.enquiry_items || product._count.order_items) {
+      return { error: "This product is on an order or an enquiry, so it cannot be deleted. Archive it instead." };
+    }
+    await prisma.product.delete({ where: { id: pid } });
+    // Photos are removed best-effort: the product is already gone, and a missing file must not block that.
+    await Promise.allSettled(product.images.filter((i) => !i.storage_path.startsWith("/")).map((i) => removeFile("media", i.storage_path)));
+    done();
+  } catch (err) {
+    return failure(err);
+  }
+  if (thenGoToList) redirect("/admin/products");
+  return { ok: true };
+}
+
 export async function uploadImages(productId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
   try {
     await requireAdmin();

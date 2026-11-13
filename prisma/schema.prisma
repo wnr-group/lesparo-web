@@ -17,11 +17,16 @@ datasource db {
 // Staff
 // ---------------------------------------------------------------------------
 
+/// Admin profile. Sign-in itself is Supabase Auth: auth_user_id is the user's id in auth.users and is the ONLY link
+/// that grants access. Roles live here (never in Supabase user metadata, which a user could edit). Rows are written by
+/// `npm run staff:grant` with the secret key; no public page or API can create one.
 model StaffUser {
   id            String   @id @default(uuid())
+  auth_user_id  String?  @unique @db.Uuid
   email         String   @unique
   name          String   @default("")
-  password_hash String
+  /// Legacy bcrypt hash from the pre-Supabase login. Unused; remove once every staff member has signed in through Supabase.
+  password_hash String?
   role          String   @default("admin") // "admin" | "sales"
   created_at    DateTime @default(now())
 

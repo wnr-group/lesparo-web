@@ -1,126 +1,27 @@
 "use client";
 
 import clsx from "clsx";
-import { ArrowRight, ArrowUpRight, ChevronDown, Menu, Search, X } from "lucide-react";
-import Image from "next/image";
+import { Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
-import { deptClass } from "@/lib/departments";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { CartLink } from "./cart";
 import { EnquiryListLink } from "./enquiry-list";
 import { MobileTabBar } from "./mobile-tab-bar";
+import { MegaPanel } from "./nav/mega-panel";
+import { MobileDrawer } from "./nav/mobile-drawer";
+import type { NavItem } from "./nav/types";
 
-export type NavGroup = { label: string; href: string; columns: { label: string; href: string; links: { label: string; href: string }[] }[] };
+export type { NavItem } from "./nav/types";
 
-type Props = { groups: NavGroup[] };
-
-/** A photograph for each dropdown, from the studio shoot and the lifestyle artwork. Keyed by the last part of the group link. */
-const FEATURES: Record<string, { src: string; caption: string }> = {
-  garments: { src: "/history/today-gents.jpg", caption: "Gents wear" },
-  "fabric-unstitched": { src: "/history/today-lungi.jpg", caption: "Woven lines" },
-};
-
-const STATIC_LINKS = [
-  { label: "About", href: "/about" },
-  { label: "Wholesale", href: "/wholesale" },
-  { label: "Contact", href: "/contact" },
-];
+type Props = { items: NavItem[]; logo: ReactNode };
 
 function isActive(pathname: string, href: string) {
-  return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+  const path = href.split("?")[0];
+  return path === "/" ? pathname === "/" : pathname === path || pathname.startsWith(path + "/");
 }
 
-function DesktopMenu({ group, pathname }: { group: NavGroup; pathname: string }) {
-  // Open state is tied to the page it was opened on, so navigating closes the menu.
-  const [openOn, setOpenOn] = useState<string | null>(null);
-  const open = openOn === pathname;
-  const setOpen = (next: boolean | ((o: boolean) => boolean)) => setOpenOn((typeof next === "function" ? next(open) : next) ? pathname : null);
-  const id = useId();
-  const ref = useRef<HTMLLIElement>(null);
-  const active = isActive(pathname, group.href) || group.columns.some((c) => c.links.some((l) => isActive(pathname, l.href)) || isActive(pathname, c.href));
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: PointerEvent) => !ref.current?.contains(e.target as Node) && setOpenOn(null);
-    document.addEventListener("pointerdown", onDown);
-    return () => document.removeEventListener("pointerdown", onDown);
-  }, [open]);
-
-  return (
-    <li
-      ref={ref}
-      className={clsx("flex h-full items-center", deptClass(group.href.split("/").pop()))}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-      onKeyDown={(e) => {
-        if (e.key === "Escape" && open) {
-          setOpen(false);
-          ref.current?.querySelector("button")?.focus();
-        }
-      }}
-      onBlur={(e) => !ref.current?.contains(e.relatedTarget as Node) && setOpen(false)}
-    >
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls={id}
-        onClick={() => setOpen((o) => !o)}
-        className={clsx("nav-link flex items-center gap-1 rounded-full px-3.5 py-2 text-[0.82rem] font-bold uppercase tracking-[0.06em] transition-colors hover:text-indigo", (active || open) && "text-indigo")}
-        aria-current={active ? "page" : undefined}
-      >
-        {group.label}
-        <ChevronDown className={clsx("size-3.5 transition-transform duration-300", open && "rotate-180")} aria-hidden />
-      </button>
-      <div
-        id={id}
-        className={clsx(
-          "absolute left-1/2 top-full z-40 -translate-x-1/2 pt-3 transition-[opacity,transform] duration-300 ease-[var(--ease-atelier)]",
-          open ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0",
-        )}
-      >
-        <div className="menu-panel grid w-[min(50rem,92vw)] grid-cols-[1fr_13rem] overflow-clip rounded-[1.1rem] border border-line bg-white shadow-[var(--shadow-float)]" data-open={open}>
-          <div className="flex flex-col p-8">
-            <div className="grid flex-1 gap-8" style={{ gridTemplateColumns: `repeat(${group.columns.length}, minmax(0, 1fr))` }}>
-              {group.columns.map((col, ci) => (
-                <div key={col.href} className={clsx("menu-item", deptClass(col.href.split("/").pop()))} style={{ ["--i" as string]: ci }}>
-                  <Link href={col.href} className="group/col flex items-center gap-2 font-sport text-lg font-extrabold uppercase italic tracking-tight text-[var(--dept,var(--color-ink))]">
-                    <span aria-hidden className="size-2 shrink-0 rounded-full bg-[var(--dept,var(--color-sun))]" />
-                    <span className="hline">{col.label}</span>
-                    <ArrowUpRight className="size-4 -translate-x-1 opacity-0 transition-[opacity,transform] duration-300 group-hover/col:translate-x-0 group-hover/col:opacity-100" aria-hidden />
-                  </Link>
-                  <ul className="mt-3 space-y-1.5 border-t-2 border-[var(--dept,var(--color-line))] pt-3">
-                    {col.links.map((l) => (
-                      <li key={l.href}>
-                        <Link href={l.href} className="group/l inline-flex items-center gap-1 text-[0.92rem] text-ink-soft transition-[color,transform] duration-300 hover:translate-x-1 hover:text-ink" aria-current={isActive(pathname, l.href) ? "page" : undefined}>
-                          {l.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-            <Link href={group.href} className="menu-item group/all mt-7 inline-flex items-center gap-2 self-start border-t border-ink/10 pt-4 text-sm font-bold" style={{ ["--i" as string]: group.columns.length }}>
-              <span className="hline">View all {group.label.toLowerCase()}</span>
-              <ArrowRight className="size-4 transition-transform duration-300 group-hover/all:translate-x-1" aria-hidden />
-            </Link>
-          </div>
-          {FEATURES[group.href.split("/").pop() ?? ""] && (
-            <Link href={group.href} tabIndex={open ? 0 : -1} aria-label={`${group.label}: ${FEATURES[group.href.split("/").pop() ?? ""].caption}`} className="menu-feature group/f relative block min-h-[19rem] overflow-clip bg-night">
-              <Image src={FEATURES[group.href.split("/").pop() ?? ""].src} alt="" fill sizes="220px" quality={85} className="object-cover transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover/f:scale-[1.06]" />
-              <span aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-              <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-4 text-white">
-                <span className="font-sport text-lg font-extrabold uppercase italic leading-tight tracking-tight">{FEATURES[group.href.split("/").pop() ?? ""].caption}</span>
-                <ArrowUpRight className="size-5 shrink-0 transition-transform duration-300 group-hover/f:rotate-45" aria-hidden />
-              </span>
-            </Link>
-          )}
-        </div>
-      </div>
-    </li>
-  );
-}
+const itemClass = "relative inline-flex h-full items-center px-2.5 text-[0.76rem] font-semibold uppercase tracking-[0.1em] text-ink transition-colors hover:text-indigo xl:px-3.5 aria-[current=page]:text-indigo";
 
 function SearchBar({ onClose, inline = false }: { onClose?: () => void; inline?: boolean }) {
   const router = useRouter();
@@ -141,7 +42,7 @@ function SearchBar({ onClose, inline = false }: { onClose?: () => void; inline?:
           router.push(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
           inputRef.current?.blur();
         }}
-        className="relative hidden xl:block"
+        className="relative mr-1 hidden 2xl:block"
       >
         <label htmlFor={id} className="sr-only">
           Search products
@@ -152,8 +53,8 @@ function SearchBar({ onClose, inline = false }: { onClose?: () => void; inline?:
           id={id}
           name="q"
           type="search"
-          placeholder="Search shorts, lungi, towel…"
-          className="h-10 w-52 rounded-full border border-transparent bg-paper pl-10 pr-4 text-[0.85rem] transition-[width,background-color,border-color,box-shadow] duration-300 ease-[var(--ease-out-soft)] placeholder:text-muted hover:border-sand focus:w-64 focus:border-indigo focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo/15 2xl:w-60 2xl:focus:w-72"
+          placeholder="Search shorts, tracks, T-shirts…"
+          className="h-10 w-52 rounded-full border border-transparent bg-paper pl-10 pr-4 text-[0.85rem] transition-[width,background-color,border-color,box-shadow] duration-300 ease-[var(--ease-out-soft)] placeholder:text-muted hover:border-sand focus:w-64 focus:border-indigo focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo/15"
         />
       </form>
     );
@@ -177,7 +78,7 @@ function SearchBar({ onClose, inline = false }: { onClose?: () => void; inline?:
         id="site-search"
         name="q"
         type="search"
-        placeholder="Search shorts, lungi, towel…"
+        placeholder="Search shorts, tracks, T-shirts…"
         className="field h-10 rounded-full px-4 py-0"
         onKeyDown={(e) => e.key === "Escape" && onClose?.()}
       />
@@ -188,16 +89,41 @@ function SearchBar({ onClose, inline = false }: { onClose?: () => void; inline?:
   );
 }
 
-export function SiteNav({ groups }: Props) {
+export function SiteNav({ items, logo }: Props) {
   const pathname = usePathname();
-  // Both panels remember the page they were opened on, so any navigation closes them.
+  // Everything that opens remembers the page it was opened on, so any navigation closes it.
   const [drawerOn, setDrawerOn] = useState<string | null>(null);
   const [searchOn, setSearchOn] = useState<string | null>(null);
+  const [menu, setMenu] = useState<{ key: string; on: string } | null>(null);
+  const [shown, setShown] = useState<string | null>(null);
   const drawer = drawerOn === pathname;
   const search = searchOn === pathname;
+  const openKey = menu?.on === pathname ? menu.key : null;
   const setDrawer = (v: boolean) => setDrawerOn(v ? pathname : null);
   const setSearch = (v: boolean | ((s: boolean) => boolean)) => setSearchOn((typeof v === "function" ? v(search) : v) ? pathname : null);
   const drawerRef = useRef<HTMLDialogElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const withPanel = items.filter((i) => i.panel);
+
+  const clear = () => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+  };
+  const show = (key: string, delay = 0) => {
+    clear();
+    const go = () => {
+      setMenu({ key, on: pathname });
+      setShown(key);
+    };
+    if (delay) timer.current = setTimeout(go, delay);
+    else go();
+  };
+  // A short grace period when leaving, so the pointer can cross between a trigger and its panel without it flickering shut.
+  const hide = (delay = 140) => {
+    clear();
+    timer.current = setTimeout(() => setMenu(null), delay);
+  };
 
   useEffect(() => {
     const d = drawerRef.current;
@@ -206,57 +132,119 @@ export function SiteNav({ groups }: Props) {
     if (!drawer && d.open) d.close();
   }, [drawer]);
 
+  // The row condenses once the page is scrolled (styles key off html[data-scrolled]); an open panel closes.
+  useEffect(() => {
+    const root = document.documentElement;
+    const onScroll = () => {
+      if (window.scrollY > 24) root.setAttribute("data-scrolled", "");
+      else root.removeAttribute("data-scrolled");
+      setMenu(null);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      root.removeAttribute("data-scrolled");
+      clear();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!openKey) return;
+    const onDown = (e: PointerEvent) => !wrapRef.current?.contains(e.target as Node) && setMenu(null);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setMenu(null);
+      wrapRef.current?.querySelector<HTMLElement>(`[data-nav="${openKey}"]`)?.focus();
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [openKey]);
+
+  const shownItem = withPanel.find((i) => i.key === shown);
+
   return (
     <>
-      <nav aria-label="Main" className="hidden self-stretch lg:block">
-        <ul className="flex h-full items-center gap-1">
-          <li>
-            <Link
-              href="/shop"
-              className="nav-link rounded-full px-3.5 py-2 text-[0.82rem] font-bold uppercase tracking-[0.06em] transition-colors hover:text-indigo aria-[current=page]:text-indigo"
-              aria-current={isActive(pathname, "/shop") ? "page" : undefined}
-            >
-              Shop
-            </Link>
-          </li>
-          {groups.map((g) => (
-            <DesktopMenu key={g.href} group={g} pathname={pathname} />
-          ))}
-          {STATIC_LINKS.map((l) => (
-            <li key={l.href}>
-              <Link
-                href={l.href}
-                className="nav-link rounded-full px-3.5 py-2 text-[0.82rem] font-bold uppercase tracking-[0.06em] transition-colors hover:text-indigo aria-[current=page]:text-indigo"
-                aria-current={isActive(pathname, l.href) ? "page" : undefined}
-              >
-                {l.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      <div ref={wrapRef} className="relative" onMouseLeave={() => hide()} onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node) && setMenu(null)}>
+        {/* One slim row: brand | destinations | tools. */}
+        <div className="mx-auto grid h-16 max-w-page grid-cols-[1fr_auto] items-center gap-6 px-4 transition-[height] duration-300 ease-[var(--ease-out-soft)] sm:px-6 lg:h-[4.25rem] lg:grid-cols-[auto_1fr_auto] lg:px-10 2xl:px-14 [html[data-scrolled]_&]:lg:h-14">
+          {logo}
 
-      <div className="flex items-center gap-1 sm:gap-3">
-        <SearchBar inline />
-        <button
-          type="button"
-          onClick={() => setSearch((s) => !s)}
-          aria-expanded={search}
-          aria-controls="header-search"
-          className="flex size-10 items-center justify-center rounded-full hover:bg-linen xl:hidden"
-          aria-label="Search products"
+          <nav aria-label="Main" className="hidden h-full justify-self-center lg:block">
+            <ul className="flex h-full items-center">
+              {items.map((item) => {
+                const active = isActive(pathname, item.href) || !!item.panel?.columns.some((c) => c.links.some((l) => isActive(pathname, l.href) && l.href !== "/shop"));
+                return (
+                  <li key={item.key} className="flex h-full items-center" onMouseEnter={() => (item.panel ? show(item.key, openKey ? 0 : 70) : hide(0))}>
+                    {item.panel ? (
+                      <button
+                        type="button"
+                        data-nav={item.key}
+                        aria-expanded={openKey === item.key}
+                        aria-controls="nav-panel"
+                        aria-current={active ? "page" : undefined}
+                        onClick={() => (openKey === item.key ? setMenu(null) : show(item.key))}
+                        className={clsx(itemClass, "nav-link")}
+                      >
+                        {item.label}
+                      </button>
+                    ) : (
+                      <Link href={item.href} aria-current={isActive(pathname, item.href) ? "page" : undefined} className={clsx(itemClass, "nav-link", item.key === "wholesale" && "text-indigo")}>
+                        {item.label}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          <div className="flex items-center justify-self-end gap-0.5 sm:gap-1">
+            <SearchBar inline />
+            <button
+              type="button"
+              onClick={() => setSearch((s) => !s)}
+              aria-expanded={search}
+              aria-controls="header-search"
+              className="flex size-10 items-center justify-center rounded-full transition-colors hover:bg-linen 2xl:hidden"
+              aria-label="Search products"
+            >
+              {search ? <X className="size-5" strokeWidth={1.6} aria-hidden /> : <Search className="size-5" strokeWidth={1.6} aria-hidden />}
+            </button>
+            <CartLink className="flex h-10 items-center gap-1.5 rounded-full px-2.5 transition-colors hover:bg-linen" />
+            <EnquiryListLink className="ml-1 hidden h-9 items-center gap-2 bg-ink px-4 text-[0.78rem] font-semibold text-white transition-colors hover:bg-indigo sm:inline-flex" />
+            <button type="button" onClick={() => setDrawer(true)} className="flex size-10 items-center justify-center rounded-full hover:bg-linen lg:hidden" aria-label="Open menu" aria-haspopup="dialog">
+              <Menu className="size-5" strokeWidth={1.6} aria-hidden />
+            </button>
+          </div>
+        </div>
+
+        {/* The shared panel and a light scrim behind it; hovering or clicking the scrim closes the menu. */}
+        <div aria-hidden onMouseEnter={() => hide(0)} onClick={() => setMenu(null)} className={clsx("absolute inset-x-0 top-full z-30 hidden h-screen bg-ink/15 transition-opacity duration-300 lg:block", openKey ? "opacity-100" : "pointer-events-none opacity-0")} />
+        <div
+          id="nav-panel"
+          role="region"
+          aria-label={shownItem ? `${shownItem.label} menu` : "Menu"}
+          onMouseEnter={clear}
+          className={clsx(
+            "absolute inset-x-0 top-full z-40 hidden border-t border-ink/10 bg-[#faf8f4] transition-[opacity,transform] duration-300 ease-[var(--ease-out-soft)] lg:block",
+            openKey ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0",
+          )}
         >
-          {search ? <X className="size-[18px]" aria-hidden /> : <Search className="size-[18px]" aria-hidden />}
-        </button>
-        <CartLink className="flex h-10 items-center gap-1.5 rounded-full px-3 hover:bg-linen" />
-        <EnquiryListLink className="hidden h-10 items-center gap-2 rounded-full bg-indigo px-4 text-[0.85rem] font-semibold text-white transition-colors hover:bg-indigo-deep sm:inline-flex" />
-        <button type="button" onClick={() => setDrawer(true)} className="flex size-10 items-center justify-center rounded-full hover:bg-linen lg:hidden" aria-label="Open menu" aria-haspopup="dialog">
-          <Menu className="size-5" aria-hidden />
-        </button>
+          {withPanel.map((item) => (
+            <div key={item.key} hidden={shown !== item.key} className={shown === item.key ? "animate-[rise_0.35s_var(--ease-out-soft)]" : undefined}>
+              <MegaPanel panel={item.panel!} active={openKey === item.key} pathname={pathname} onNavigate={() => setMenu(null)} />
+            </div>
+          ))}
+        </div>
       </div>
 
       {search && (
-        <div id="header-search" className="absolute inset-x-0 top-full border-b border-line bg-paper py-4 shadow-sm">
+        <div id="header-search" className="absolute inset-x-0 top-full border-b border-line bg-[#faf8f4] py-5">
           <div className="mx-auto max-w-2xl px-4">
             <SearchBar onClose={() => setSearch(false)} />
           </div>
@@ -264,69 +252,7 @@ export function SiteNav({ groups }: Props) {
       )}
 
       <MobileTabBar onSearch={() => setSearch(true)} onMenu={() => setDrawer(true)} />
-
-      <dialog
-        ref={drawerRef}
-        onClose={() => setDrawer(false)}
-        onClick={(e) => e.target === drawerRef.current && setDrawer(false)}
-        aria-label="Menu"
-        className="m-0 ml-auto h-dvh max-h-none w-[min(26rem,100%)] max-w-none rounded-l-3xl bg-white p-0 text-ink backdrop:bg-ink/40 backdrop:backdrop-blur-sm open:animate-[rise_0.4s_var(--ease-out-soft)]"
-      >
-        <div className="flex h-full flex-col">
-          <div className="flex items-center justify-between border-b border-line px-5 py-4">
-            <span className="eyebrow">Menu</span>
-            <button type="button" onClick={() => setDrawer(false)} className="flex size-10 items-center justify-center rounded-full hover:bg-linen" aria-label="Close menu">
-              <X className="size-5" aria-hidden />
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto px-5 py-6">
-            <SearchBar onClose={() => setDrawer(false)} />
-            <ul className="menu-list mt-8 space-y-1 font-display font-semibold text-[1.7rem] leading-tight">
-              <li>
-                <Link href="/shop" className="block py-1.5">
-                  Shop all
-                </Link>
-              </li>
-              {groups.map((g) => (
-                <li key={g.href}>
-                  <details className="group">
-                    <summary className="flex cursor-pointer list-none items-center justify-between py-1.5">
-                      {g.label}
-                      <ChevronDown className="size-5 transition-transform group-open:rotate-180" aria-hidden />
-                    </summary>
-                    <div className="space-y-4 pb-4 pl-1 pt-2 font-sans text-base">
-                      {g.columns.map((c) => (
-                        <div key={c.href} className={deptClass(c.href.split("/").pop())}>
-                          <Link href={c.href} className="font-semibold text-[var(--dept,var(--color-ink))]">
-                            {c.label}
-                          </Link>
-                          <ul className="mt-1.5 space-y-1.5 border-l-2 border-[var(--dept,var(--color-line))] pl-3 text-ink-soft">
-                            {c.links.map((l) => (
-                              <li key={l.href}>
-                                <Link href={l.href}>{l.label}</Link>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </details>
-                </li>
-              ))}
-              {STATIC_LINKS.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="block py-1.5">
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="border-t border-line px-5 py-5">
-            <EnquiryListLink className="flex h-12 items-center justify-center gap-2 rounded-full bg-indigo text-[0.9rem] font-semibold text-white" />
-          </div>
-        </div>
-      </dialog>
+      <MobileDrawer items={items} dialogRef={drawerRef} onClose={() => setDrawer(false)} logo={logo} search={<SearchBar onClose={() => setDrawer(false)} />} />
     </>
   );
 }

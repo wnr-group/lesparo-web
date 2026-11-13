@@ -12,7 +12,7 @@ import { submitEnquiryAction } from "./actions";
 
 export const metadata: Metadata = {
   title: "Wholesale enquiries",
-  description: "Request a quotation from LESPARO — Abija Exports, Erode. Gents and kids garments, lungis, kavi dhothies, towels and kerchiefs for retailers and wholesalers.",
+  description: "Request a quotation from LESPARO (Abija Exports, Erode). Gents and kids garments, lungis, kavi dhothies, towels and kerchiefs for retailers and wholesalers.",
   alternates: { canonical: "/wholesale" },
 };
 
@@ -61,7 +61,7 @@ export default async function WholesalePage(props: PageProps<"/wholesale">) {
                   <Link href={`/collections/${t.slug}`} className="hline font-semibold">
                     {t.name}
                   </Link>
-                  <span className="text-muted"> — {t.children.map((c) => c.name).join(" · ")}</span>
+                  <span className="text-muted">: {t.children.map((c) => c.name).join(" · ")}</span>
                 </li>
               ))}
             </ul>

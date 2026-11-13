@@ -1,38 +1,32 @@
-"use client";
-
 import Image from "next/image";
-import { useActionState } from "react";
-import { signIn, type LoginState } from "./actions";
+import { Suspense } from "react";
+import { LoginForm } from "./login-form";
 
-export default function LoginPage() {
-  const [state, action, pending] = useActionState(signIn, {} as LoginState);
+// Fixed messages only: the notice code from the address bar is looked up, never printed.
+const NOTICES: Record<string, string> = {
+  signedout: "You have been signed out.",
+  reset: "Your password was changed. Sign in with the new one.",
+  expired: "That reset link has expired or was already used. Request a new one.",
+};
+
+/** Reads the query string at request time, so it streams in behind a boundary while the form itself stays in the static page. */
+async function Notice({ searchParams }: { searchParams: PageProps<"/admin/login">["searchParams"] }) {
+  const code = (await searchParams).notice;
+  const text = typeof code === "string" ? NOTICES[code] : undefined;
+  if (!text) return null;
+  return <p className="mt-6 border border-line bg-plate px-3 py-2 text-center text-sm text-ink-soft">{text}</p>;
+}
+
+export default function LoginPage(props: PageProps<"/admin/login">) {
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm">
         <Image src="/lesparo-logo-v3.png" alt="LESPARO" width={875} height={460} className="mx-auto h-16 w-auto" priority />
         <h1 className="mt-8 text-center font-display font-semibold text-3xl">Staff sign in</h1>
-        <form action={action} className="mt-8 space-y-4 border border-line bg-paper p-6">
-          {state.error && (
-            <p role="alert" className="border border-danger/30 bg-danger-soft px-3 py-2 text-sm text-danger">
-              {state.error}
-            </p>
-          )}
-          <div>
-            <label htmlFor="email" className="mb-1.5 block text-sm font-medium">
-              Email
-            </label>
-            <input id="email" name="email" type="email" autoComplete="username" required defaultValue={state.email ?? "admin@lesparo.com"} className="field" />
-          </div>
-          <div>
-            <label htmlFor="password" className="mb-1.5 block text-sm font-medium">
-              Password
-            </label>
-            <input id="password" name="password" type="password" autoComplete="current-password" required className="field" />
-          </div>
-          <button type="submit" disabled={pending} className="h-11 w-full bg-indigo text-sm font-medium text-paper hover:bg-indigo-deep disabled:opacity-60">
-            {pending ? "Signing in…" : "Sign in"}
-          </button>
-        </form>
+        <Suspense fallback={null}>
+          <Notice searchParams={props.searchParams} />
+        </Suspense>
+        <LoginForm />
         <p className="mt-4 text-center text-xs text-muted">Accounts are created by an administrator.</p>
       </div>
     </main>

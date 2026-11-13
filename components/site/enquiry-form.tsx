@@ -129,7 +129,7 @@ export function EnquiryForm({
     return (
       <div ref={statusRef} tabIndex={-1} role="status" className="border border-success/30 bg-paper p-8 outline-none sm:p-12">
         <CheckCircle2 className="size-8 text-success" aria-hidden />
-        <h3 className="mt-5 font-display font-semibold text-title">Thank you — your enquiry has been received.</h3>
+        <h3 className="mt-5 font-display font-semibold text-title">Thank you, your enquiry has been received.</h3>
         {state.enquiryNumber !== "—" && (
           <p className="mt-3 text-ink-soft">
             Your reference is <strong className="font-medium text-ink tabular-nums">{state.enquiryNumber}</strong>. Please quote it if you contact us. Our sales team will review your requirement and get back to you.
@@ -329,7 +329,7 @@ export function EnquiryForm({
 
       <fieldset className={clsx("space-y-5", step !== 2 && "hidden")}>
         <legend className="sr-only">3 · Details</legend>
-        <Field id={`${uid}-msg`} label="Your requirement" required error={err("message")} hint="Delivery location, timelines, packing or branding needs — anything that helps us quote accurately.">
+        <Field id={`${uid}-msg`} label="Your requirement" required error={err("message")} hint="Delivery location, timelines, packing or branding needs, or anything else that helps us quote accurately.">
           <textarea {...aria(`${uid}-msg`, "message")} rows={4} className="field field-soft" />
         </Field>
         <Field id={`${uid}-files`} label={`Reference files (up to ${ATTACHMENT_RULES.maxFiles}, 8 MB each)`} error={err("attachments")} hint="JPG, PNG, WebP or PDF. Files are stored privately.">

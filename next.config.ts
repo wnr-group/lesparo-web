@@ -1,4 +1,3 @@
-import { randomBytes } from "node:crypto";
 import type { NextConfig } from "next";
 import legacyRedirects from "./data/legacy-redirects.json";
 
@@ -6,9 +5,6 @@ import legacyRedirects from "./data/legacy-redirects.json";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL) : null;
 
 const nextConfig: NextConfig = {
-  // Without an AUTH_SECRET (e.g. on Vercel) each build signs sessions with its own random
-  // secret, inlined into the server code; staff simply sign in again after a deploy.
-  env: { AUTH_SECRET: process.env.AUTH_SECRET || randomBytes(32).toString("hex") },
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
@@ -24,6 +20,10 @@ const nextConfig: NextConfig = {
     serverActions: { bodySizeLimit: "26mb" },
   },
   images: {
+    qualities: [75, 85],
+    // Some home/office networks use DNS64, which resolves Supabase to a NAT64 address (64:ff9b::/96) that Next treats as private,
+    // so the image optimizer refuses it. Relax that for `next dev` only; production keeps the protection.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
     remotePatterns: supabaseUrl ? [{ protocol: "https", hostname: supabaseUrl.hostname, pathname: "/storage/v1/object/public/**" }] : [],
   },
   async redirects() {

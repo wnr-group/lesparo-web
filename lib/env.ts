@@ -4,8 +4,8 @@ import { z } from "zod";
 /**
  * Server-only configuration. Public values (NEXT_PUBLIC_*) are read directly where needed;
  * everything secret is validated here and must never be imported by client components.
- * DATABASE_URL, SUPABASE_SECRET_KEY and AUTH_SECRET are read by lib/db.ts, lib/storage.ts and
- * lib/auth/session.ts.
+ * DATABASE_URL, SUPABASE_SECRET_KEY and SUPABASE_PUBLISHABLE_KEY are read by lib/db.ts, lib/storage.ts and
+ * lib/supabase/config.ts.
  */
 /** A blank value in .env.local (KEY=) means "not set", not an invalid value. */
 const blankToUndefined = (v: unknown) => (typeof v === "string" && v.trim() === "" ? undefined : v);
