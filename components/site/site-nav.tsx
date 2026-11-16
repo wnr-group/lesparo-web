@@ -21,7 +21,7 @@ function isActive(pathname: string, href: string) {
   return path === "/" ? pathname === "/" : pathname === path || pathname.startsWith(path + "/");
 }
 
-const itemClass = "relative inline-flex h-full items-center px-2.5 text-[0.76rem] font-semibold uppercase tracking-[0.1em] text-ink transition-colors hover:text-indigo xl:px-3.5 aria-[current=page]:text-indigo";
+const itemClass = "relative inline-flex h-full items-center px-2.5 text-[0.9rem] font-bold uppercase tracking-[0.08em] text-ink transition-colors hover:text-indigo xl:px-3.5 aria-[current=page]:text-indigo";
 
 function SearchBar({ onClose, inline = false }: { onClose?: () => void; inline?: boolean }) {
   const router = useRouter();

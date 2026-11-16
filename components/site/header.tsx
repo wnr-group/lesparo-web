@@ -7,7 +7,7 @@ import type { NavColumn, NavItem, NavLink, NavTile } from "./nav/types";
 import { SiteNav } from "./site-nav";
 
 /**
- * The navigation, built from the live category tree: Shop, Men, Women, Kids, Collections, About, Wholesale, Contact.
+ * The navigation, built from the live category tree: Shop, Men, Kids, Collections, About, Wholesale, Contact.
  * A link is only added when its category exists, so a menu never points at something the catalogue does not sell.
  * Photographs: Men and Women use studio/licensed photography in public/menu (see SOURCES.txt there); Kids and Hoodies use
  * existing project photography and real catalogue product photos. Catalogue product images themselves are never altered.
@@ -71,21 +71,6 @@ async function buildNav(): Promise<NavItem[]> {
       },
     });
 
-  if (has("women"))
-    items.push({
-      key: "women",
-      label: "Women",
-      href: "/collections/women",
-      panel: {
-        heading: "Women",
-        blurb: "T-shirts, track pants and 3/4th pants.",
-        columns: [...col("Shop by type", types("women", false)), ...col("Discover", [...newest("women"), { label: "View all women’s products", href: "/collections/women" }])],
-        tiles: tile("women", "Women", "/menu/women-studio.jpg", "50% 30%"),
-        shape: "landscape",
-        cta: { label: "Explore women", href: "/collections/women" },
-      },
-    });
-
   if (has("kids") || has("boys"))
     items.push({
       key: "kids",
@@ -118,16 +103,17 @@ async function buildNav(): Promise<NavItem[]> {
       },
     });
 
-  items.push({ key: "about", label: "About", href: "/about" }, { key: "wholesale", label: "Wholesale", href: "/wholesale" }, { key: "contact", label: "Contact", href: "/contact" });
+  items.push({ key: "about", label: "About", href: "/about" }, { key: "contact", label: "Contact", href: "/contact" }, { key: "wholesale", label: "Wholesale", href: "/wholesale" });
   return items;
 }
 
 export async function Header() {
   const items = await buildNav();
   const logo = (
-    <Link href="/" className="shrink-0" aria-label="LESPARO home">
-      {/* Registered LESPARO mark, unaltered. */}
-      <Image src="/lesparo-logo-v3.png" alt="LESPARO" width={875} height={460} priority className="h-10 w-auto transition-[height] duration-300 ease-[var(--ease-out-soft)] lg:h-11 [html[data-scrolled]_&]:lg:h-9" />
+    <Link href="/" className="flex shrink-0 items-center gap-3 lg:gap-4" aria-label="LESPARO home">
+      {/* Bird and name shown as separate pieces. */}
+      <Image src="/lesparo-logo-bird.png" alt="" width={270} height={350} priority className="h-10 w-auto transition-[height] duration-300 ease-[var(--ease-out-soft)] lg:h-12 [html[data-scrolled]_&]:lg:h-10" />
+      <Image src="/lesparo-wordmark.png" alt="LESPARO" width={700} height={205} priority className="h-6 w-auto transition-[height] duration-300 ease-[var(--ease-out-soft)] lg:h-7 [html[data-scrolled]_&]:lg:h-6" />
     </Link>
   );
   return (
