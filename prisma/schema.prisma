@@ -150,7 +150,9 @@ model WholesaleEnquiry {
   quotation_valid_until String?
   quotation_details     String?
   follow_up_at          DateTime?
-  /** First time any staff member opened the enquiry; null = still an unread notification. */
+  /**
+   * First time any staff member opened the enquiry; null = still an unread notification.
+   */
   admin_seen_at         DateTime?
   follow_up_outcome     String?
   crm_record_id         String?
@@ -164,9 +166,12 @@ model WholesaleEnquiry {
   attachments           EnquiryAttachment[]
   notes                 EnquiryNote[]
   status_history        EnquiryStatusHistory[]
+  customer_id           String?
+  customer              Customer?              @relation(fields: [customer_id], references: [id], onDelete: SetNull)
 
   @@index([status, created_at])
   @@index([created_at])
+  @@index([customer_id, created_at])
   @@map("wholesale_enquiries")
 }
 
@@ -309,6 +314,12 @@ model RetailOrder {
   paid_at             DateTime?
   payments            Payment[]
   audits              OrderAudit[]
+  /// The signed-in customer who placed the order (null for guest checkout).
+  customer_id         String?
+  customer            Customer?         @relation(fields: [customer_id], references: [id], onDelete: SetNull)
+  tracking_carrier    String?
+  tracking_number     String?
+  tracking_url        String?
   /// new | confirmed | shipped | delivered | cancelled
   status              String            @default("new")
   currency            String            @default("INR")
@@ -318,6 +329,7 @@ model RetailOrder {
   items               RetailOrderItem[]
 
   @@index([status, created_at])
+  @@index([customer_id, created_at])
   @@map("retail_orders")
 }
 
@@ -391,4 +403,86 @@ model OrderAudit {
 
   @@index([order_id, created_at])
   @@map("order_audits")
+}
+
+// ---------------------------------------------------------------------------
+// Customer accounts. Separate from StaffUser: staff roles never come from here.
+// ---------------------------------------------------------------------------
+
+model Customer {
+  id                String             @id @default(uuid())
+  /// Always stored lowercase.
+  email             String             @unique
+  name              String
+  phone             String
+  password_hash     String
+  email_verified_at DateTime?
+  /// Bumped on password change/reset; sessions carrying an older value stop working.
+  session_version   Int                @default(0)
+  created_at        DateTime           @default(now())
+  updated_at        DateTime           @updatedAt
+  addresses         CustomerAddress[]
+  tokens            CustomerToken[]
+  orders            RetailOrder[]
+  enquiries         WholesaleEnquiry[]
+
+  @@map("customers")
+}
+
+model CustomerAddress {
+  id          String   @id @default(uuid())
+  customer_id String
+  customer    Customer @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  label       String   @default("Home")
+  full_name   String
+  phone       String
+  line        String
+  city        String
+  state       String
+  postcode    String
+  is_default  Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([customer_id])
+  @@map("customer_addresses")
+}
+
+/// One-time tokens for email verification, email change and password reset. Only the SHA-256 hash is stored.
+model CustomerToken {
+  id          String    @id @default(uuid())
+  customer_id String
+  customer    Customer  @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  /// verify_email | change_email | reset_password
+  type        String
+  token_hash  String    @unique
+  /// change_email only: the address being switched to.
+  new_email   String?
+  expires_at  DateTime
+  used_at     DateTime?
+  created_at  DateTime  @default(now())
+
+  @@index([customer_id, type])
+  @@map("customer_tokens")
+}
+
+/// One row per transactional email (deduplicated on idempotency_key). Bodies and links are never stored.
+model EmailLog {
+  id              String    @id @default(uuid())
+  idempotency_key String    @unique
+  template        String
+  to_email        String
+  subject         String
+  /// sending | sent | failed
+  status          String    @default("sending")
+  attempts        Int       @default(0)
+  entity_id       String?
+  provider_id     String?
+  last_error      String?
+  created_at      DateTime  @default(now())
+  sent_at         DateTime?
+  updated_at      DateTime  @updatedAt
+
+  @@index([status, updated_at])
+  @@map("email_logs")
 }

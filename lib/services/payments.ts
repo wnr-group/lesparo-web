@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { prisma } from "@/lib/db";
 import { decideSettlement, mergePaymentStatus, nextOrderPaymentStatus, orderAmountPaise, safeEqualText, verifyCheckoutSignature, verifyWebhookSignature, type GatewayPayment, type Settlement } from "@/lib/payments/core";
 import { createGateway, razorpayConfig, type RazorpayGateway } from "@/lib/payments/razorpay";
+import { notifyPaymentFailed, notifyPaymentSuccess } from "@/lib/email/notifications";
 import { hitRateLimit, rateLimitKey } from "@/lib/services/enquiries";
 
 /** Never include card, UPI or signature data in a log line: ids and short reasons only. */
@@ -93,7 +94,9 @@ type OrderForApply = Pick<OrderRow, "id" | "payment_status" | "razorpay_order_id
 
 /** Records the payment attempt and moves the order forward according to decideSettlement. Safe to call any number of times. */
 async function applyPayment(order: OrderForApply, payment: GatewayPayment, extra: { method?: string | null; errorCode?: string | null; errorDescription?: string | null } = {}): Promise<Settlement> {
-  return prisma.$transaction(async (tx) => {
+  // Set inside the transaction, acted on only after it commits. The emails are deduplicated per order / payment, so repeats are harmless.
+  let notice = null as "paid" | "failed" | null;
+  const settled = await prisma.$transaction(async (tx) => {
     // Re-read inside the transaction so two concurrent deliveries decide against the same, latest state.
     const current = await tx.retailOrder.findUnique({ where: { id: order.id }, select: { payment_status: true, razorpay_order_id: true, razorpay_amount: true, currency: true, razorpay_payment_id: true } });
     if (!current) return { action: "ignore" } as Settlement;
@@ -115,13 +118,18 @@ async function applyPayment(order: OrderForApply, payment: GatewayPayment, extra
     const next = nextOrderPaymentStatus(current.payment_status, settlement);
     if (settlement.action === "mark_paid") {
       await tx.retailOrder.update({ where: { id: order.id }, data: { payment_status: "paid", payment_verified: true, razorpay_payment_id: payment.id, paid_at: new Date() } });
+      notice = "paid";
     } else if (next !== current.payment_status) {
       await tx.retailOrder.update({ where: { id: order.id }, data: { payment_status: next } });
     }
+    if (next === "failed" && current.payment_status !== "failed" && settlement.action !== "reject") notice = "failed";
     if (settlement.action === "reject") log("payment rejected", { order: order.id, payment: payment.id, reason: settlement.reason });
     if (settlement.action === "duplicate_capture") log("duplicate capture: refund needed", { order: order.id, payment: payment.id });
     return settlement;
   });
+  if (notice === "paid") notifyPaymentSuccess(order.id);
+  else if (notice === "failed") notifyPaymentFailed(order.id, payment.id);
+  return settled;
 }
 
 // ---------------------------------------------------------------------------

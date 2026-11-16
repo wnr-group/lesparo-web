@@ -40,7 +40,9 @@ let pageKey = "";
 const clientKey = () => (pageKey ||= crypto.randomUUID());
 const noSubscribe = () => () => {};
 
-export function CheckoutForm({ action, onlinePayments = false }: { action: (s: CheckoutState, fd: FormData) => Promise<CheckoutState>; onlinePayments?: boolean }) {
+export type CheckoutPrefill = { customerName?: string; phone?: string; email?: string; addressLine?: string; city?: string; state?: string; postcode?: string };
+
+export function CheckoutForm({ action, onlinePayments = false, prefill = {} }: { action: (s: CheckoutState, fd: FormData) => Promise<CheckoutState>; onlinePayments?: boolean; prefill?: CheckoutPrefill }) {
   const router = useRouter();
   const PAYMENTS = onlinePayments ? PAYMENTS_ONLINE : PAYMENTS_OFFLINE;
   const [state, formAction, pending] = useActionState(action, { status: "idle" } as CheckoutState);
@@ -121,14 +123,14 @@ export function CheckoutForm({ action, onlinePayments = false }: { action: (s: C
         <fieldset className="grid gap-5 sm:grid-cols-2">
           <legend className="mb-4 font-display text-xl font-bold">Contact</legend>
           <Field id="customerName" label="Full name" error={f.customerName}>
-            <input id="customerName" name="customerName" autoComplete="name" required className={input} />
+            <input id="customerName" name="customerName" defaultValue={prefill.customerName} autoComplete="name" required className={input} />
           </Field>
           <Field id="phone" label="Phone" error={f.phone}>
-            <input id="phone" name="phone" type="tel" autoComplete="tel" required className={input} />
+            <input id="phone" name="phone" type="tel" defaultValue={prefill.phone} autoComplete="tel" required className={input} />
           </Field>
           <div className="sm:col-span-2">
             <Field id="email" label="Email" error={f.email}>
-              <input id="email" name="email" type="email" autoComplete="email" required className={input} />
+              <input id="email" name="email" type="email" defaultValue={prefill.email} autoComplete="email" required className={input} />
             </Field>
           </div>
         </fieldset>
@@ -136,17 +138,17 @@ export function CheckoutForm({ action, onlinePayments = false }: { action: (s: C
           <legend className="mb-4 font-display text-xl font-bold">Delivery address</legend>
           <div className="sm:col-span-2">
             <Field id="addressLine" label="Address" error={f.addressLine}>
-              <input id="addressLine" name="addressLine" autoComplete="street-address" required className={input} />
+              <input id="addressLine" name="addressLine" defaultValue={prefill.addressLine} autoComplete="street-address" required className={input} />
             </Field>
           </div>
           <Field id="city" label="City" error={f.city}>
-            <input id="city" name="city" autoComplete="address-level2" required className={input} />
+            <input id="city" name="city" defaultValue={prefill.city} autoComplete="address-level2" required className={input} />
           </Field>
           <Field id="state" label="State" error={f.state}>
-            <input id="state" name="state" autoComplete="address-level1" required className={input} />
+            <input id="state" name="state" defaultValue={prefill.state} autoComplete="address-level1" required className={input} />
           </Field>
           <Field id="postcode" label="PIN code" error={f.postcode}>
-            <input id="postcode" name="postcode" inputMode="numeric" autoComplete="postal-code" required className={input} />
+            <input id="postcode" name="postcode" defaultValue={prefill.postcode} inputMode="numeric" autoComplete="postal-code" required className={input} />
           </Field>
         </fieldset>
         <fieldset>

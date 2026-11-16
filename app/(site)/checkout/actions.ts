@@ -1,6 +1,8 @@
 "use server";
 
 import { headers } from "next/headers";
+import { getCustomer } from "@/lib/auth/customer";
+import { notifyOrderPlaced } from "@/lib/email/notifications";
 import { fieldErrors } from "@/lib/services/enquiry-form";
 import { placeOrder } from "@/lib/services/orders";
 import { orderSchema } from "@/lib/validation/order";
@@ -30,12 +32,16 @@ export async function placeOrderAction(_prev: CheckoutState, fd: FormData): Prom
   const clientId = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "unknown";
   let result;
   try {
-    result = await placeOrder(parsed.data, clientId);
+    // A signed-in customer's order is attached to their account; guest checkout stays as it was.
+    const me = await getCustomer();
+    result = await placeOrder(parsed.data, clientId, me?.id ?? null);
   } catch (err) {
     console.error("[checkout]", err);
     return { status: "error", message: "We could not place your order just now. Please try again, or call us to order by phone.", fields: {} };
   }
   if (!result.ok) return { status: "error", message: result.message, fields: {} };
+  // Confirmation email (deduplicated per order, so a double submit sends one).
+  if (result.orderId && result.created) notifyOrderPlaced(result.orderId);
   if (result.paymentMethod === "razorpay" && result.accessToken) return { status: "payment", orderNumber: result.orderNumber, accessToken: result.accessToken };
   return { status: "success", orderNumber: result.orderNumber, subtotal: result.subtotal, currency: result.currency };
 }

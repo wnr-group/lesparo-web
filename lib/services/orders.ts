@@ -5,13 +5,13 @@ import { razorpayEnabled } from "@/lib/payments/razorpay";
 import { hitRateLimit, rateLimitKey } from "@/lib/services/enquiries";
 import type { OrderInput } from "@/lib/validation/order";
 
-export type PlaceOrderResult = { ok: true; orderNumber: string; subtotal: number; currency: string; paymentMethod: string; accessToken: string | null } | { ok: false; message: string };
+export type PlaceOrderResult = { ok: true; orderId?: string; /** False when a repeated submit returned the existing order. */ created?: boolean; orderNumber: string; subtotal: number; currency: string; paymentMethod: string; accessToken: string | null } | { ok: false; message: string };
 
 /**
  * Creates a retail order. Prices, names and availability are read from the database here; nothing the
  * browser sends about money is trusted. Idempotent on idempotencyKey so a double submit places one order.
  */
-export async function placeOrder(input: OrderInput, clientId: string): Promise<PlaceOrderResult> {
+export async function placeOrder(input: OrderInput, clientId: string, customerId: string | null = null): Promise<PlaceOrderResult> {
   const existing = await prisma.retailOrder.findUnique({ where: { idempotency_key: input.idempotencyKey }, select: { order_number: true, subtotal: true, currency: true, payment_method: true, access_token: true } });
   if (existing) return { ok: true, orderNumber: existing.order_number, subtotal: existing.subtotal, currency: existing.currency, paymentMethod: existing.payment_method, accessToken: existing.access_token };
 
@@ -46,6 +46,7 @@ export async function placeOrder(input: OrderInput, clientId: string): Promise<P
     const year = new Intl.DateTimeFormat("en-IN", { year: "numeric", timeZone: "Asia/Kolkata" }).format(new Date());
     return tx.retailOrder.create({
       data: {
+        customer_id: customerId,
         order_number: `ORD-${year}-${String(counter.value).padStart(5, "0")}`,
         idempotency_key: input.idempotencyKey,
         customer_name: input.customerName,
@@ -62,8 +63,8 @@ export async function placeOrder(input: OrderInput, clientId: string): Promise<P
         subtotal,
         items: { create: lines },
       },
-      select: { order_number: true },
+      select: { id: true, order_number: true },
     });
   });
-  return { ok: true, orderNumber: order.order_number, subtotal, currency, paymentMethod: input.paymentMethod, accessToken };
+  return { ok: true, orderId: order.id, created: true, orderNumber: order.order_number, subtotal, currency, paymentMethod: input.paymentMethod, accessToken };
 }

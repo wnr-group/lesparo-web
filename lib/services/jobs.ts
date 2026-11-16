@@ -2,6 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/db";
 import { serverEnv } from "@/lib/env";
 import type { CrmEnquiry } from "@/lib/integrations/crm/types";
+import { retryFailedEmails } from "@/lib/email/notifications";
 import { getCrm, getEmail } from "@/lib/integrations/registry";
 import { blockedReason, executeJob, type JobOperation, type JobRecord } from "./job-runner";
 
@@ -102,6 +103,7 @@ export async function processDueJobs(limit = 50) {
     select: { id: true },
   });
   for (const job of jobs) await processJob(job.id);
+  await retryFailedEmails().catch((err) => console.error("[jobs] email retry failed", err));
   return jobs.length;
 }
 

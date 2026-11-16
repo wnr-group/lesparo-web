@@ -50,7 +50,7 @@ export async function hitRateLimit(key: string, max: number, windowSeconds: numb
  * Creates the enquiry, its items, the first status-history entry and its outbox jobs in one
  * transaction. Idempotent on idempotency_key: a repeat returns the original with created=false.
  */
-async function createEnquiry(input: EnquiryInput) {
+async function createEnquiry(input: EnquiryInput, customerId: string | null) {
   const existing = await prisma.wholesaleEnquiry.findUnique({ where: { idempotency_key: input.idempotencyKey }, select: { id: true, enquiry_number: true } });
   if (existing) return { ...existing, created: false };
 
@@ -65,6 +65,7 @@ async function createEnquiry(input: EnquiryInput) {
 
     const enquiry = await tx.wholesaleEnquiry.create({
       data: {
+        customer_id: customerId,
         enquiry_number: enquiryNumber,
         idempotency_key: input.idempotencyKey,
         customer_name: input.customerName,
@@ -112,7 +113,7 @@ async function createEnquiry(input: EnquiryInput) {
  * Stores a validated enquiry. Idempotent on input.idempotencyKey: resubmitting the same
  * form (double click, retry after a network error) returns the original enquiry.
  */
-export async function submitEnquiry(input: EnquiryInput, files: File[], clientId: string): Promise<SubmitResult> {
+export async function submitEnquiry(input: EnquiryInput, files: File[], clientId: string, customerId: string | null = null): Promise<SubmitResult> {
   let allowed: boolean;
   try {
     allowed = await hitRateLimit(rateLimitKey(clientId), 5, 600);
@@ -127,7 +128,7 @@ export async function submitEnquiry(input: EnquiryInput, files: File[], clientId
 
   let row: Awaited<ReturnType<typeof createEnquiry>>;
   try {
-    row = await createEnquiry(input);
+    row = await createEnquiry(input, customerId);
   } catch (err) {
     console.error("[enquiry] create failed", err);
     return { ok: false, reason: "server_error", message: "We could not submit your enquiry. Please try again." };
