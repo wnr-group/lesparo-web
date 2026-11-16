@@ -2,12 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getCategoryTree, type CategoryNode } from "@/lib/catalogue/queries";
+import { AccountIcon, AccountMenu } from "./account-menu";
 import { AnnouncementBar } from "./announcement-bar";
 import type { NavColumn, NavItem, NavLink, NavTile } from "./nav/types";
 import { SiteNav } from "./site-nav";
 
 /**
- * The navigation, built from the live category tree: Shop, Men, Kids, Collections, About, Wholesale, Contact.
+ * The navigation, built from the live category tree: Shop, Men, Kids, Trending, About, Wholesale, Contact.
  * A link is only added when its category exists, so a menu never points at something the catalogue does not sell.
  * Photographs: Men and Women use studio/licensed photography in public/menu (see SOURCES.txt there); Kids and Hoodies use
  * existing project photography and real catalogue product photos. Catalogue product images themselves are never altered.
@@ -91,19 +92,19 @@ async function buildNav(): Promise<NavItem[]> {
   if (collections.length)
     items.push({
       key: "collections",
-      label: "Collections",
+      label: "Trending",
       href: collections[0].href,
       panel: {
-        heading: "Collections",
-        blurb: "Ranges that sit across audiences.",
-        columns: col("Ranges", collections),
+        heading: "Trending",
+        blurb: "Our hoodies and newest styles, for everyone.",
+        columns: col("Browse", collections),
         tiles: tile("hoodies", "Hoodies", "/menu/hoodies.jpg", "50% 30%"),
         shape: "portrait",
         cta: { label: "Shop all", href: "/shop" },
       },
     });
 
-  items.push({ key: "about", label: "About", href: "/about" }, { key: "contact", label: "Contact", href: "/contact" }, { key: "wholesale", label: "Wholesale", href: "/wholesale" });
+  items.push({ key: "about", label: "About", href: "/about" }, { key: "contact", label: "Contact", href: "/contact" }, { key: "wholesale", label: "B2B Sales", href: "/wholesale" });
   return items;
 }
 
@@ -124,7 +125,15 @@ export async function Header() {
       </a>
       {/* usePathname() is request data: a boundary lets pages re-render after admin edits. */}
       <Suspense>
-        <SiteNav items={items} logo={logo} />
+        <SiteNav
+          items={items}
+          logo={logo}
+          account={
+            <Suspense fallback={<AccountIcon />}>
+              <AccountMenu />
+            </Suspense>
+          }
+        />
       </Suspense>
     </header>
   );

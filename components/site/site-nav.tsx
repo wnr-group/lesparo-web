@@ -14,7 +14,7 @@ import type { NavItem } from "./nav/types";
 
 export type { NavItem } from "./nav/types";
 
-type Props = { items: NavItem[]; logo: ReactNode };
+type Props = { items: NavItem[]; logo: ReactNode; account: ReactNode };
 
 function isActive(pathname: string, href: string) {
   const path = href.split("?")[0];
@@ -89,7 +89,7 @@ function SearchBar({ onClose, inline = false }: { onClose?: () => void; inline?:
   );
 }
 
-export function SiteNav({ items, logo }: Props) {
+export function SiteNav({ items, logo, account }: Props) {
   const pathname = usePathname();
   // Everything that opens remembers the page it was opened on, so any navigation closes it.
   const [drawerOn, setDrawerOn] = useState<string | null>(null);
@@ -193,7 +193,7 @@ export function SiteNav({ items, logo }: Props) {
                         {item.label}
                       </button>
                     ) : (
-                      <Link href={item.href} aria-current={isActive(pathname, item.href) ? "page" : undefined} className={clsx(itemClass, "nav-link", item.key === "wholesale" && "text-indigo")}>
+                      <Link href={item.href} aria-current={isActive(pathname, item.href) ? "page" : undefined} className={clsx(itemClass, "nav-link", item.key === "wholesale" && "font-extrabold bg-gradient-to-r from-[#a21cf0] via-[#ff2d95] to-[#ff8a00] bg-clip-text !text-transparent hover:!text-transparent")}>
                         {item.label}
                       </Link>
                     )}
@@ -203,7 +203,7 @@ export function SiteNav({ items, logo }: Props) {
             </ul>
           </nav>
 
-          <div className="flex items-center justify-self-end gap-0.5 sm:gap-1">
+          <div className="flex items-center justify-self-end gap-1.5 sm:gap-3">
             <SearchBar inline />
             <button
               type="button"
@@ -215,8 +215,9 @@ export function SiteNav({ items, logo }: Props) {
             >
               {search ? <X className="size-5" strokeWidth={1.6} aria-hidden /> : <Search className="size-5" strokeWidth={1.6} aria-hidden />}
             </button>
-            <CartLink className="flex h-10 items-center gap-1.5 rounded-full px-2.5 transition-colors hover:bg-linen" />
-            <EnquiryListLink className="ml-1 hidden h-9 items-center gap-2 bg-ink px-4 text-[0.78rem] font-semibold text-white transition-colors hover:bg-indigo sm:inline-flex" />
+            {account}
+            <CartLink className="mr-2 flex size-10 items-center justify-center rounded-full transition-colors hover:bg-linen" />
+            <EnquiryListLink className="ml-2 hidden h-9 items-center gap-2 bg-ink px-4 text-[0.78rem] font-semibold text-white transition-colors hover:bg-indigo sm:inline-flex" />
             <button type="button" onClick={() => setDrawer(true)} className="flex size-10 items-center justify-center rounded-full hover:bg-linen lg:hidden" aria-label="Open menu" aria-haspopup="dialog">
               <Menu className="size-5" strokeWidth={1.6} aria-hidden />
             </button>

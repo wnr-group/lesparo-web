@@ -90,12 +90,14 @@ export function useCart() {
 export function CartLink({ className }: { className?: string }) {
   const { count } = useCart();
   return (
-    <Link href="/cart" className={className} aria-label={`Cart, ${count} item${count === 1 ? "" : "s"}`}>
-      <ShoppingBag className="size-[1.15rem]" aria-hidden />
-      {/* Fixed-size badge so the header never shifts when the count changes. */}
-      <span aria-hidden className={clsx("inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[0.7rem] font-bold tabular-nums", count ? "bg-sun text-ink" : "bg-line text-muted")}>
-        {count}
-      </span>
+    <Link href="/cart" className={clsx("relative", className)} aria-label={`Cart, ${count} item${count === 1 ? "" : "s"}`}>
+      <ShoppingBag className="size-[1.3rem]" strokeWidth={1.7} aria-hidden />
+      {/* The count sits on the top corner of the icon. It is absolutely placed so the header never shifts, and hidden while the cart is empty. */}
+      {count > 0 && (
+        <span aria-hidden className="absolute -right-1.5 -top-0.5 flex h-[1.15rem] min-w-[1.15rem] items-center justify-center rounded-full bg-sun px-1 text-[0.65rem] font-bold leading-none tabular-nums text-ink shadow-sm ring-2 ring-white">
+          {count > 99 ? "99+" : count}
+        </span>
+      )}
     </Link>
   );
 }

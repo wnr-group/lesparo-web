@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { ArrowRight, ChevronDown, X } from "lucide-react";
+import { ArrowRight, ChevronDown, UserRound, X } from "lucide-react";
 import Link from "next/link";
 import { useState, type ReactNode, type RefObject } from "react";
 import { EnquiryListLink } from "../enquiry-list";
@@ -66,7 +66,7 @@ export function MobileDrawer({ items, dialogRef, onClose, logo, search }: { item
             })}
             {plain.map((item) => (
               <li key={item.key} className="border-b border-ink/15">
-                <Link href={item.href} onClick={onClose} className={clsx("flex items-center justify-between py-4 font-display text-[1.6rem] font-bold uppercase tracking-tight", item.key === "wholesale" && "text-indigo")}>
+                <Link href={item.href} onClick={onClose} className={clsx("flex items-center justify-between py-4 font-display text-[1.6rem] font-bold uppercase tracking-tight", item.key === "wholesale" && "bg-gradient-to-r from-[#a21cf0] via-[#ff2d95] to-[#ff8a00] bg-clip-text !text-transparent")}>
                   {item.label}
                   <ArrowRight className="size-5" aria-hidden />
                 </Link>
