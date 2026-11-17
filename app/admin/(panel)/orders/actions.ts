@@ -39,6 +39,9 @@ export async function updateOrder(id: string, _prev: ActionState, fd: FormData):
 
     const { status, paymentStatus } = parsed.data;
     const paymentChanged = paymentStatus !== order.payment_status;
+    // Cancelling returned the order's units to stock. Reopening it would leave a live order with no stock behind it,
+    // so a cancelled order stays cancelled: place a new order instead.
+    if (order.status === "cancelled" && status !== "cancelled") return { error: "A cancelled order cannot be reopened because its stock was returned. Place a new order instead." };
     if (order.payment_method === "razorpay" && paymentChanged && !(paymentStatus === "refunded" && order.payment_status === "paid"))
       return { error: "This payment is managed through Razorpay. Use “Check with Razorpay” to refresh it, or record a refund once an order is paid." };
     if (paymentChanged && paymentStatus === "refunded" && order.payment_method === "razorpay") await requireAdmin();

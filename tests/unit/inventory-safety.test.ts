@@ -131,4 +131,34 @@ describe.skipIf(!DB)("stock safety (real Postgres)", () => {
       expect(await qty(p.id)).toBe(5);
     });
   });
+
+  describe("a cancelled order cannot be reopened (H4)", () => {
+    it("refuses to reopen and leaves stock alone", async () => {
+      const p = await product({ M: 2 });
+      const o = await place(p.id);
+      sales();
+      expect((await setStatus(o.orderId, "cancelled")).ok).toBe(true);
+      expect(await qty(p.id)).toBe(2);
+      const again = await setStatus(o.orderId, "confirmed");
+      expect(again.ok).toBeUndefined();
+      expect(again.error).toMatch(/cannot be reopened/);
+      expect((await prisma.retailOrder.findUniqueOrThrow({ where: { id: o.orderId } })).status).toBe("cancelled");
+      expect(await qty(p.id)).toBe(2);
+    });
+    it("normal progress still works: new -> confirmed -> shipped -> delivered, stock untouched", async () => {
+      const p = await product({ M: 4 });
+      const o = await place(p.id);
+      sales();
+      for (const s of ["confirmed", "shipped", "delivered"]) expect((await setStatus(o.orderId, s)).ok).toBe(true);
+      expect(await qty(p.id)).toBe(3);
+    });
+    it("saving a cancelled order as cancelled (for example to add tracking notes) is still allowed and does not restock again", async () => {
+      const p = await product({ M: 2 });
+      const o = await place(p.id);
+      sales();
+      await setStatus(o.orderId, "cancelled");
+      expect((await setStatus(o.orderId, "cancelled")).ok).toBe(true);
+      expect(await qty(p.id)).toBe(2);
+    });
+  });
 });
