@@ -60,39 +60,76 @@ model Category {
 }
 
 model Product {
-  id              String            @id @default(uuid())
-  name            String
-  slug            String            @unique
-  sku             String?           @unique
-  category_id     String?
-  category        Category?         @relation(fields: [category_id], references: [id], onDelete: Restrict)
-  description     String?
+  id                  String            @id @default(uuid())
+  name                String
+  slug                String            @unique
+  sku                 String?           @unique
+  category_id         String?
+  category            Category?         @relation(fields: [category_id], references: [id], onDelete: Restrict)
+  description         String?
   /// Ordered label/value pairs, e.g. [{"label":"Fit type","value":"Regular"}].
-  specs           Json              @default("[]")
-  fabric          String?
+  specs               Json              @default("[]")
+  fabric              String?
   /// string[]
-  sizes           Json              @default("[]")
-  packing         String?
-  quote_enabled   Boolean           @default(true)
-  retail_enabled  Boolean           @default(false)
-  price           Float?
-  currency        String            @default("INR")
-  is_published    Boolean           @default(false)
-  is_featured     Boolean           @default(false)
-  archived_at     DateTime?
-  seo_title       String?
-  seo_description String?
-  legacy_id       Int?              @unique
-  legacy_url      String?
-  created_at      DateTime          @default(now())
-  updated_at      DateTime          @updatedAt
-  images          ProductImage[]
-  enquiry_items   EnquiryItem[]
-  order_items     RetailOrderItem[]
+  sizes               Json              @default("[]")
+  packing             String?
+  quote_enabled       Boolean           @default(true)
+  retail_enabled      Boolean           @default(false)
+  price               Float?
+  currency            String            @default("INR")
+  is_published        Boolean           @default(false)
+  is_featured         Boolean           @default(false)
+  archived_at         DateTime?
+  /// When true, stock is counted per size (see ProductStock): orders are limited to what is on hand and the shop shows low/out-of-stock tags.
+  track_inventory     Boolean           @default(false)
+  /// Total units on hand at or below which the shop shows an "Only N left" tag.
+  low_stock_threshold Int               @default(5)
+  seo_title           String?
+  seo_description     String?
+  legacy_id           Int?              @unique
+  legacy_url          String?
+  created_at          DateTime          @default(now())
+  updated_at          DateTime          @updatedAt
+  images              ProductImage[]
+  enquiry_items       EnquiryItem[]
+  order_items         RetailOrderItem[]
+  stock               ProductStock[]
+  stock_movements     StockMovement[]
 
   @@index([category_id])
   @@index([is_published, created_at])
   @@map("products")
+}
+
+/// Units on hand for one size of a product. size is "" for products without sizes.
+model ProductStock {
+  id         String   @id @default(uuid())
+  product_id String
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  size       String   @default("")
+  quantity   Int      @default(0)
+  updated_at DateTime @updatedAt
+
+  @@unique([product_id, size])
+  @@map("product_stock")
+}
+
+/// Append-only history of every stock change. reason: adjustment | order | order_cancelled | initial.
+model StockMovement {
+  id             String   @id @default(uuid())
+  product_id     String
+  product        Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  size           String   @default("")
+  delta          Int
+  quantity_after Int
+  reason         String
+  note           String?
+  actor          String?
+  order_id       String?
+  created_at     DateTime @default(now())
+
+  @@index([product_id, created_at])
+  @@map("stock_movements")
 }
 
 model ProductImage {

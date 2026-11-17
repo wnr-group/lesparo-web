@@ -1,6 +1,7 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 import { prisma } from "@/lib/db";
+import { OutOfStockError, reserveStock } from "@/lib/inventory/stock";
 import { razorpayEnabled } from "@/lib/payments/razorpay";
 import { hitRateLimit, rateLimitKey } from "@/lib/services/enquiries";
 import type { OrderInput } from "@/lib/validation/order";
@@ -41,7 +42,9 @@ export async function placeOrder(input: OrderInput, clientId: string, customerId
   // The buyer's private key to this order's status and payment page.
   const accessToken = randomBytes(24).toString("base64url");
 
-  const order = await prisma.$transaction(async (tx) => {
+  let order: { id: string; order_number: string };
+  try {
+    order = await prisma.$transaction(async (tx) => {
     const counter = await tx.counter.upsert({ where: { name: "order_number" }, create: { name: "order_number", value: 1 }, update: { value: { increment: 1 } } });
     const year = new Intl.DateTimeFormat("en-IN", { year: "numeric", timeZone: "Asia/Kolkata" }).format(new Date());
     return tx.retailOrder.create({
@@ -64,7 +67,14 @@ export async function placeOrder(input: OrderInput, clientId: string, customerId
         items: { create: lines },
       },
       select: { id: true, order_number: true },
+    }).then(async (o) => {
+      await reserveStock(tx, o.id, lines);
+      return o;
     });
   });
+  } catch (err) {
+    if (err instanceof OutOfStockError) return { ok: false, message: err.available > 0 ? `Sorry, only ${err.available} of ${err.productName}${err.size ? ` in size ${err.size}` : ""} left. Please lower the quantity in your cart.` : `Sorry, ${err.productName}${err.size ? ` in size ${err.size}` : ""} is out of stock. Please remove it from your cart.` };
+    throw err;
+  }
   return { ok: true, orderId: order.id, created: true, orderNumber: order.order_number, subtotal, currency, paymentMethod: input.paymentMethod, accessToken };
 }

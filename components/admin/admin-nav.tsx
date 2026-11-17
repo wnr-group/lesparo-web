@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { FolderTree, Home, Inbox, LayoutDashboard, Package, ShoppingBag, Tag, Users } from "lucide-react";
+import { FolderTree, Home, Inbox, LayoutDashboard, Package, Boxes, ShoppingBag, Tag, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useNotifications } from "./notifications";
@@ -12,6 +12,7 @@ const LINKS = [
   { href: "/admin/orders", label: "Retail orders", icon: ShoppingBag },
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/inventory", label: "Inventory", icon: Boxes },
   { href: "/admin/pricing", label: "Pricing", icon: Tag },
   { href: "/admin/categories", label: "Categories", icon: FolderTree },
   { href: "/admin/content", label: "Homepage", icon: Home },

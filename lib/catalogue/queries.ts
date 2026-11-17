@@ -4,6 +4,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { publicMediaUrl } from "@/lib/storage";
 import { DEFAULT_HOMEPAGE, homepageSchema, type HomepageContent } from "@/lib/validation/content";
+import { stockInfo, type StockInfo } from "@/lib/inventory/status";
 import type { Spec } from "./legacy-description";
 
 /** Every catalogue read is tagged; admin mutations call updateTag(CATALOGUE_TAG). */
@@ -35,6 +36,10 @@ export type ProductCard = {
   currency: string;
   category: { name: string; slug: string } | null;
   images: ProductImage[];
+  /** Low / out-of-stock state; level is "untracked" for products whose stock is not managed. */
+  stock: StockInfo;
+  /** Sizes with nothing left (only for products with tracked stock). */
+  soldOutSizes: string[];
 };
 
 export type ProductDetail = ProductCard & {
@@ -61,6 +66,7 @@ export type CategoryNode = Category & { children: CategoryNode[] };
 const CARD_INCLUDE = {
   category: { select: { name: true, slug: true } },
   images: { orderBy: { display_order: "asc" }, select: { storage_path: true, alt_text: true, width: true, height: true } },
+  stock: { select: { size: true, quantity: true } },
 } satisfies Prisma.ProductInclude;
 
 type CardRow = Prisma.ProductGetPayload<{ include: typeof CARD_INCLUDE }>;
@@ -88,6 +94,8 @@ function toCard(row: CardRow): ProductCard {
     currency: row.currency,
     category: row.category,
     images: row.images.map((i) => ({ url: publicMediaUrl(i.storage_path)!, alt: i.alt_text || row.name, width: i.width, height: i.height })),
+    stock: stockInfo(row.track_inventory, row.low_stock_threshold, row.stock.map((r) => r.quantity)),
+    soldOutSizes: row.track_inventory ? jsonStrings(row.sizes).filter((z) => !(row.stock.find((r) => r.size === z)?.quantity ?? 0)) : [],
   };
 }
 

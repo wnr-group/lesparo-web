@@ -4,6 +4,9 @@ import { refresh } from "next/cache";
 import { z } from "zod";
 import { AuthorizationError, requireAdmin, requireStaff } from "@/lib/auth/staff";
 import { prisma } from "@/lib/db";
+import { releaseStock } from "@/lib/inventory/stock";
+import { updateTag } from "next/cache";
+import { CATALOGUE_TAG } from "@/lib/catalogue/queries";
 import { notifyOrderStatus } from "@/lib/email/notifications";
 import { reconcileOrder } from "@/lib/services/payments";
 import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/lib/validation/order";
@@ -48,6 +51,11 @@ export async function updateOrder(id: string, _prev: ActionState, fd: FormData):
     ]);
     // The customer is told once per status (the email key includes the status), after the change is saved.
     if (status !== order.status) notifyOrderStatus(orderId, status);
+    // A cancelled order returns its units to stock (once), so the shop tags update straight away.
+    if (status === "cancelled" && order.status !== "cancelled") {
+      await prisma.$transaction((tx) => releaseStock(tx, orderId, actor));
+      updateTag(CATALOGUE_TAG);
+    }
     refresh();
     return { ok: true };
   } catch (err) {

@@ -1,6 +1,8 @@
 "use server";
 
 import { headers } from "next/headers";
+import { updateTag } from "next/cache";
+import { CATALOGUE_TAG } from "@/lib/catalogue/queries";
 import { getCustomer } from "@/lib/auth/customer";
 import { notifyOrderPlaced } from "@/lib/email/notifications";
 import { fieldErrors } from "@/lib/services/enquiry-form";
@@ -41,7 +43,11 @@ export async function placeOrderAction(_prev: CheckoutState, fd: FormData): Prom
   }
   if (!result.ok) return { status: "error", message: result.message, fields: {} };
   // Confirmation email (deduplicated per order, so a double submit sends one).
-  if (result.orderId && result.created) notifyOrderPlaced(result.orderId);
+  if (result.orderId && result.created) {
+    notifyOrderPlaced(result.orderId);
+    // Stock just dropped: refresh the cached shop pages so "Only N left" tags are current.
+    updateTag(CATALOGUE_TAG);
+  }
   if (result.paymentMethod === "razorpay" && result.accessToken) return { status: "payment", orderNumber: result.orderNumber, accessToken: result.accessToken };
   return { status: "success", orderNumber: result.orderNumber, subtotal: result.subtotal, currency: result.currency };
 }

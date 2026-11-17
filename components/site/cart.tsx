@@ -102,14 +102,14 @@ export function CartLink({ className }: { className?: string }) {
   );
 }
 
-export type BuyableProduct = { id: string; slug: string; name: string; image: string | null; price: number; currency: string; sizes: string[] };
+export type BuyableProduct = { id: string; slug: string; name: string; image: string | null; price: number; currency: string; sizes: string[]; /** Sizes with no stock left; shown but not selectable. */ soldOutSizes?: string[] };
 
 /** Product page purchase box: size, quantity, Add to cart and Buy now. */
 export function RetailPurchase({ product }: { product: BuyableProduct }) {
   const cart = useCart();
   const router = useRouter();
   const uid = useId();
-  const [size, setSize] = useState<string | null>(product.sizes.length === 1 ? product.sizes[0] : null);
+  const [size, setSize] = useState<string | null>(product.sizes.length === 1 && !product.soldOutSizes?.includes(product.sizes[0]) ? product.sizes[0] : null);
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState("");
   const [justAdded, setJustAdded] = useState(false);
@@ -134,14 +134,17 @@ export function RetailPurchase({ product }: { product: BuyableProduct }) {
             {size && <span className="text-muted">{size}</span>}
           </legend>
           <div className="mt-3 flex flex-wrap gap-2">
-            {product.sizes.map((s) => (
+            {product.sizes.map((s) => {
+              const soldOut = product.soldOutSizes?.includes(s) ?? false;
+              return (
               <label key={s} className="relative">
-                <input type="radio" name={`${uid}-size`} value={s} checked={size === s} onChange={() => (setSize(s), setError(""))} className="peer sr-only" />
-                <span className="flex h-11 min-w-[3.25rem] cursor-pointer items-center justify-center rounded-md border border-sand bg-white px-4 text-sm font-medium transition-[border-color,background-color,color] duration-200 hover:border-ink peer-checked:border-ink peer-checked:bg-ink peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-indigo">
+                <input type="radio" name={`${uid}-size`} value={s} checked={size === s} disabled={soldOut} onChange={() => (setSize(s), setError(""))} className="peer sr-only" />
+                <span className={clsx("flex h-11 min-w-[3.25rem] cursor-pointer items-center justify-center rounded-md border border-sand bg-white px-4 text-sm font-medium transition-[border-color,background-color,color] duration-200 hover:border-ink peer-checked:border-ink peer-checked:bg-ink peer-checked:text-white peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-indigo", soldOut && "!cursor-not-allowed !border-line !bg-paper text-muted line-through hover:!border-line")}>
                   {s}
                 </span>
               </label>
-            ))}
+              );
+            })}
           </div>
         </fieldset>
       )}
