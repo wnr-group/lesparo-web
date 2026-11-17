@@ -42,6 +42,9 @@ export async function reserveStock(tx: Tx, orderId: string, lines: { product_id:
 
 /** Puts an order's units back when it is cancelled. Safe to call twice: it does nothing if the order was already returned. */
 export async function releaseStock(tx: Tx, orderId: string, actor: string | null) {
+  // Lock the order row first: two cancellations at the same moment queue up here, so the "already returned?" check below
+  // always sees the first one's result and the units go back once.
+  await tx.$queryRaw`SELECT id FROM retail_orders WHERE id = ${orderId} FOR UPDATE`;
   const taken = await tx.stockMovement.findMany({ where: { order_id: orderId, reason: "order" } });
   if (!taken.length) return;
   if (await tx.stockMovement.findFirst({ where: { order_id: orderId, reason: "order_cancelled" }, select: { id: true } })) return;
