@@ -95,7 +95,7 @@ describe.skipIf(!DB)("stock safety (real Postgres)", () => {
     it("sales staff cannot change stock", async () => {
       const p = await product({ M: 5 });
       sales();
-      const r = await inv.saveStock(p.id, {}, fd({ track: "on", threshold: "3", "qty:M": "999" }));
+      const r = await inv.saveStock(p.id, {}, fd({ track: "on", threshold: "3", "qty:M": "999", "was:M": "5" }));
       expect(r.ok).toBeUndefined();
       expect(await qty(p.id)).toBe(5);
     });
@@ -184,6 +184,101 @@ describe.skipIf(!DB)("stock safety (real Postgres)", () => {
       expect((await setStatus(o.orderId, "cancelled")).ok).toBe(true);
       expect(await qty(p.id)).toBe(10);
       expect(await prisma.orderAudit.count({ where: { order_id: o.orderId, to_value: "cancelled" } })).toBe(1);
+    });
+  });
+
+  describe("saving stock cannot overwrite sales or lose history (H1, M2, M5)", () => {
+    const save = (id: string, o: Record<string, string>) => inv.saveStock(id, {}, fd({ track: "on", threshold: "3", ...o }));
+
+    it("a stale form that only changes the threshold leaves sales alone", async () => {
+      const p = await product({ M: 5 });
+      admin();
+      await place(p.id, { quantity: 2 }); // the admin's page still says 5
+      const r = await save(p.id, { threshold: "4", "qty:M": "5", "was:M": "5" });
+      expect(r.ok).toBe(true);
+      expect(await qty(p.id)).toBe(3);
+      expect((await prisma.product.findUniqueOrThrow({ where: { id: p.id } })).low_stock_threshold).toBe(4);
+    });
+
+    it("an edit made from a stale page is refused, and nothing in that save is applied", async () => {
+      const p = await product({ M: 5, L: 5 });
+      admin();
+      await place(p.id, { quantity: 2 }); // M is now 3
+      const r = await save(p.id, { threshold: "9", "qty:M": "20", "was:M": "5", "qty:L": "7", "was:L": "5" });
+      expect(r.ok).toBeUndefined();
+      expect(r.error).toMatch(/changed from 5 to 3/);
+      expect(await qty(p.id)).toBe(3);
+      expect(await qty(p.id, "L")).toBe(5);
+      expect((await prisma.product.findUniqueOrThrow({ where: { id: p.id } })).low_stock_threshold).toBe(3);
+    });
+
+    it("an edit from an up-to-date page is applied and logged with the true before and after", async () => {
+      const p = await product({ M: 5 });
+      admin();
+      const r = await save(p.id, { "qty:M": "12", "was:M": "5", note: "delivery" });
+      expect(r.ok).toBe(true);
+      expect(await qty(p.id)).toBe(12);
+      const m = await prisma.stockMovement.findFirstOrThrow({ where: { product_id: p.id } });
+      expect([m.delta, m.quantity_after, m.reason, m.note, m.actor]).toEqual([7, 12, "adjustment", "delivery", "admin@x"]);
+    });
+
+    it("two admins saving at once: one wins, the other is told, and the history adds up", async () => {
+      const p = await product({ M: 10 });
+      admin();
+      const [a, b] = await Promise.all([save(p.id, { "qty:M": "20", "was:M": "10" }), save(p.id, { "qty:M": "30", "was:M": "10" })]);
+      expect([a.ok, b.ok].filter(Boolean).length).toBe(1);
+      expect([a.error, b.error].filter(Boolean)[0]).toMatch(/changed from 10 to/);
+      const final = await qty(p.id);
+      expect([20, 30]).toContain(final);
+      const moves = await prisma.stockMovement.findMany({ where: { product_id: p.id } });
+      expect(moves.length).toBe(1);
+      expect(10 + moves.reduce((n, m) => n + m.delta, 0)).toBe(final);
+    });
+
+    it("saving twice with the same values changes nothing the second time", async () => {
+      const p = await product({ M: 5 });
+      admin();
+      await save(p.id, { "qty:M": "9", "was:M": "5" });
+      const again = await save(p.id, { "qty:M": "9", "was:M": "9" });
+      expect(again.ok).toBe(true);
+      expect(await prisma.stockMovement.count({ where: { product_id: p.id } })).toBe(1);
+    });
+
+    it("a blank quantity is an error, not zero", async () => {
+      const p = await product({ M: 8 });
+      admin();
+      const r = await save(p.id, { "qty:M": "", "was:M": "8" });
+      expect(r.ok).toBeUndefined();
+      expect(r.fields?.["qty:M"]).toMatch(/Enter a number/);
+      expect(await qty(p.id)).toBe(8);
+    });
+
+    it("negative, fractional and missing was-values are refused", async () => {
+      const p = await product({ M: 8 });
+      admin();
+      expect((await save(p.id, { "qty:M": "-1", "was:M": "8" })).ok).toBeUndefined();
+      expect((await save(p.id, { "qty:M": "2.5", "was:M": "8" })).ok).toBeUndefined();
+      const noWas = await inv.saveStock(p.id, {}, fd({ track: "on", threshold: "3", "qty:M": "9" }));
+      expect(noWas.error).toMatch(/out of date/);
+      expect(await qty(p.id)).toBe(8);
+    });
+
+    it("a size with no stock row yet can be set for the first time and is logged as the initial count", async () => {
+      const p = await prisma.product.create({ data: { name: "New", slug: `n-${randomUUID()}`, is_published: true, sizes: ["M"], track_inventory: false } });
+      admin();
+      const r = await save(p.id, { "qty:M": "6", "was:M": "0" });
+      expect(r.ok).toBe(true);
+      expect(await qty(p.id)).toBe(6);
+      expect((await prisma.stockMovement.findFirstOrThrow({ where: { product_id: p.id } })).reason).toBe("initial");
+    });
+
+    it("sales staff and signed-out visitors still cannot save", async () => {
+      const p = await product({ M: 5 });
+      sales();
+      expect((await save(p.id, { "qty:M": "99", "was:M": "5" })).ok).toBeUndefined();
+      auth.session = null;
+      expect((await save(p.id, { "qty:M": "99", "was:M": "5" })).ok).toBeUndefined();
+      expect(await qty(p.id)).toBe(5);
     });
   });
 });

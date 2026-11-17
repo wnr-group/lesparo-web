@@ -58,9 +58,12 @@ export default async function ProductInventoryPage(props: PageProps<"/admin/inve
             </div>
             <div className="mt-5">
               <p className="mb-2 text-sm font-medium">{sizes.length ? "Units on hand by size" : "Units on hand"}</p>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {/* The key remounts the inputs when the stored counts change, so the page never shows numbers the database no longer has. */}
+              <div key={keys.map((k) => qtyOf(k)).join(",")} className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {keys.map((k) => (
                   <div key={k || "one"}>
+                    {/* What this admin was looking at: the save is refused if the stock has moved since. */}
+                    <input type="hidden" name={`was:${k}`} value={qtyOf(k)} readOnly />
                     <label htmlFor={`qty:${k}`} className="mb-1 block text-xs text-muted">
                       {k || "Quantity"}
                     </label>
