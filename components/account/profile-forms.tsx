@@ -28,7 +28,7 @@ export function EmailForm({ email }: { email: string }) {
         Your sign-in email is <strong>{email}</strong>. To change it, confirm with your password. We will email a link to the new address, and nothing changes until you open it.
       </p>
       <div className="grid gap-5 sm:grid-cols-2">
-        <TextField label="New email" name="email" type="email" autoComplete="email" required state={state} />
+        <TextField label="New email" name="email" type="email" autoComplete="off" required state={state} />
         <TextField label="Current password" name="currentPassword" type="password" autoComplete="current-password" required state={state} />
       </div>
       <Result state={state} />

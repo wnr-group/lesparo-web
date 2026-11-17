@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
+import Loading from "../loading";
 import { EmailForm, PasswordForm, ProfileForm } from "@/components/account/profile-forms";
 import { requireCustomerPage } from "@/lib/auth/customer";
 
@@ -16,7 +17,16 @@ function Section({ id, title, children }: { id: string; title: string; children:
   );
 }
 
-export default async function ProfilePage() {
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <ProfileContent />
+    </Suspense>
+  );
+}
+
+/** Reads the customer session, so it streams in behind the Suspense boundary above instead of blocking the navigation. */
+async function ProfileContent() {
   const me = await requireCustomerPage("/account/profile");
   return (
     <div className="space-y-8">
