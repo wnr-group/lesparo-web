@@ -16,6 +16,8 @@ export function SmoothScroll() {
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Lenis only smooths wheel scrolling (touch is left alone), but its frame loop would still run on every phone for nothing.
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     const instance = new Lenis({
       autoRaf: true,
       // Quick to follow the wheel (a low lerp feels floaty and slow), and a little more distance per notch.
