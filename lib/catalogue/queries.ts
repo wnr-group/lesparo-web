@@ -4,7 +4,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { prisma } from "@/lib/db";
 import { publicMediaUrl } from "@/lib/storage";
 import { DEFAULT_HOMEPAGE, homepageSchema, type HomepageContent } from "@/lib/validation/content";
-import { stockInfo, type StockInfo } from "@/lib/inventory/status";
+import { liveQuantities, stockInfo, type StockInfo } from "@/lib/inventory/status";
 import type { Spec } from "./legacy-description";
 
 /** Every catalogue read is tagged; admin mutations call updateTag(CATALOGUE_TAG). */
@@ -94,7 +94,7 @@ function toCard(row: CardRow): ProductCard {
     currency: row.currency,
     category: row.category,
     images: row.images.map((i) => ({ url: publicMediaUrl(i.storage_path)!, alt: i.alt_text || row.name, width: i.width, height: i.height })),
-    stock: stockInfo(row.track_inventory, row.low_stock_threshold, row.stock.map((r) => r.quantity)),
+    stock: stockInfo(row.track_inventory, row.low_stock_threshold, liveQuantities(jsonStrings(row.sizes), row.stock)),
     soldOutSizes: row.track_inventory ? jsonStrings(row.sizes).filter((z) => !(row.stock.find((r) => r.size === z)?.quantity ?? 0)) : [],
   };
 }

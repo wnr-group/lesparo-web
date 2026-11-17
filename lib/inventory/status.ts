@@ -4,6 +4,15 @@ export type StockInfo = { level: StockLevel; /** Units on hand across all sizes 
 
 export const DEFAULT_LOW_STOCK = 5;
 
+/**
+ * The quantities that count: one per size the product currently offers (or the single no-size row). Stock left behind for a
+ * size that was removed from the product is ignored, so it cannot make a sold-out product look in stock.
+ */
+export function liveQuantities(sizes: string[], rows: { size: string; quantity: number }[]): number[] {
+  const offered = sizes.length ? new Set(sizes) : new Set([""]);
+  return rows.filter((r) => offered.has(r.size)).map((r) => r.quantity);
+}
+
 export function stockInfo(track: boolean, threshold: number, quantities: number[]): StockInfo {
   if (!track) return { level: "untracked", total: 0 };
   const total = quantities.reduce((n, q) => n + Math.max(0, q), 0);

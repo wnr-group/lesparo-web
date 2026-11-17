@@ -6,7 +6,7 @@ import { Alert, Badge } from "@/components/ui/primitives";
 import { getStaffSession } from "@/lib/auth/staff";
 import { jsonStrings } from "@/lib/catalogue/queries";
 import { requestDb } from "@/lib/db";
-import { stockInfo } from "@/lib/inventory/status";
+import { liveQuantities, stockInfo } from "@/lib/inventory/status";
 import { saveStock } from "../actions";
 
 const REASONS: Record<string, string> = { initial: "Initial count", adjustment: "Adjustment", order: "Retail order", order_cancelled: "Order cancelled" };
@@ -27,7 +27,7 @@ export default async function ProductInventoryPage(props: PageProps<"/admin/inve
   const sizes = jsonStrings(p.sizes);
   const keys = sizes.length ? sizes : [""];
   const qtyOf = (k: string) => p.stock.find((s) => s.size === k)?.quantity ?? 0;
-  const info = stockInfo(p.track_inventory, p.low_stock_threshold, p.stock.map((s) => s.quantity));
+  const info = stockInfo(p.track_inventory, p.low_stock_threshold, liveQuantities(sizes, p.stock));
 
   return (
     <>

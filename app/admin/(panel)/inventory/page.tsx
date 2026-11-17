@@ -5,7 +5,7 @@ import { Badge, EmptyState } from "@/components/ui/primitives";
 import type { Prisma } from "@prisma/client";
 import { jsonStrings, sanitiseSearch } from "@/lib/catalogue/queries";
 import { requestDb } from "@/lib/db";
-import { stockInfo } from "@/lib/inventory/status";
+import { liveQuantities, stockInfo } from "@/lib/inventory/status";
 
 const PAGE_SIZE = 40;
 
@@ -34,7 +34,7 @@ export default async function InventoryPage(props: PageProps<"/admin/inventory">
     select: { id: true, name: true, sku: true, sizes: true, track_inventory: true, low_stock_threshold: true, category: { select: { name: true } }, stock: { select: { size: true, quantity: true } } },
     orderBy: { name: "asc" },
   });
-  const rows = all.map((p) => ({ ...p, info: stockInfo(p.track_inventory, p.low_stock_threshold, p.stock.map((s) => s.quantity)) }));
+  const rows = all.map((p) => ({ ...p, info: stockInfo(p.track_inventory, p.low_stock_threshold, liveQuantities(jsonStrings(p.sizes), p.stock)) }));
   const lowCount = rows.filter((p) => p.info.level === "low").length;
   const outCount = rows.filter((p) => p.info.level === "out").length;
   const filtered = show === "out" ? rows.filter((p) => p.info.level === "out") : show === "low" ? rows.filter((p) => p.info.level === "low" || p.info.level === "out") : rows;
