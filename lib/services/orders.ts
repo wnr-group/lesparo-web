@@ -2,6 +2,7 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 import { prisma } from "@/lib/db";
 import { OutOfStockError, reserveStock } from "@/lib/inventory/stock";
+import { paymentDeadline } from "@/lib/services/order-lifecycle";
 import { razorpayEnabled } from "@/lib/payments/razorpay";
 import { hitRateLimit, rateLimitKey } from "@/lib/services/enquiries";
 import type { OrderInput } from "@/lib/validation/order";
@@ -61,6 +62,7 @@ export async function placeOrder(input: OrderInput, clientId: string, customerId
         postcode: input.postcode,
         notes: input.notes,
         payment_method: input.paymentMethod,
+        payment_due_at: input.paymentMethod === "razorpay" ? paymentDeadline() : null,
         access_token: accessToken,
         currency,
         subtotal,

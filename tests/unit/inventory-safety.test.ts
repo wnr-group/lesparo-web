@@ -12,6 +12,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 vi.mock("next/cache", () => ({ cacheLife() {}, cacheTag() {}, updateTag() {}, refresh() {}, revalidateTag() {} }));
 vi.mock("next/navigation", () => ({ redirect() {} }));
+vi.mock("next/server", async (importOriginal) => ({ ...(await importOriginal<typeof import("next/server")>()), connection: async () => {} }));
 vi.mock("@/lib/email/notifications", () => ({ notifyOrderStatus() {}, notifyOrderPlaced() {}, notifyPaymentSuccess() {}, notifyPaymentFailed() {}, retryFailedEmails: async () => 0 }));
 const auth = vi.hoisted(() => ({ session: null as null | { userId: string; email: string; isAdmin: boolean } }));
 vi.mock("@/lib/auth/staff", () => {
@@ -36,6 +37,8 @@ let orders: typeof import("@/lib/services/orders");
 let stock: typeof import("@/lib/inventory/stock");
 let inv: typeof import("@/app/admin/(panel)/inventory/actions");
 let ordAct: typeof import("@/app/admin/(panel)/orders/actions");
+let life: typeof import("@/lib/services/order-lifecycle");
+let pay: typeof import("@/lib/services/payments");
 let ip = 0;
 const client = () => `10.8.0.${++ip}`;
 const admin = () => (auth.session = { userId: "a1", email: "admin@x", isAdmin: true });
@@ -74,6 +77,8 @@ describe.skipIf(!DB)("stock safety (real Postgres)", () => {
     stock = await import("@/lib/inventory/stock");
     inv = await import("@/app/admin/(panel)/inventory/actions");
     ordAct = await import("@/app/admin/(panel)/orders/actions");
+    life = await import("@/lib/services/order-lifecycle");
+    pay = await import("@/lib/services/payments");
     await prisma.rateLimit.deleteMany();
   }, 120_000);
   afterAll(async () => {
@@ -278,6 +283,126 @@ describe.skipIf(!DB)("stock safety (real Postgres)", () => {
       expect((await save(p.id, { "qty:M": "99", "was:M": "5" })).ok).toBeUndefined();
       auth.session = null;
       expect((await save(p.id, { "qty:M": "99", "was:M": "5" })).ok).toBeUndefined();
+      expect(await qty(p.id)).toBe(5);
+    });
+  });
+
+  describe("unpaid online orders give their stock back (H3)", () => {
+    const later = (mins: number) => new Date(Date.now() + mins * 60_000);
+    const gateway = () => ({
+      createOrder: async (i: { amount: number; currency: string }) => ({ id: `order_${randomUUID().slice(0, 8)}`, amount: i.amount, currency: i.currency }),
+      fetchPayment: async (): Promise<never> => {
+        throw new Error("n/a");
+      },
+      fetchOrderPayments: async () => [],
+    });
+
+    it("an online order takes stock and gets a payment deadline about 30 minutes out", async () => {
+      const p = await product({ M: 5 });
+      const o = await place(p.id, { quantity: 2, method: "razorpay" });
+      expect(await qty(p.id)).toBe(3);
+      const row = await prisma.retailOrder.findUniqueOrThrow({ where: { id: o.orderId } });
+      const mins = (row.payment_due_at!.getTime() - Date.now()) / 60000;
+      expect(mins).toBeGreaterThan(25);
+      expect(mins).toBeLessThan(31);
+    });
+
+    it("cash on delivery orders have no deadline and are never expired", async () => {
+      const p = await product({ M: 5 });
+      const o = await place(p.id, { method: "cod" });
+      expect((await prisma.retailOrder.findUniqueOrThrow({ where: { id: o.orderId } })).payment_due_at).toBeNull();
+      expect(await life.expireUnpaidOrders(later(24 * 60))).not.toContain(o.orderId);
+      expect(await qty(p.id)).toBe(4);
+    });
+
+    it("nothing happens before the deadline", async () => {
+      const p = await product({ M: 5 });
+      const o = await place(p.id, { method: "razorpay" });
+      expect(await life.expireUnpaidOrders(new Date())).not.toContain(o.orderId);
+      expect(await qty(p.id)).toBe(4);
+    });
+
+    it("after the deadline the order is cancelled, the stock returns once, and it is logged as the system", async () => {
+      const p = await product({ M: 5 });
+      const o = await place(p.id, { quantity: 3, method: "razorpay" });
+      expect(await life.expireUnpaidOrders(later(31))).toContain(o.orderId);
+      expect((await prisma.retailOrder.findUniqueOrThrow({ where: { id: o.orderId } })).status).toBe("cancelled");
+      expect(await qty(p.id)).toBe(5);
+      expect(await life.expireUnpaidOrders(later(31))).not.toContain(o.orderId);
+      expect(await qty(p.id)).toBe(5);
+      expect((await prisma.orderAudit.findFirstOrThrow({ where: { order_id: o.orderId, actor: "system" } })).to_value).toMatch(/cancelled/);
+    });
+
+    it("two releases at the same moment return the stock once", async () => {
+      const p = await product({ M: 5 });
+      const o = await place(p.id, { quantity: 2, method: "razorpay" });
+      await Promise.all([life.expireUnpaidOrders(later(31)), life.expireUnpaidOrders(later(31)), life.expireUnpaidOrders(later(31))]);
+      expect(await qty(p.id)).toBe(5);
+      expect(await prisma.stockMovement.count({ where: { order_id: o.orderId, reason: "order_cancelled" } })).toBe(1);
+    });
+
+    it("a failed payment is released too once the deadline passes", async () => {
+      const p = await product({ M: 5 });
+      const o = await place(p.id, { method: "razorpay" });
+      await prisma.retailOrder.update({ where: { id: o.orderId }, data: { payment_status: "failed" } });
+      expect(await life.expireUnpaidOrders(later(31))).toContain(o.orderId);
+      expect(await qty(p.id)).toBe(5);
+    });
+
+    it("a paid order and an order waiting for capture are never cancelled", async () => {
+      const p = await product({ M: 5 });
+      const paid = await place(p.id, { method: "razorpay" });
+      const waiting = await place(p.id, { method: "razorpay" });
+      await prisma.retailOrder.update({ where: { id: paid.orderId }, data: { payment_status: "paid" } });
+      await prisma.retailOrder.update({ where: { id: waiting.orderId }, data: { payment_status: "verifying" } });
+      const done = await life.expireUnpaidOrders(later(120));
+      expect(done).not.toContain(paid.orderId);
+      expect(done).not.toContain(waiting.orderId);
+      expect(await qty(p.id)).toBe(3);
+    });
+
+    it("an order that is already cancelled is not released a second time", async () => {
+      const p = await product({ M: 5 });
+      const o = await place(p.id, { method: "razorpay" });
+      sales();
+      await setStatus(o.orderId, "cancelled");
+      expect(await qty(p.id)).toBe(5);
+      await life.expireUnpaidOrders(later(31));
+      expect(await qty(p.id)).toBe(5);
+    });
+
+    it("a buyer who starts paying gets a fresh window", async () => {
+      const p = await product({ M: 5 });
+      const o = await place(p.id, { method: "razorpay" });
+      await prisma.retailOrder.update({ where: { id: o.orderId }, data: { payment_due_at: later(1) } });
+      const row = await prisma.retailOrder.findUniqueOrThrow({ where: { id: o.orderId } });
+      const s = await pay.createPaymentSession(row.order_number, row.access_token!, client(), gateway() as never);
+      expect(s.ok).toBe(true);
+      const after = await prisma.retailOrder.findUniqueOrThrow({ where: { id: o.orderId } });
+      expect((after.payment_due_at!.getTime() - Date.now()) / 60000).toBeGreaterThan(25);
+    });
+
+    it("the freed unit can be bought by someone else", async () => {
+      const p = await product({ M: 1 });
+      const first = await place(p.id, { method: "razorpay" });
+      expect((await orders.placeOrder(input(p.id), client())).ok).toBe(false);
+      await life.expireUnpaidOrders(later(31));
+      expect((await orders.placeOrder(input(p.id), client())).ok).toBe(true);
+      expect((await prisma.retailOrder.findUniqueOrThrow({ where: { id: first.orderId } })).status).toBe("cancelled");
+    });
+
+    it("the release job route runs it (with the secret) and is closed without it", async () => {
+      process.env.CRON_SECRET = "cron-secret-for-tests-0123456789";
+      const route = await import("@/app/api/jobs/run/route");
+      const p = await product({ M: 5 });
+      const o = await place(p.id, { method: "razorpay" });
+      await prisma.retailOrder.update({ where: { id: o.orderId }, data: { payment_due_at: new Date(Date.now() - 1000) } });
+      const denied = await route.GET(new Request("http://x/api/jobs/run"));
+      expect(denied.status).toBe(401);
+      expect(await qty(p.id)).toBe(4);
+      const ok = await route.GET(new Request("http://x/api/jobs/run", { headers: { authorization: `Bearer ${process.env.CRON_SECRET}` } }));
+      expect(ok.status).toBe(200);
+      expect((await ok.json()).expiredOrders).toBeGreaterThanOrEqual(1);
       expect(await qty(p.id)).toBe(5);
     });
   });

@@ -349,6 +349,8 @@ model RetailOrder {
   /// True once the checkout signature was verified and the payment confirmed as captured.
   payment_verified    Boolean           @default(false)
   paid_at             DateTime?
+  /// Online-payment orders still unpaid at this time are cancelled and their stock released. Null for cash on delivery.
+  payment_due_at      DateTime?
   payments            Payment[]
   audits              OrderAudit[]
   /// The signed-in customer who placed the order (null for guest checkout).
@@ -367,6 +369,7 @@ model RetailOrder {
 
   @@index([status, created_at])
   @@index([customer_id, created_at])
+  @@index([payment_due_at])
   @@map("retail_orders")
 }
 

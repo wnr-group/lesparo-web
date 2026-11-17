@@ -6,6 +6,7 @@ import { CATALOGUE_TAG } from "@/lib/catalogue/queries";
 import { getCustomer } from "@/lib/auth/customer";
 import { notifyOrderPlaced } from "@/lib/email/notifications";
 import { fieldErrors } from "@/lib/services/enquiry-form";
+import { expireUnpaidOrders } from "@/lib/services/order-lifecycle";
 import { placeOrder } from "@/lib/services/orders";
 import { orderSchema } from "@/lib/validation/order";
 
@@ -34,6 +35,8 @@ export async function placeOrderAction(_prev: CheckoutState, fd: FormData): Prom
   const clientId = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "unknown";
   let result;
   try {
+    // Unpaid online orders past their deadline give their stock back before this order looks for it.
+    if ((await expireUnpaidOrders()).length) updateTag(CATALOGUE_TAG);
     // A signed-in customer's order is attached to their account; guest checkout stays as it was.
     const me = await getCustomer();
     result = await placeOrder(parsed.data, clientId, me?.id ?? null);

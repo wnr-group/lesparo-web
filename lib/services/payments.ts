@@ -5,6 +5,7 @@ import { decideSettlement, mergePaymentStatus, nextOrderPaymentStatus, orderAmou
 import { createGateway, razorpayConfig, type RazorpayGateway } from "@/lib/payments/razorpay";
 import { notifyPaymentFailed, notifyPaymentSuccess } from "@/lib/email/notifications";
 import { hitRateLimit, rateLimitKey } from "@/lib/services/enquiries";
+import { paymentDeadline } from "@/lib/services/order-lifecycle";
 
 /** Never include card, UPI or signature data in a log line: ids and short reasons only. */
 const log = (msg: string, extra?: Record<string, string | number | boolean | null>) => console.warn(`[razorpay] ${msg}`, extra ?? "");
@@ -69,6 +70,9 @@ export async function createPaymentSession(orderNumber: string, token: string, c
     }
     if (!razorpayOrderId || amount === null) return { ok: false, status: 500, message: "We could not start the payment. Please try again." };
   }
+
+  // The buyer is actively paying: give them a fresh window so the order is not cancelled under them.
+  await prisma.retailOrder.updateMany({ where: { id: order.id, payment_status: { in: ["pending", "failed"] } }, data: { payment_due_at: paymentDeadline() } });
 
   // A fresh attempt after a failure: show the order as awaiting payment again.
   if (order.payment_status === "failed") await prisma.retailOrder.updateMany({ where: { id: order.id, payment_status: "failed" }, data: { payment_status: "pending" } });
