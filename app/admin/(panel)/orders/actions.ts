@@ -47,18 +47,19 @@ export async function updateOrder(id: string, _prev: ActionState, fd: FormData):
     if (paymentChanged && paymentStatus === "refunded" && order.payment_method === "razorpay") await requireAdmin();
 
     const actor = session.email ?? session.userId;
-    await prisma.$transaction([
-      prisma.retailOrder.update({ where: { id: orderId }, data: { status, payment_status: paymentStatus, tracking_carrier: parsed.data.trackingCarrier, tracking_number: parsed.data.trackingNumber, tracking_url: parsed.data.trackingUrl } }),
-      ...(status !== order.status ? [prisma.orderAudit.create({ data: { order_id: orderId, actor, action: "order_status", from_value: order.status, to_value: status } })] : []),
-      ...(paymentChanged ? [prisma.orderAudit.create({ data: { order_id: orderId, actor, action: "payment_status", from_value: order.payment_status, to_value: paymentStatus } })] : []),
-    ]);
+    const cancelling = status === "cancelled" && order.status !== "cancelled";
+    // One transaction: the status change, its audit entries and (for a cancellation) the units going back to stock all succeed
+    // or all fail together. A failure can never leave an order cancelled with its stock still taken.
+    await prisma.$transaction(async (tx) => {
+      await tx.retailOrder.update({ where: { id: orderId }, data: { status, payment_status: paymentStatus, tracking_carrier: parsed.data.trackingCarrier, tracking_number: parsed.data.trackingNumber, tracking_url: parsed.data.trackingUrl } });
+      if (status !== order.status) await tx.orderAudit.create({ data: { order_id: orderId, actor, action: "order_status", from_value: order.status, to_value: status } });
+      if (paymentChanged) await tx.orderAudit.create({ data: { order_id: orderId, actor, action: "payment_status", from_value: order.payment_status, to_value: paymentStatus } });
+      if (cancelling) await releaseStock(tx, orderId, actor);
+    });
     // The customer is told once per status (the email key includes the status), after the change is saved.
     if (status !== order.status) notifyOrderStatus(orderId, status);
-    // A cancelled order returns its units to stock (once), so the shop tags update straight away.
-    if (status === "cancelled" && order.status !== "cancelled") {
-      await prisma.$transaction((tx) => releaseStock(tx, orderId, actor));
-      updateTag(CATALOGUE_TAG);
-    }
+    // The cancelled order's units are back on sale, so the shop tags update straight away.
+    if (cancelling) updateTag(CATALOGUE_TAG);
     refresh();
     return { ok: true };
   } catch (err) {

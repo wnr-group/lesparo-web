@@ -161,4 +161,29 @@ describe.skipIf(!DB)("stock safety (real Postgres)", () => {
       expect(await qty(p.id)).toBe(2);
     });
   });
+
+  describe("cancelling and returning stock happen together (M1)", () => {
+    it("a cancellation that fails while returning stock leaves the order not cancelled", async () => {
+      const INT_MAX = 2147483647;
+      const p = await product({ M: INT_MAX - 1 });
+      const o = await place(p.id, { quantity: 2 });
+      // Force the stock write in the cancellation to fail: the column is a 32-bit integer.
+      await prisma.productStock.update({ where: { product_id_size: { product_id: p.id, size: "M" } }, data: { quantity: INT_MAX } });
+      sales();
+      const r = await setStatus(o.orderId, "cancelled");
+      expect(r.ok).toBeUndefined();
+      const after = await prisma.retailOrder.findUniqueOrThrow({ where: { id: o.orderId } });
+      expect(after.status).toBe("new");
+      expect(await prisma.orderAudit.count({ where: { order_id: o.orderId, to_value: "cancelled" } })).toBe(0);
+      expect(await qty(p.id)).toBe(INT_MAX);
+    });
+    it("once the problem is gone the same cancellation can be retried and returns the stock", async () => {
+      const p = await product({ M: 10 });
+      const o = await place(p.id, { quantity: 2 });
+      sales();
+      expect((await setStatus(o.orderId, "cancelled")).ok).toBe(true);
+      expect(await qty(p.id)).toBe(10);
+      expect(await prisma.orderAudit.count({ where: { order_id: o.orderId, to_value: "cancelled" } })).toBe(1);
+    });
+  });
 });
