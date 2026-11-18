@@ -8,12 +8,11 @@ import type { NavColumn, NavItem, NavLink, NavTile } from "./nav/types";
 import { SiteNav } from "./site-nav";
 
 /**
- * The navigation, built from the live category tree: Shop, Men, Kids, Trending, About, Wholesale, Contact.
+ * The navigation, built from the live category tree: Shop, Men, Trending, About, Wholesale, Contact.
  * A link is only added when its category exists, so a menu never points at something the catalogue does not sell.
  * Photographs: Men and Women use studio/licensed photography in public/menu (see SOURCES.txt there); Kids and Hoodies use
  * existing project photography and real catalogue product photos. Catalogue product images themselves are never altered.
  */
-const cdn = (c?: CategoryNode) => c?.coverUrl ?? null;
 
 async function buildNav(): Promise<NavItem[]> {
   const tree = await getCategoryTree();
@@ -69,21 +68,6 @@ async function buildNav(): Promise<NavItem[]> {
         tiles: [...tile("gents-tracks", "Track pants", "/menu/men-movement.jpg", "50% 22%"), ...tile("gents-t-shirt", "T-shirts", "/menu/men-tee.jpg", "50% 22%")],
         shape: "portrait",
         cta: { label: "Explore men", href: "/collections/gents" },
-      },
-    });
-
-  if (has("kids") || has("boys"))
-    items.push({
-      key: "kids",
-      label: "Kids",
-      href: "/collections/kids",
-      panel: {
-        heading: "Kids",
-        blurb: "Sizes 20 to 28 for kids, and 30 to 36 for boys.",
-        columns: [...col("Kids", [...types("kids"), ...newest("kids")]), ...col("Boys", [...types("boys"), ...newest("boys")])],
-        tiles: [...tile("kids", "Kids", "/about/range-kids.jpg", "50% 25%"), ...tile("boys", "Boys", cdn(all.get("boys")), "50% 30%")],
-        shape: "square",
-        cta: { label: "Explore kids", href: "/collections/kids" },
       },
     });
 
