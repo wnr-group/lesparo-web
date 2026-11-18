@@ -1,17 +1,19 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 import { prisma } from "@/lib/db";
+import { OutOfStockError, reserveStock } from "@/lib/inventory/stock";
+import { paymentDeadline } from "@/lib/services/order-lifecycle";
 import { razorpayEnabled } from "@/lib/payments/razorpay";
 import { hitRateLimit, rateLimitKey } from "@/lib/services/enquiries";
 import type { OrderInput } from "@/lib/validation/order";
 
-export type PlaceOrderResult = { ok: true; orderNumber: string; subtotal: number; currency: string; paymentMethod: string; accessToken: string | null } | { ok: false; message: string };
+export type PlaceOrderResult = { ok: true; orderId?: string; /** False when a repeated submit returned the existing order. */ created?: boolean; orderNumber: string; subtotal: number; currency: string; paymentMethod: string; accessToken: string | null } | { ok: false; message: string };
 
 /**
  * Creates a retail order. Prices, names and availability are read from the database here; nothing the
  * browser sends about money is trusted. Idempotent on idempotencyKey so a double submit places one order.
  */
-export async function placeOrder(input: OrderInput, clientId: string): Promise<PlaceOrderResult> {
+export async function placeOrder(input: OrderInput, clientId: string, customerId: string | null = null): Promise<PlaceOrderResult> {
   const existing = await prisma.retailOrder.findUnique({ where: { idempotency_key: input.idempotencyKey }, select: { order_number: true, subtotal: true, currency: true, payment_method: true, access_token: true } });
   if (existing) return { ok: true, orderNumber: existing.order_number, subtotal: existing.subtotal, currency: existing.currency, paymentMethod: existing.payment_method, accessToken: existing.access_token };
 
@@ -41,11 +43,14 @@ export async function placeOrder(input: OrderInput, clientId: string): Promise<P
   // The buyer's private key to this order's status and payment page.
   const accessToken = randomBytes(24).toString("base64url");
 
-  const order = await prisma.$transaction(async (tx) => {
+  let order: { id: string; order_number: string };
+  try {
+    order = await prisma.$transaction(async (tx) => {
     const counter = await tx.counter.upsert({ where: { name: "order_number" }, create: { name: "order_number", value: 1 }, update: { value: { increment: 1 } } });
     const year = new Intl.DateTimeFormat("en-IN", { year: "numeric", timeZone: "Asia/Kolkata" }).format(new Date());
     return tx.retailOrder.create({
       data: {
+        customer_id: customerId,
         order_number: `ORD-${year}-${String(counter.value).padStart(5, "0")}`,
         idempotency_key: input.idempotencyKey,
         customer_name: input.customerName,
@@ -57,13 +62,21 @@ export async function placeOrder(input: OrderInput, clientId: string): Promise<P
         postcode: input.postcode,
         notes: input.notes,
         payment_method: input.paymentMethod,
+        payment_due_at: input.paymentMethod === "razorpay" ? paymentDeadline() : null,
         access_token: accessToken,
         currency,
         subtotal,
         items: { create: lines },
       },
-      select: { order_number: true },
+      select: { id: true, order_number: true },
+    }).then(async (o) => {
+      await reserveStock(tx, o.id, lines);
+      return o;
     });
   });
-  return { ok: true, orderNumber: order.order_number, subtotal, currency, paymentMethod: input.paymentMethod, accessToken };
+  } catch (err) {
+    if (err instanceof OutOfStockError) return { ok: false, message: err.available > 0 ? `Sorry, only ${err.available} of ${err.productName}${err.size ? ` in size ${err.size}` : ""} left. Please lower the quantity in your cart.` : `Sorry, ${err.productName}${err.size ? ` in size ${err.size}` : ""} is out of stock. Please remove it from your cart.` };
+    throw err;
+  }
+  return { ok: true, orderId: order.id, created: true, orderNumber: order.order_number, subtotal, currency, paymentMethod: input.paymentMethod, accessToken };
 }

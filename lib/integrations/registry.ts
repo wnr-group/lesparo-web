@@ -4,6 +4,7 @@ import { AbijaCrm } from "./crm/abija";
 import { MockCrm } from "./crm/mock";
 import type { CrmAdapter } from "./crm/types";
 import { MockEmail } from "./email/mock";
+import { SmtpEmail } from "./email/smtp";
 import type { EmailAdapter } from "./email/types";
 
 // Module-level singletons so the mock keeps state for a dev server's lifetime.
@@ -26,7 +27,7 @@ export function getCrm(): CrmAdapter | null {
 export function getEmail(): EmailAdapter | null {
   if (email !== undefined) return email;
   const provider = serverEnv().EMAIL_PROVIDER;
-  email = provider === "mock" ? new MockEmail() : null;
+  email = provider === "smtp" ? new SmtpEmail() : provider === "mock" ? new MockEmail() : null;
   return email;
 }
 

@@ -1,5 +1,6 @@
 import type { CrmAdapter, CrmEnquiry } from "@/lib/integrations/crm/types";
 import type { EmailAdapter } from "@/lib/integrations/email/types";
+import { templates } from "@/lib/email/templates";
 import { NotConfiguredError, isTransient, nextAttemptDelayMs, safeErrorMessage } from "@/lib/integrations/errors";
 
 export const JOB_OPERATIONS = ["crm.create_enquiry", "email.sales_notification", "email.buyer_confirmation"] as const;
@@ -59,6 +60,8 @@ export async function executeJob(job: JobRecord, deps: JobDeps, now = new Date()
           {
             to: deps.salesInbox!,
             replyTo: enquiry.contact.email,
+            template: "sales_notification",
+            entityId: enquiry.websiteEnquiryId,
             subject: `New wholesale enquiry ${enquiry.enquiryNumber} — ${enquiry.company?.name ?? enquiry.contact.name}`,
             text: `${enquiry.contact.name}${enquiry.company ? ` (${enquiry.company.name})` : ""}\n${enquiry.contact.email} · ${enquiry.contact.phone}${enquiry.contact.country ? ` · ${enquiry.contact.country}` : ""}\n\n${itemLines(enquiry)}\n\n${enquiry.message}\n\nOpen in admin: ${deps.siteUrl}/admin/enquiries/${enquiry.websiteEnquiryId}`,
           },
@@ -67,12 +70,15 @@ export async function executeJob(job: JobRecord, deps: JobDeps, now = new Date()
         return { status: "succeeded", externalId };
       }
       case "email.buyer_confirmation": {
+        const mail = templates.enquiryReceived({
+          name: enquiry.contact.name,
+          enquiryNumber: enquiry.enquiryNumber,
+          items: enquiry.items.map((i) => ({ name: i.productName, detail: [i.quantity ? `Qty ${i.quantity}` : "", i.specifications ?? ""].filter(Boolean).join(", ") || "No details given" })),
+          siteUrl: deps.siteUrl,
+          hasAccount: false,
+        });
         const { externalId } = await deps.email!.send(
-          {
-            to: enquiry.contact.email,
-            subject: `We received your enquiry ${enquiry.enquiryNumber} — LESPARO`,
-            text: `Dear ${enquiry.contact.name},\n\nThank you for your enquiry. Our sales team will review it and get back to you.\n\nYour reference: ${enquiry.enquiryNumber}\n\n${itemLines(enquiry)}\n\nLESPARO — Abija Exports, Erode`,
-          },
+          { to: enquiry.contact.email, subject: mail.subject, text: mail.text, html: mail.html, template: "enquiry_received", entityId: enquiry.websiteEnquiryId },
           job.idempotency_key,
         );
         return { status: "succeeded", externalId };

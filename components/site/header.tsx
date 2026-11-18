@@ -2,17 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getCategoryTree, type CategoryNode } from "@/lib/catalogue/queries";
+import { AccountIcon, AccountMenu } from "./account-menu";
 import { AnnouncementBar } from "./announcement-bar";
 import type { NavColumn, NavItem, NavLink, NavTile } from "./nav/types";
 import { SiteNav } from "./site-nav";
 
 /**
- * The navigation, built from the live category tree: Shop, Men, Women, Kids, Collections, About, Wholesale, Contact.
+ * The navigation, built from the live category tree: Shop, Men, Trending, About, Wholesale, Contact.
  * A link is only added when its category exists, so a menu never points at something the catalogue does not sell.
  * Photographs: Men and Women use studio/licensed photography in public/menu (see SOURCES.txt there); Kids and Hoodies use
  * existing project photography and real catalogue product photos. Catalogue product images themselves are never altered.
  */
-const cdn = (c?: CategoryNode) => c?.coverUrl ?? null;
 
 async function buildNav(): Promise<NavItem[]> {
   const tree = await getCategoryTree();
@@ -71,63 +71,34 @@ async function buildNav(): Promise<NavItem[]> {
       },
     });
 
-  if (has("women"))
-    items.push({
-      key: "women",
-      label: "Women",
-      href: "/collections/women",
-      panel: {
-        heading: "Women",
-        blurb: "T-shirts, track pants and 3/4th pants.",
-        columns: [...col("Shop by type", types("women", false)), ...col("Discover", [...newest("women"), { label: "View all women’s products", href: "/collections/women" }])],
-        tiles: tile("women", "Women", "/menu/women-studio.jpg", "50% 30%"),
-        shape: "landscape",
-        cta: { label: "Explore women", href: "/collections/women" },
-      },
-    });
-
-  if (has("kids") || has("boys"))
-    items.push({
-      key: "kids",
-      label: "Kids",
-      href: "/collections/kids",
-      panel: {
-        heading: "Kids",
-        blurb: "Sizes 20 to 28 for kids, and 30 to 36 for boys.",
-        columns: [...col("Kids", [...types("kids"), ...newest("kids")]), ...col("Boys", [...types("boys"), ...newest("boys")])],
-        tiles: [...tile("kids", "Kids", "/about/range-kids.jpg", "50% 25%"), ...tile("boys", "Boys", cdn(all.get("boys")), "50% 30%")],
-        shape: "square",
-        cta: { label: "Explore kids", href: "/collections/kids" },
-      },
-    });
-
   // Collections: only ranges that exist as their own category.
   const collections = [...link("hoodies", "Hoodies"), ...link("new-styles", "New styles")];
   if (collections.length)
     items.push({
       key: "collections",
-      label: "Collections",
+      label: "Trending",
       href: collections[0].href,
       panel: {
-        heading: "Collections",
-        blurb: "Ranges that sit across audiences.",
-        columns: col("Ranges", collections),
+        heading: "Trending",
+        blurb: "Our hoodies and newest styles, for everyone.",
+        columns: col("Browse", collections),
         tiles: tile("hoodies", "Hoodies", "/menu/hoodies.jpg", "50% 30%"),
         shape: "portrait",
         cta: { label: "Shop all", href: "/shop" },
       },
     });
 
-  items.push({ key: "about", label: "About", href: "/about" }, { key: "wholesale", label: "Wholesale", href: "/wholesale" }, { key: "contact", label: "Contact", href: "/contact" });
+  items.push({ key: "about", label: "About", href: "/about" }, { key: "contact", label: "Contact", href: "/contact" }, { key: "wholesale", label: "B2B Sales", href: "/wholesale" });
   return items;
 }
 
 export async function Header() {
   const items = await buildNav();
   const logo = (
-    <Link href="/" className="shrink-0" aria-label="LESPARO home">
-      {/* Registered LESPARO mark, unaltered. */}
-      <Image src="/lesparo-logo-v3.png" alt="LESPARO" width={875} height={460} priority className="h-10 w-auto transition-[height] duration-300 ease-[var(--ease-out-soft)] lg:h-11 [html[data-scrolled]_&]:lg:h-9" />
+    <Link href="/" className="flex shrink-0 items-center gap-3 lg:gap-4" aria-label="LESPARO home">
+      {/* Bird and name shown as separate pieces. */}
+      <Image src="/lesparo-logo-bird.png" alt="" width={270} height={350} priority className="h-10 w-auto transition-[height] duration-300 ease-[var(--ease-out-soft)] lg:h-12 [html[data-scrolled]_&]:lg:h-10" />
+      <Image src="/lesparo-wordmark.png" alt="LESPARO" width={700} height={205} priority className="h-6 w-auto transition-[height] duration-300 ease-[var(--ease-out-soft)] lg:h-7 [html[data-scrolled]_&]:lg:h-6" />
     </Link>
   );
   return (
@@ -138,7 +109,15 @@ export async function Header() {
       </a>
       {/* usePathname() is request data: a boundary lets pages re-render after admin edits. */}
       <Suspense>
-        <SiteNav items={items} logo={logo} />
+        <SiteNav
+          items={items}
+          logo={logo}
+          account={
+            <Suspense fallback={<AccountIcon />}>
+              <AccountMenu />
+            </Suspense>
+          }
+        />
       </Suspense>
     </header>
   );

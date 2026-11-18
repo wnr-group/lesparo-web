@@ -1,4 +1,5 @@
-import { ArrowRight, Check, ChevronRight, Plus, RotateCcw, ShieldCheck, Truck, Store } from "lucide-react";
+import { stockLabel } from "@/lib/inventory/status";
+import { ArrowRight, Check, Flame, ChevronRight, Plus, RotateCcw, ShieldCheck, Truck, Store } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -73,6 +74,7 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
 
   // Structured data: verified facts, plus the retail price only when the admin has switched retail on.
   const retail = p.retailEnabled && p.price !== null;
+  const stockText = stockLabel(p.stock);
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -131,6 +133,12 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
               <span className="text-xs text-muted">per piece</span>
             </p>
           )}
+          {stockText && (
+            <p className={`mt-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[0.78rem] font-bold ${p.stock.level === "out" ? "bg-danger text-white" : "bg-[#fff1cc] text-[#8a5a12] ring-1 ring-[#f0c35a]"}`}>
+              {p.stock.level === "low" && <Flame aria-hidden className="size-4 fill-[#f59e0b] text-[#d9480f] motion-safe:animate-[flame_1.4s_ease-in-out_infinite]" />}
+              {stockText}
+            </p>
+          )}
           <p className="mt-5 max-w-prose leading-relaxed text-ink-soft">{description}</p>
 
           {p.quoteEnabled && (
@@ -158,7 +166,7 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
 
           {retail && (
             <div className="mt-8 border-t border-line pt-7">
-              <RetailPurchase product={{ id: p.id, slug: p.slug, name: p.name, image: p.images[0]?.url ?? null, price: p.price!, currency: p.currency, sizes: p.sizes }} />
+              <RetailPurchase product={{ id: p.id, slug: p.slug, name: p.name, image: p.images[0]?.url ?? null, price: p.price!, currency: p.currency, sizes: p.sizes, soldOutSizes: p.soldOutSizes }} />
             </div>
           )}
 

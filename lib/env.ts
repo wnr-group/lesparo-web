@@ -19,7 +19,15 @@ const schema = z.object({
   // Abija Exports "New Enquiry" API. Both are required when CRM_PROVIDER=abija. The key is server-only.
   ABIJA_ENQUIRY_API_URL: optional(z.url().refine((u) => new URL(u).protocol === "https:", "must be an https URL")),
   ABIJA_ENQUIRY_API_KEY: optional(z.string().min(8)),
-  EMAIL_PROVIDER: z.enum(["none", "mock"]).default("none"),
+  EMAIL_PROVIDER: z.enum(["none", "mock", "smtp"]).default("none"),
+  // SMTP (EMAIL_PROVIDER=smtp). Server-side only; never prefix these with NEXT_PUBLIC_.
+  SMTP_HOST: optional(z.string().min(1)),
+  SMTP_PORT: optional(z.coerce.number().int().min(1).max(65535)),
+  SMTP_SECURE: optional(z.enum(["true", "false"]).transform((v) => v === "true")),
+  SMTP_USER: optional(z.string().min(1)),
+  SMTP_PASSWORD: optional(z.string().min(1)),
+  SMTP_FROM_EMAIL: optional(z.email()),
+  SMTP_FROM_NAME: optional(z.string().min(1)),
   SALES_NOTIFICATION_EMAIL: optional(z.email()),
   // Razorpay: online payment stays off until both the key pair is set. The webhook secret is needed to receive payment events.
   RAZORPAY_KEY_ID: optional(z.string().min(1)),
@@ -46,6 +54,8 @@ export function serverEnv(): ServerEnv {
   if (process.env.NODE_ENV === "production" && (parsed.data.CRM_PROVIDER === "mock" || parsed.data.EMAIL_PROVIDER === "mock")) {
     throw new Error("Mock integration providers are not allowed in production.");
   }
+  const d = parsed.data;
+  if (d.EMAIL_PROVIDER === "smtp" && (!d.SMTP_HOST || !d.SMTP_PORT || !d.SMTP_FROM_EMAIL)) throw new Error("EMAIL_PROVIDER=smtp needs SMTP_HOST, SMTP_PORT and SMTP_FROM_EMAIL. See .env.example.");
   cached = parsed.data;
   return cached;
 }
