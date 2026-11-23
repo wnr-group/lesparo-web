@@ -4,13 +4,14 @@ import Link from "next/link";
 import { Magnetic } from "@/components/site/pointer-fx";
 import { SplitWords } from "@/components/site/split-words";
 import { BUSINESS } from "@/lib/business";
+import { asset } from "@/lib/assets";
 
 /** Three close-ups of the actual garments, each with a caption that only says what the photograph shows. */
 export function DetailPanels() {
   const panels = [
-    { src: "/spotlight/waist.jpg", pos: "50% 25%", title: "Drawcord waistband", text: "A soft elasticated waist with a woven drawcord, set into a fine textured knit." },
-    { src: "/spotlight/tee-detail.jpg", pos: "50% 55%", title: "Textured jacquard knit", text: "A raised, crinkled surface knitted into the cloth, with the LESPARO bird on the chest." },
-    { src: "/collections/garments.jpg", pos: "50% 25%", title: "Contrast collar and cuffs", text: "A brown honeycomb knit polo, trimmed in cream at the collar and sleeves." },
+    { src: asset("/spotlight/waist.jpg"), pos: "50% 25%", title: "Drawcord waistband", text: "A soft elasticated waist with a woven drawcord, set into a fine textured knit." },
+    { src: asset("/spotlight/tee-detail.jpg"), pos: "50% 55%", title: "Textured jacquard knit", text: "A raised, crinkled surface knitted into the cloth, with the LESPARO bird on the chest." },
+    { src: asset("/collections/garments.jpg"), pos: "50% 25%", title: "Contrast collar and cuffs", text: "A brown honeycomb knit polo, trimmed in cream at the collar and sleeves." },
   ];
   return (
     <section aria-labelledby="details" className="bg-white py-16 lg:py-24">
@@ -48,10 +49,10 @@ export function DetailPanels() {
  */
 export function StudioLooks() {
   const looks = [
-    { src: "/looks/grey-tee.jpg", pos: "50% 30%", title: "Everyday tee", href: "/shop" },
-    { src: "/looks/cargo-pants.jpg", pos: "50% 60%", title: "Cargo track pants", href: "/collections/gents-tracks" },
-    { src: "/looks/beige-tee.jpg", pos: "50% 35%", title: "Tee and cargos", href: "/shop" },
-    { src: "/looks/white-tee.jpg", pos: "50% 35%", title: "Training fit", href: "/collections/gents" },
+    { src: asset("/looks/grey-tee.jpg"), pos: "50% 30%", title: "Everyday tee", href: "/shop" },
+    { src: asset("/looks/cargo-pants.jpg"), pos: "50% 60%", title: "Cargo track pants", href: "/collections/gents-tracks" },
+    { src: asset("/looks/beige-tee.jpg"), pos: "50% 35%", title: "Tee and cargos", href: "/shop" },
+    { src: asset("/looks/white-tee.jpg"), pos: "50% 35%", title: "Training fit", href: "/collections/gents" },
   ];
   return (
     <section aria-labelledby="looks" className="edit-track">

@@ -6,6 +6,7 @@ import { AccountIcon, AccountMenu } from "./account-menu";
 import { AnnouncementBar } from "./announcement-bar";
 import type { NavColumn, NavItem, NavLink, NavTile } from "./nav/types";
 import { SiteNav } from "./site-nav";
+import { asset } from "@/lib/assets";
 
 /**
  * The navigation, built from the live category tree: Shop, Men, Trending, About, Wholesale, Contact.
@@ -50,7 +51,7 @@ async function buildNav(): Promise<NavItem[]> {
         ...col("By audience", [...link("gents", "Men’s wear"), ...link("women", "Women’s wear"), ...link("kids", "Kids’ wear"), ...link("boys", "Boys’ wear")]),
         ...col("By range", [...link("hoodies", "Hoodies"), ...link("new-styles", "New styles")]),
       ],
-      tiles: [{ label: "Shop all", href: "/shop", image: "/menu/men-casual.jpg", pos: "50% 22%" }],
+      tiles: [{ label: "Shop all", href: "/shop", image: asset("/menu/men-casual.jpg"), pos: "50% 22%" }],
       shape: "portrait",
       cta: { label: "Shop all", href: "/shop" },
     },
@@ -65,7 +66,7 @@ async function buildNav(): Promise<NavItem[]> {
         heading: "Men",
         blurb: "Everyday shorts, tracks, 3/4ths and T-shirts, cut for comfort.",
         columns: [...col("Shop by type", [...types("gents"), ...link("hoodies", "Hoodies")]), ...col("Discover", [...newest("gents"), { label: "View all men’s products", href: "/collections/gents" }])],
-        tiles: [...tile("gents-tracks", "Track pants", "/menu/men-movement.jpg", "50% 22%"), ...tile("gents-t-shirt", "T-shirts", "/menu/men-tee.jpg", "50% 22%")],
+        tiles: [...tile("gents-tracks", "Track pants", asset("/menu/men-movement.jpg"), "50% 22%"), ...tile("gents-t-shirt", "T-shirts", asset("/menu/men-tee.jpg"), "50% 22%")],
         shape: "portrait",
         cta: { label: "Explore men", href: "/collections/gents" },
       },
@@ -82,7 +83,7 @@ async function buildNav(): Promise<NavItem[]> {
         heading: "Trending",
         blurb: "Our hoodies and newest styles, for everyone.",
         columns: col("Browse", collections),
-        tiles: tile("hoodies", "Hoodies", "/menu/hoodies.jpg", "50% 30%"),
+        tiles: tile("hoodies", "Hoodies", asset("/menu/hoodies.jpg"), "50% 30%"),
         shape: "portrait",
         cta: { label: "Shop all", href: "/shop" },
       },
@@ -97,8 +98,8 @@ export async function Header() {
   const logo = (
     <Link href="/" className="flex shrink-0 items-center gap-3 lg:gap-4" aria-label="LESPARO home">
       {/* Bird and name shown as separate pieces. */}
-      <Image src="/lesparo-logo-bird.png" alt="" width={270} height={350} priority className="h-10 w-auto transition-[height] duration-300 ease-[var(--ease-out-soft)] lg:h-12 [html[data-scrolled]_&]:lg:h-10" />
-      <Image src="/lesparo-wordmark.png" alt="LESPARO" width={700} height={205} priority className="-translate-y-[13%] h-6 w-auto transition-[height] duration-300 ease-[var(--ease-out-soft)] lg:h-7 [html[data-scrolled]_&]:lg:h-6" />
+      <Image src={asset("/lesparo-logo-bird.png")} alt="" width={270} height={350} priority className="h-10 w-auto transition-[height] duration-300 ease-[var(--ease-out-soft)] lg:h-12 [html[data-scrolled]_&]:lg:h-10" />
+      <Image src={asset("/lesparo-wordmark.png")} alt="LESPARO" width={700} height={205} priority className="-translate-y-[13%] h-6 w-auto transition-[height] duration-300 ease-[var(--ease-out-soft)] lg:h-7 [html[data-scrolled]_&]:lg:h-6" />
     </Link>
   );
   return (

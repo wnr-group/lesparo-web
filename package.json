@@ -14,6 +14,7 @@
     "catalogue:publish": "tsx --conditions=react-server --env-file=.env.local scripts/publish-local-catalogue.ts",
     "catalogue:import": "tsx --conditions=react-server --env-file=.env.local scripts/import-catalogue.ts",
     "storage:setup": "tsx --conditions=react-server --env-file=.env.local scripts/setup-storage.ts",
+    "assets:upload": "tsx --env-file=.env.local scripts/upload-site-assets.ts",
     "staff:grant": "tsx --env-file=.env.local scripts/grant-staff-role.ts",
     "db:migrate": "node --env-file=.env.local ./node_modules/prisma/build/index.js migrate dev",
     "db:deploy": "node --env-file=.env.local ./node_modules/prisma/build/index.js migrate deploy",

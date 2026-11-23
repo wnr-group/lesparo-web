@@ -2,6 +2,7 @@ import { ClipboardList, MapPin, PackageCheck, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { asset } from "@/lib/assets";
 
 const PERKS = [
   { icon: PackageCheck, text: "Follow every order from payment to delivery" },
@@ -18,7 +19,7 @@ export function AuthCard({ eyebrow = "Your account", title, intro, children, foo
 
       <div className="mx-auto grid max-w-5xl overflow-hidden rounded-[1.75rem] bg-white shadow-[0_40px_90px_-40px_rgb(18_22_76/0.45)] ring-1 ring-ink/5 lg:min-h-[640px] lg:grid-cols-[0.95fr_1.05fr]">
         <aside className="relative isolate hidden flex-col justify-between overflow-hidden p-10 text-white lg:flex">
-          <Image src="/collections/gents.jpg" alt="" fill priority sizes="(min-width:1024px) 480px, 0px" className="-z-20 object-cover" />
+          <Image src={asset("/collections/gents.jpg")} alt="" fill priority sizes="(min-width:1024px) 480px, 0px" className="-z-20 object-cover" />
           <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-b from-[#0b0f3d]/55 via-[#0b0f3d]/10 to-[#0b0f3d]/90" />
 
           <Link href="/" className="w-fit" aria-label="LESPARO home">

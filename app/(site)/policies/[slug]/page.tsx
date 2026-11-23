@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { LoopVideo } from "@/components/site/loop-video";
 import { Alert, Container } from "@/components/ui/primitives";
 import { POLICIES } from "@/lib/policies";
+import { asset } from "@/lib/assets";
 
 export function generateStaticParams() {
   return POLICIES.map((p) => ({ slug: p.slug }));
@@ -39,7 +40,7 @@ async function PolicyBody({ params }: { params: Promise<{ slug: string }> }) {
       {slug === "quality" && (
         <div className="mt-10">
           {/* Cotton, the loom, a waistband, folded garments, a boy at play, and the line "Crafted in Erode. Made for You." */}
-          <LoopVideo src="/videos/making-of.mp4" label="How LESPARO is made: crafted in Erode" className="aspect-[16/9] lg:aspect-[21/9]" />
+          <LoopVideo src={asset("/videos/making-of.mp4")} label="How LESPARO is made: crafted in Erode" className="aspect-[16/9] lg:aspect-[21/9]" />
         </div>
       )}
       <div className="mt-12 border-t border-line">

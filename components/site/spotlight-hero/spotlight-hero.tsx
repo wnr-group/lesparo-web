@@ -14,6 +14,7 @@ import "./spotlight.css";
 const Garment3D = dynamic(() => import("./garment-3d-premium"), { ssr: false });
 const GarmentClassic = dynamic(() => import("./garment-3d"), { ssr: false });
 import type { Part, Point3D } from "./garment-3d";
+import { asset } from "@/lib/assets";
 
 /**
  * Where each named point sits on a real 3D model: a ray is fired at the model from that side, across and up its
@@ -49,8 +50,8 @@ const VIEWS_3D: Record<string, View3DDef[]> = {
 
 /** The full look when there is no look.glb: the T-shirt over the track pants, each scaled to its real proportion (the shirt overlaps the waistband). */
 const LOOK_PARTS: Part[] = [
-  { src: "/models/pants.glb", height: 1, top: 0 },
-  { src: "/models/tee.glb", height: 0.8, top: 0.68 },
+  { src: asset("/models/pants.glb"), height: 1, top: 0 },
+  { src: asset("/models/tee.glb"), height: 0.8, top: 0.68 },
 ];
 
 const POINTS_3D: Record<string, { label: string; side: Point3D["side"]; u: number; v: number }[]> = {
@@ -81,7 +82,7 @@ type Product = { id: string; label: string; frames: string[]; spots: Spot[]; spi
  */
 const STAND_IN: Record<string, { frames: string[]; spots: Spot[]; keys: string[] }> = {
   pants: {
-    frames: ["/spotlight/front.webp", "/spotlight/model.webp", "/spotlight/side.webp", "/spotlight/waist.jpg"],
+    frames: [asset("/spotlight/front.webp"), asset("/spotlight/model.webp"), asset("/spotlight/side.webp"), asset("/spotlight/waist.jpg")],
     keys: ["Front", "On model", "Back", "Waistband"],
     spots: [
       { frame: 0, x: 0.495, y: 0.085, label: "Drawstring waistband" },
@@ -98,10 +99,10 @@ const STAND_IN: Record<string, { frames: string[]; spots: Spot[]; keys: string[]
     ],
   },
   tee: {
-    frames: ["/spotlight/polo-front.jpg"],
+    frames: [asset("/spotlight/polo-front.jpg")],
     keys: ["Front"],
     spots: [
-      { frame: 0, x: 0.7, y: 0.34, label: "LESPARO brand", art: "/lesparo-bird.png" },
+      { frame: 0, x: 0.7, y: 0.34, label: "LESPARO brand", art: asset("/lesparo-bird.png") },
       { frame: 0, x: 0.5, y: 0.09, label: "Polo collar" },
       { frame: 0, x: 0.52, y: 0.5, label: "Textured knit" },
       { frame: 0, x: 0.87, y: 0.49, label: "Contrast cuff" },
@@ -109,7 +110,7 @@ const STAND_IN: Record<string, { frames: string[]; spots: Spot[]; keys: string[]
     ],
   },
   look: {
-    frames: ["/spotlight/model.webp"],
+    frames: [asset("/spotlight/model.webp")],
     keys: ["On model"],
     spots: [],
   },
@@ -139,8 +140,8 @@ const isCut = (src: string) => /\.(webp|png)$/i.test(src);
 const detailSrc = (src: string) => (src.startsWith("/spotlight/") ? src.replace(/\.webp$/, ".jpg") : src);
 /** Where a stand-in photograph was cropped by the original shoot, that edge fades instead of ending in a hard line. */
 const FADE: Record<string, "top" | "bottom"> = {
-  "/spotlight/front.webp": "top",
-  "/spotlight/side.webp": "top",
+  [asset("/spotlight/front.webp")]: "top",
+  [asset("/spotlight/side.webp")]: "top",
 };
 const FADE_MASK = {
   top: "linear-gradient(to bottom, transparent 0, #000 9%)",
@@ -398,7 +399,7 @@ export function SpotlightHero({ eyebrow, heading, subheading, cta, secondary, tu
         ))}
       </ul>
       <div className="sp-side sp-side-r sp-copy hidden lg:flex">
-        {[["Track pants", "/collections/gents-tracks", "/looks/pants-front.jpg", "50% 62%"], ["Tees and polos", "/shop", "/looks/beige-tee.jpg", "50% 30%"]].map(([t, href, src, pos], i) => (
+        {[["Track pants", "/collections/gents-tracks", asset("/looks/pants-front.jpg"), "50% 62%"], ["Tees and polos", "/shop", asset("/looks/beige-tee.jpg"), "50% 30%"]].map(([t, href, src, pos], i) => (
           <Link key={t} href={href} className={"sp-card " + (i ? "sp-card-b" : "sp-card-a")}>
             <span className="sp-card-img">
               <Image src={src} alt="" fill sizes="120px" className="object-cover" style={{ objectPosition: pos }} />
