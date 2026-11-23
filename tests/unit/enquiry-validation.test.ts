@@ -7,6 +7,8 @@ function form(overrides: Record<string, string | null> = {}) {
   const base: Record<string, string> = {
     idempotencyKey: "0b8e9c5e-3a52-4f63-9a35-2d6c8f9a1b11",
     customerName: "Test Buyer",
+    companyName: "Test Traders",
+    gstNumber: "33abcde1234f1z5",
     email: "buyer@example.com",
     phone: "+91 90000 00000",
     message: "Need 600 pieces delivered to Coimbatore.",
@@ -24,6 +26,17 @@ describe("wholesale enquiry validation", () => {
     const r = parseEnquiryForm(form());
     expect(r.success).toBe(true);
     expect(r.data?.items[0]).toMatchObject({ productId: PRODUCT, quantity: 600 });
+  });
+
+  it("requires a shop name and a valid GST number, and uppercases the GST", () => {
+    expect(parseEnquiryForm(form()).data).toMatchObject({ companyName: "Test Traders", gstNumber: "33ABCDE1234F1Z5", priceListRequest: false });
+    expect(parseEnquiryForm(form({ companyName: "" })).error?.issues[0].path).toEqual(["companyName"]);
+    expect(parseEnquiryForm(form({ gstNumber: "" })).success).toBe(false);
+    expect(parseEnquiryForm(form({ gstNumber: "NOT-A-GSTIN" })).success).toBe(false);
+  });
+
+  it("flags the enquiry as a B2B price list request from the submit button", () => {
+    expect(parseEnquiryForm(form({ intent: "price_list" })).data?.priceListRequest).toBe(true);
   });
 
   it("treats a blank quantity as not given (regression: '' coerced to 0)", () => {

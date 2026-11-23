@@ -72,10 +72,17 @@ const estimatedValue = z
   )
   .transform((v) => (v ? v : undefined));
 
+/** GSTIN: 2-digit state code, 10-character PAN, entity number, "Z", check character. */
+export const GSTIN_PATTERN = /^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
+
 export const enquirySchema = z.object({
   idempotencyKey: z.uuid(),
   customerName: trimmed(120).min(2, "Please enter your name."),
-  companyName: optionalText(160),
+  companyName: trimmed(160).min(2, "Please enter your shop name."),
+  gstNumber: trimmed(15)
+    .transform((v) => v.toUpperCase())
+    .pipe(z.string().regex(GSTIN_PATTERN, "Enter a valid 15-character GST number, for example 33ABCDE1234F1Z5.")),
+  priceListRequest: z.boolean().default(false),
   email: z.email("Enter a valid email address.").trim().max(200),
   phone: trimmed(32)
     .min(7, "Enter a phone number with country code.")

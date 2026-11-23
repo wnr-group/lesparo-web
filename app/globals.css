@@ -1006,13 +1006,23 @@ details.acc[open]::details-content {
 
 /* Soft filled inputs for the wholesale enquiry form. */
 .field-soft {
-  border-color: transparent;
-  background: var(--color-paper);
+  border: 1.5px solid color-mix(in oklab, var(--color-ink) 28%, white);
+  background: #fff;
   border-radius: 0.6rem;
+  padding: 0.8rem 0.95rem;
+  color: var(--color-ink);
+}
+.field-soft::placeholder {
+  color: color-mix(in oklab, var(--color-ink) 45%, white);
 }
 .field-soft:hover {
-  border-color: var(--color-sand);
+  border-color: color-mix(in oklab, var(--color-ink) 55%, white);
 }
 .field-soft:focus {
+  border-color: var(--color-indigo);
   background: #fff;
+}
+.field-soft:disabled {
+  background: color-mix(in oklab, var(--color-ink) 4%, white);
+  border-color: color-mix(in oklab, var(--color-ink) 15%, white);
 }

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { BrandLogo } from "@/components/admin/brand-logo";
 import Link from "next/link";
 import { Suspense } from "react";
 import { AdminNav } from "@/components/admin/admin-nav";
@@ -41,7 +41,7 @@ export default function PanelLayout({ children }: LayoutProps<"/admin">) {
       <aside className="border-b border-line bg-ivory px-4 py-4 lg:sticky lg:top-0 lg:h-dvh lg:w-64 lg:shrink-0 lg:border-b-0 lg:border-r lg:px-4 lg:py-7">
         <div className="mb-4 flex items-center justify-between lg:mb-8 lg:block">
           <Link href="/admin" className="flex items-center gap-3">
-            <Image src="/lesparo-logo-v3.png" alt="LESPARO" width={875} height={460} className="h-10 w-auto" />
+            <BrandLogo />
             <span className="rounded-full bg-indigo/10 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-indigo">Admin</span>
           </Link>
           <Link href="/" className="text-xs text-muted transition-colors hover:text-indigo lg:mt-4 lg:inline-block">

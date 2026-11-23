@@ -170,7 +170,12 @@ model WholesaleEnquiry {
   enquiry_number        String                 @unique
   idempotency_key       String                 @unique
   customer_name         String
+  /// Shop name (retail enquiry form). Sent to the Abija CRM as `company_name`.
   company_name          String?
+  /// GSTIN the shop gave; kept here only, the Abija API has no field for it.
+  gst_number            String?
+  /// True when the buyer used the "Request B2B Price List" button.
+  price_list_request    Boolean                @default(false)
   email                 String
   phone                 String
   country               String?

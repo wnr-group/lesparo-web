@@ -98,7 +98,7 @@ export async function Header() {
     <Link href="/" className="flex shrink-0 items-center gap-3 lg:gap-4" aria-label="LESPARO home">
       {/* Bird and name shown as separate pieces. */}
       <Image src="/lesparo-logo-bird.png" alt="" width={270} height={350} priority className="h-10 w-auto transition-[height] duration-300 ease-[var(--ease-out-soft)] lg:h-12 [html[data-scrolled]_&]:lg:h-10" />
-      <Image src="/lesparo-wordmark.png" alt="LESPARO" width={700} height={205} priority className="h-6 w-auto transition-[height] duration-300 ease-[var(--ease-out-soft)] lg:h-7 [html[data-scrolled]_&]:lg:h-6" />
+      <Image src="/lesparo-wordmark.png" alt="LESPARO" width={700} height={205} priority className="-translate-y-[13%] h-6 w-auto transition-[height] duration-300 ease-[var(--ease-out-soft)] lg:h-7 [html[data-scrolled]_&]:lg:h-6" />
     </Link>
   );
   return (
