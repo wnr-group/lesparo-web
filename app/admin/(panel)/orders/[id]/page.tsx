@@ -145,6 +145,20 @@ export default async function OrderPage(props: PageProps<"/admin/orders/[id]">) 
                 </option>
               ))}
             </select>
+            <p className="mb-1 mt-5 text-xs font-semibold text-ink-soft">Shipment tracking (shown to the customer)</p>
+            <label htmlFor="trackingCarrier" className="mb-1 block text-xs text-muted">
+              Carrier
+            </label>
+            <input id="trackingCarrier" name="trackingCarrier" defaultValue={order.tracking_carrier ?? ""} maxLength={80} className="field h-10 w-full" />
+            <label htmlFor="trackingNumber" className="mb-1 mt-3 block text-xs text-muted">
+              Tracking number
+            </label>
+            <input id="trackingNumber" name="trackingNumber" defaultValue={order.tracking_number ?? ""} maxLength={80} className="field h-10 w-full" />
+            <label htmlFor="trackingUrl" className="mb-1 mt-3 block text-xs text-muted">
+              Tracking link
+            </label>
+            <input id="trackingUrl" name="trackingUrl" type="url" defaultValue={order.tracking_url ?? ""} maxLength={500} placeholder="https://" className="field h-10 w-full" />
+            <p className="mt-2 text-xs text-muted">Add tracking before marking the order Shipped: the customer is emailed once when the status changes.</p>
           </ActionForm>
           {online && <p className="mt-3 text-xs text-muted">Payment status on online orders is set by Razorpay. Staff can only record a refund after payment.</p>}
         </Panel>

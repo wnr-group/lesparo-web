@@ -60,39 +60,76 @@ model Category {
 }
 
 model Product {
-  id              String            @id @default(uuid())
-  name            String
-  slug            String            @unique
-  sku             String?           @unique
-  category_id     String?
-  category        Category?         @relation(fields: [category_id], references: [id], onDelete: Restrict)
-  description     String?
+  id                  String            @id @default(uuid())
+  name                String
+  slug                String            @unique
+  sku                 String?           @unique
+  category_id         String?
+  category            Category?         @relation(fields: [category_id], references: [id], onDelete: Restrict)
+  description         String?
   /// Ordered label/value pairs, e.g. [{"label":"Fit type","value":"Regular"}].
-  specs           Json              @default("[]")
-  fabric          String?
+  specs               Json              @default("[]")
+  fabric              String?
   /// string[]
-  sizes           Json              @default("[]")
-  packing         String?
-  quote_enabled   Boolean           @default(true)
-  retail_enabled  Boolean           @default(false)
-  price           Float?
-  currency        String            @default("INR")
-  is_published    Boolean           @default(false)
-  is_featured     Boolean           @default(false)
-  archived_at     DateTime?
-  seo_title       String?
-  seo_description String?
-  legacy_id       Int?              @unique
-  legacy_url      String?
-  created_at      DateTime          @default(now())
-  updated_at      DateTime          @updatedAt
-  images          ProductImage[]
-  enquiry_items   EnquiryItem[]
-  order_items     RetailOrderItem[]
+  sizes               Json              @default("[]")
+  packing             String?
+  quote_enabled       Boolean           @default(true)
+  retail_enabled      Boolean           @default(false)
+  price               Float?
+  currency            String            @default("INR")
+  is_published        Boolean           @default(false)
+  is_featured         Boolean           @default(false)
+  archived_at         DateTime?
+  /// When true, stock is counted per size (see ProductStock): orders are limited to what is on hand and the shop shows low/out-of-stock tags.
+  track_inventory     Boolean           @default(false)
+  /// Total units on hand at or below which the shop shows an "Only N left" tag.
+  low_stock_threshold Int               @default(5)
+  seo_title           String?
+  seo_description     String?
+  legacy_id           Int?              @unique
+  legacy_url          String?
+  created_at          DateTime          @default(now())
+  updated_at          DateTime          @updatedAt
+  images              ProductImage[]
+  enquiry_items       EnquiryItem[]
+  order_items         RetailOrderItem[]
+  stock               ProductStock[]
+  stock_movements     StockMovement[]
 
   @@index([category_id])
   @@index([is_published, created_at])
   @@map("products")
+}
+
+/// Units on hand for one size of a product. size is "" for products without sizes.
+model ProductStock {
+  id         String   @id @default(uuid())
+  product_id String
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  size       String   @default("")
+  quantity   Int      @default(0)
+  updated_at DateTime @updatedAt
+
+  @@unique([product_id, size])
+  @@map("product_stock")
+}
+
+/// Append-only history of every stock change. reason: adjustment | order | order_cancelled | initial.
+model StockMovement {
+  id             String   @id @default(uuid())
+  product_id     String
+  product        Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  size           String   @default("")
+  delta          Int
+  quantity_after Int
+  reason         String
+  note           String?
+  actor          String?
+  order_id       String?
+  created_at     DateTime @default(now())
+
+  @@index([product_id, created_at])
+  @@map("stock_movements")
 }
 
 model ProductImage {
@@ -133,7 +170,12 @@ model WholesaleEnquiry {
   enquiry_number        String                 @unique
   idempotency_key       String                 @unique
   customer_name         String
+  /// Shop name (retail enquiry form). Sent to the Abija CRM as `company_name`.
   company_name          String?
+  /// GSTIN the shop gave; kept here only, the Abija API has no field for it.
+  gst_number            String?
+  /// True when the buyer used the "Request B2B Price List" button.
+  price_list_request    Boolean                @default(false)
   email                 String
   phone                 String
   country               String?
@@ -150,7 +192,9 @@ model WholesaleEnquiry {
   quotation_valid_until String?
   quotation_details     String?
   follow_up_at          DateTime?
-  /** First time any staff member opened the enquiry; null = still an unread notification. */
+  /**
+   * First time any staff member opened the enquiry; null = still an unread notification.
+   */
   admin_seen_at         DateTime?
   follow_up_outcome     String?
   crm_record_id         String?
@@ -164,9 +208,12 @@ model WholesaleEnquiry {
   attachments           EnquiryAttachment[]
   notes                 EnquiryNote[]
   status_history        EnquiryStatusHistory[]
+  customer_id           String?
+  customer              Customer?              @relation(fields: [customer_id], references: [id], onDelete: SetNull)
 
   @@index([status, created_at])
   @@index([created_at])
+  @@index([customer_id, created_at])
   @@map("wholesale_enquiries")
 }
 
@@ -307,8 +354,16 @@ model RetailOrder {
   /// True once the checkout signature was verified and the payment confirmed as captured.
   payment_verified    Boolean           @default(false)
   paid_at             DateTime?
+  /// Online-payment orders still unpaid at this time are cancelled and their stock released. Null for cash on delivery.
+  payment_due_at      DateTime?
   payments            Payment[]
   audits              OrderAudit[]
+  /// The signed-in customer who placed the order (null for guest checkout).
+  customer_id         String?
+  customer            Customer?         @relation(fields: [customer_id], references: [id], onDelete: SetNull)
+  tracking_carrier    String?
+  tracking_number     String?
+  tracking_url        String?
   /// new | confirmed | shipped | delivered | cancelled
   status              String            @default("new")
   currency            String            @default("INR")
@@ -318,6 +373,8 @@ model RetailOrder {
   items               RetailOrderItem[]
 
   @@index([status, created_at])
+  @@index([customer_id, created_at])
+  @@index([payment_due_at])
   @@map("retail_orders")
 }
 
@@ -391,4 +448,86 @@ model OrderAudit {
 
   @@index([order_id, created_at])
   @@map("order_audits")
+}
+
+// ---------------------------------------------------------------------------
+// Customer accounts. Separate from StaffUser: staff roles never come from here.
+// ---------------------------------------------------------------------------
+
+model Customer {
+  id                String             @id @default(uuid())
+  /// Always stored lowercase.
+  email             String             @unique
+  name              String
+  phone             String
+  password_hash     String
+  email_verified_at DateTime?
+  /// Bumped on password change/reset; sessions carrying an older value stop working.
+  session_version   Int                @default(0)
+  created_at        DateTime           @default(now())
+  updated_at        DateTime           @updatedAt
+  addresses         CustomerAddress[]
+  tokens            CustomerToken[]
+  orders            RetailOrder[]
+  enquiries         WholesaleEnquiry[]
+
+  @@map("customers")
+}
+
+model CustomerAddress {
+  id          String   @id @default(uuid())
+  customer_id String
+  customer    Customer @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  label       String   @default("Home")
+  full_name   String
+  phone       String
+  line        String
+  city        String
+  state       String
+  postcode    String
+  is_default  Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([customer_id])
+  @@map("customer_addresses")
+}
+
+/// One-time tokens for email verification, email change and password reset. Only the SHA-256 hash is stored.
+model CustomerToken {
+  id          String    @id @default(uuid())
+  customer_id String
+  customer    Customer  @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+  /// verify_email | change_email | reset_password
+  type        String
+  token_hash  String    @unique
+  /// change_email only: the address being switched to.
+  new_email   String?
+  expires_at  DateTime
+  used_at     DateTime?
+  created_at  DateTime  @default(now())
+
+  @@index([customer_id, type])
+  @@map("customer_tokens")
+}
+
+/// One row per transactional email (deduplicated on idempotency_key). Bodies and links are never stored.
+model EmailLog {
+  id              String    @id @default(uuid())
+  idempotency_key String    @unique
+  template        String
+  to_email        String
+  subject         String
+  /// sending | sent | failed
+  status          String    @default("sending")
+  attempts        Int       @default(0)
+  entity_id       String?
+  provider_id     String?
+  last_error      String?
+  created_at      DateTime  @default(now())
+  sent_at         DateTime?
+  updated_at      DateTime  @updatedAt
+
+  @@index([status, updated_at])
+  @@map("email_logs")
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -45,22 +45,33 @@ const THUMBS = [
 const MS = 4000;
 const SUN = "#ffd23f";
 const SLIDES: Slide[] = [...PHOTOS, ...(SHOW_CUTOUT_CAMPAIGNS ? CAMPAIGNS : [])];
+// The srcset next/image would use for the first banner's wide picture, for the media-scoped preload above.
+const firstWide = getImageProps({ src: PHOTOS[0].img, alt: "", fill: true, sizes: "100vw" }).props;
 
 /**
  * Hero banner: eight full-bleed campaign banners in one format. The first four are campaign messages, the next four are category
  * banners (Boys, Women, Hoodies, New Styles) linking to their collection pages. A counter with a progress line, pause, arrows and
- * swipe control them, and the controls are light because every banner is dark. It advances by itself (every 4 seconds), pauses only
- * while a mouse is over it or when the pause button is pressed. Reduced motion keeps the automatic advance (with a plain fade) but
+ * swipe control them, and the controls are light because every banner is dark. It advances by itself (every 4 seconds), stops only
+ * when the pause button is pressed (hovering does not pause it). Reduced motion keeps the automatic advance (with a plain fade) but
  * removes the entrance and drift animation.
  */
 export function HeroBanner() {
   const slides = SLIDES;
   const total = slides.length;
   const [i, setI] = useState(0);
-  const [hover, setHover] = useState(false);
   const [userPaused, setUserPaused] = useState(false);
   const touch = useRef(0);
-  const running = !hover && !userPaused;
+  // Only the banner on screen asks for its pictures at first, so they do not compete with the one that decides how fast the page
+  // looks loaded. The neighbouring banners start loading once the page itself has finished, well before the 4 second turn.
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const go = () => (typeof requestIdleCallback === "function" ? requestIdleCallback(() => setReady(true), { timeout: 1500 }) : setTimeout(() => setReady(true), 300));
+    if (document.readyState === "complete") go();
+    else window.addEventListener("load", go, { once: true });
+    return () => window.removeEventListener("load", go);
+  }, []);
+  // The banners keep turning on their own, even with the pointer over them. Only the pause button stops them.
+  const running = !userPaused;
   // Photo banners are dark, so the controls turn light while one is showing.
   const light = slides[i]?.kind === "photo";
 
@@ -78,18 +89,19 @@ export function HeroBanner() {
       aria-roledescription="carousel"
       aria-label="LESPARO campaigns and categories"
       className="hb relative overflow-hidden"
-      onPointerEnter={(e) => e.pointerType === "mouse" && setHover(true)}
-      onPointerLeave={(e) => e.pointerType === "mouse" && setHover(false)}
       onTouchStart={(e) => (touch.current = e.touches[0].clientX)}
       onTouchEnd={(e) => {
         const d = e.changedTouches[0].clientX - touch.current;
         if (Math.abs(d) > 50) go(i + (d < 0 ? 1 : -1));
       }}
     >
+      {/* The first banner's wide picture is fetched early on wide screens only. A plain priority hint cannot say "not on phones", so a
+          media-scoped preload does it: phones download just their own tall picture. */}
+      <link rel="preload" as="image" media="(min-width: 640px)" imageSrcSet={firstWide.srcSet} imageSizes="100vw" fetchPriority="high" />
       <div className="relative h-[44rem] sm:h-[46rem] lg:h-[min(44rem,calc(100svh-6.5rem))] lg:min-h-[36rem]">
         {slides.map((s, n) => {
           const on = n === i;
-          const near = Math.abs(n - i) <= 1 || (i === 0 && n === total - 1) || (i === total - 1 && n === 0);
+          const near = n === i || (ready && (Math.abs(n - i) <= 1 || (i === 0 && n === total - 1) || (i === total - 1 && n === 0)));
           const photo = s.kind === "photo";
           return (
             <div key={s.id} role="group" aria-roledescription="slide" aria-label={`${n + 1} of ${total}`} aria-hidden={!on} data-on={on} className="hb-slide absolute inset-0" style={{ background: s.bg }}>
@@ -99,10 +111,10 @@ export function HeroBanner() {
                   {near && (
                     <>
                       <Image src={s.img} alt="" aria-hidden fill sizes="100vw" className="hb-blur hidden object-cover sm:block" />
-                      <Image src={s.imgM} alt="" aria-hidden fill sizes="100vw" className="hb-blur object-cover sm:hidden" />
+                      <Image src={s.imgM} alt="" aria-hidden fill priority={n === 0} sizes="100vw" className="hb-blur object-cover sm:hidden" />
                       {/* The photograph itself, scaled to the full height of the hero and never cropped. Its left edge fades into the backdrop. */}
                       <div className="hb-fit hidden sm:block">
-                        <Image src={s.img} alt={on ? s.alt : ""} fill priority={n === 0} sizes="(min-width:640px) 100vw, 0px" className="hb-photo object-cover" style={{ objectPosition: `${s.pos[0]}% ${s.pos[1]}%` }} />
+                        <Image src={s.img} alt={on ? s.alt : ""} fill sizes="(min-width:640px) 100vw, 0px" className="hb-photo object-cover" style={{ objectPosition: `${s.pos[0]}% ${s.pos[1]}%` }} />
                       </div>
                       <div className="hb-fit-m sm:hidden">
                         <Image src={s.imgM} alt={on ? s.alt : ""} fill priority={n === 0} sizes="(min-width:640px) 0px, 100vw" className="hb-photo object-cover" />

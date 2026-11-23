@@ -152,7 +152,9 @@ export default async function EnquiryDetailPage(props: PageProps<"/admin/enquiri
             <dl className="space-y-2 text-sm">
               {[
                 ["Name", e.customer_name],
-                ["Company", e.company_name],
+                ["Shop", e.company_name],
+                ["GST", e.gst_number],
+                ["Request", e.price_list_request ? "B2B price list" : "Quotation"],
                 ["Address", e.address],
                 ["Country", e.country],
               ].map(([k, v]) => (

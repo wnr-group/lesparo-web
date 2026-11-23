@@ -17,6 +17,8 @@ export function formDataToEnquiryInput(fd: FormData) {
     idempotencyKey: str("idempotencyKey"),
     customerName: str("customerName"),
     companyName: str("companyName"),
+    gstNumber: str("gstNumber"),
+    priceListRequest: fd.get("intent") === "price_list",
     email: str("email"),
     phone: str("phone"),
     country: str("country"),

@@ -1,5 +1,8 @@
 import { timingSafeEqual } from "node:crypto";
 import { connection } from "next/server";
+import { revalidateTag } from "next/cache";
+import { CATALOGUE_TAG } from "@/lib/catalogue/queries";
+import { expireUnpaidOrders } from "@/lib/services/order-lifecycle";
 import { processDueJobs } from "@/lib/services/jobs";
 
 /**
@@ -13,5 +16,7 @@ export async function GET(request: Request) {
   const ok = !!secret && given.length === secret.length && timingSafeEqual(Buffer.from(given), Buffer.from(secret));
   if (!ok) return new Response("Unauthorized", { status: 401 });
   const processed = await processDueJobs();
-  return Response.json({ processed });
+  const expired = await expireUnpaidOrders();
+  if (expired.length) revalidateTag(CATALOGUE_TAG, "max");
+  return Response.json({ processed, expiredOrders: expired.length });
 }

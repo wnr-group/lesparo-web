@@ -21,7 +21,8 @@ const shopVideo = () => (existsSync(join(process.cwd(), "public", "videos", "sho
 /** Garments, Fabric Unstitched ... with their sub-categories indented beneath. */
 async function ShopCatalogue({ searchParams }: { searchParams: PageProps<"/shop">["searchParams"] }) {
   const tree = await getCategoryTree();
-  const categoryOptions = tree.flatMap((t) => [{ slug: t.slug, name: t.name, depth: 0 }, ...t.children.map((c) => ({ slug: c.slug, name: c.name, depth: 1 }))]);
+  // Fabric Unstitched is not offered as a shop filter.
+  const categoryOptions = tree.filter((t) => t.slug !== "fabric-unstitched").flatMap((t) => [{ slug: t.slug, name: t.name, depth: 0 }, ...t.children.map((c) => ({ slug: c.slug, name: c.name, depth: 1 }))]);
   return <CatalogueBrowser searchParams={searchParams} basePath="/shop" categoryOptions={categoryOptions} />;
 }
 

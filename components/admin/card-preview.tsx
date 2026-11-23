@@ -42,6 +42,8 @@ export function CardPreview({ initial, images, categories }: { initial: Draft; i
     currency: "INR",
     category: category ? { name: category.name, slug: category.slug } : null,
     images,
+    stock: { level: "untracked", total: 0 },
+    soldOutSizes: [],
   };
 
   return (

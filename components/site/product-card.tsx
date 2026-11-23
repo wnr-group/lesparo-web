@@ -1,9 +1,11 @@
+import { Flame } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ViewTransition } from "react";
 import type { ProductCard as Product } from "@/lib/catalogue/queries";
 import { deptClass } from "@/lib/departments";
 import { formatPrice } from "@/lib/format";
+import { stockLabel } from "@/lib/inventory/status";
 import { QuickAddButton } from "./cart";
 import { AddToEnquiryButton } from "./enquiry-list";
 import { ImagePlaceholder } from "./image-placeholder";
@@ -16,9 +18,11 @@ import { ImagePlaceholder } from "./image-placeholder";
  */
 export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
   const [primary, secondary] = product.images;
+  const stockText = stockLabel(product.stock);
+  // Out of stock: no one-tap add to cart (the order would be refused anyway).
   const retail = product.retailEnabled && product.price !== null;
   const sizes = "(min-width: 1536px) 18vw, (min-width: 1280px) 22vw, (min-width: 640px) 30vw, 46vw";
-  const buyable = retail ? { id: product.id, slug: product.slug, name: product.name, image: primary?.url ?? null, price: product.price!, currency: product.currency, sizes: product.sizes } : null;
+  const buyable = retail && product.stock.level !== "out" ? { id: product.id, slug: product.slug, name: product.name, image: primary?.url ?? null, price: product.price!, currency: product.currency, sizes: product.sizes } : null;
   return (
     <article className="group relative flex h-full flex-col">
       <ViewTransition name={`product-${product.id}`} share="morph" default="none">
@@ -44,6 +48,13 @@ export function ProductCard({ product, priority = false }: { product: Product; p
           {product.category && (
             <span className={`${deptClass(product.category.slug) ?? ""} absolute left-2.5 top-2.5 z-[5] rounded-full bg-white/90 px-2.5 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[var(--dept,var(--color-indigo))] backdrop-blur-sm`}>
               {product.category.name}
+            </span>
+          )}
+
+          {stockText && (
+            <span className={`absolute bottom-3 left-2.5 z-[5] inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.66rem] font-bold ${product.stock.level === "out" ? "bg-danger text-white" : "bg-[#fff1cc] text-[#8a5a12] ring-1 ring-[#f0c35a]"}`}>
+              {product.stock.level === "low" && <Flame aria-hidden className="size-3.5 fill-[#f59e0b] text-[#d9480f] motion-safe:animate-[flame_1.4s_ease-in-out_infinite]" />}
+              {stockText}
             </span>
           )}
 

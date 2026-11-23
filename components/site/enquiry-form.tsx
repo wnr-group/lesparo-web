@@ -1,28 +1,23 @@
 "use client";
 
 import clsx from "clsx";
-import { ArrowLeft, ArrowRight, Check, CheckCircle2, Loader2, Paperclip, Plus, Trash2 } from "lucide-react";
+import { ArrowRight, Check, CheckCircle2, Loader2, Lock, Paperclip, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useEffect, useId, useMemo, useRef, useState } from "react";
 import type { EnquiryFormState } from "@/app/(site)/wholesale/actions";
 import { BUSINESS } from "@/lib/business";
-import { ATTACHMENT_RULES } from "@/lib/validation/enquiry";
+import { ATTACHMENT_RULES, GSTIN_PATTERN } from "@/lib/validation/enquiry";
 import { readEnquiryList, useEnquiryList } from "./enquiry-list";
 
 type ProductOption = { id: string; name: string; slug: string; category: string | null };
 type Line = { key: string; productId: string; productName: string; quantity: string; specifications: string };
-
-const STEPS = ["What you need", "About you", "Details"] as const;
-const STEP_HINTS = ["Products and quantities", "Who we reply to", "Requirement and reference files"] as const;
-const STEP_TITLES = ["What are you looking for?", "Who should we reply to?", "Anything else we should know?"] as const;
-const STEP_FIELDS: Record<number, string[]> = { 0: ["items"], 1: ["customerName", "companyName", "email", "phone", "address", "country", "targetBudget"], 2: ["message", "attachments", "consent"] };
 
 const newLine = (productId = ""): Line => ({ key: crypto.randomUUID(), productId, productName: "", quantity: "", specifications: "" });
 
 function Field({ id, label, error, hint, required, children }: { id: string; label: string; error?: string; hint?: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium">
+      <label htmlFor={id} className="mb-1.5 block text-[0.95rem] font-semibold text-ink">
         {label}
         {required ? <span className="text-danger"> *</span> : <span className="font-normal text-muted"> (optional)</span>}
       </label>
@@ -33,11 +28,39 @@ function Field({ id, label, error, hint, required, children }: { id: string; lab
         </p>
       )}
       {error && (
-        <p id={`${id}-error`} className="mt-1.5 text-xs text-danger">
+        <p id={`${id}-error`} className="mt-1.5 text-xs font-medium text-danger">
           {error}
         </p>
       )}
     </div>
+  );
+}
+
+/** One numbered block of the form. A locked section stays readable but its fields are disabled. */
+function Section({ n, title, subtitle, done, locked, sectionRef, children }: { sectionRef?: React.Ref<HTMLElement>; n: number; title: string; subtitle: string; done?: boolean; locked?: boolean; children: React.ReactNode }) {
+  return (
+    <section ref={sectionRef} aria-labelledby={`sec-${n}`} className="scroll-mt-28 border-t-2 border-ink/10 px-5 py-7 first:border-t-0 sm:px-9 sm:py-9">
+      <header className="mb-6 flex items-start gap-4">
+        <span className={clsx("grid size-9 shrink-0 place-items-center rounded-full text-sm font-bold", done ? "bg-success text-white" : locked ? "border border-sand text-muted" : "bg-ink text-white shadow-md")}>
+          {done ? <Check className="size-4" aria-hidden /> : n}
+        </span>
+        <div className="min-w-0 flex-1">
+          <h3 id={`sec-${n}`} className={clsx("font-display text-xl font-extrabold leading-tight tracking-tight", locked && "text-ink-soft")}>
+            {title}
+          </h3>
+          <p className="mt-1 text-sm text-ink-soft">{subtitle}</p>
+        </div>
+        {locked && (
+          <span className="mt-1 hidden shrink-0 items-center gap-1.5 text-xs font-medium text-muted sm:inline-flex">
+            <Lock className="size-3.5" aria-hidden /> Press Continue in step 1 to open this
+          </span>
+        )}
+      </header>
+      <fieldset disabled={locked} className={clsx("min-w-0 space-y-5 border-0 p-0 transition-opacity", locked && "opacity-60")}>
+        <legend className="sr-only">{title}</legend>
+        {children}
+      </fieldset>
+    </section>
   );
 }
 
@@ -55,18 +78,28 @@ export function EnquiryForm({
   const [idempotencyKey, setIdempotencyKey] = useState("");
   const [lines, setLines] = useState<Line[]>([]);
   const [fileNames, setFileNames] = useState<string[]>([]);
-  const [step, setStep] = useState(0);
-  const [stepError, setStepError] = useState("");
+  // Shop name and GST come first; the other sections stay disabled until both are valid.
+  const [shopName, setShopName] = useState("");
+  const [gst, setGst] = useState("");
+  const [confirmed, setConfirmed] = useState(false);
+  const [shopError, setShopError] = useState("");
+  const [gstError, setGstError] = useState("");
+  const shopOk = shopName.trim().length >= 2;
+  const gstOk = GSTIN_PATTERN.test(gst.trim().toUpperCase());
+  const unlocked = confirmed && shopOk && gstOk;
+  const contactRef = useRef<HTMLElement>(null);
+
+  // "Continue" checks the two fields, says what is wrong, and only then opens the rest of the form.
+  const continueToForm = () => {
+    const g = gst.trim().toUpperCase();
+    setShopError(shopOk ? "" : "Enter your shop name.");
+    setGstError(gstOk ? "" : g.length === 15 ? "This GST number does not look right. Check it and try again." : `A GST number has 15 characters. You entered ${g.length}.`);
+    if (!shopOk || !gstOk) return;
+    setConfirmed(true);
+    // Wait for the sections to enable, then take the buyer to the next one.
+    setTimeout(() => contactRef.current?.scrollIntoView({ block: "start", behavior: "smooth" }), 50);
+  };
   const formRef = useRef<HTMLFormElement>(null);
-  // A new server result adjusts state during render (not in an effect): reopen on the first step that has a problem.
-  const [seenState, setSeenState] = useState(state);
-  if (seenState !== state) {
-    setSeenState(state);
-    if (state.status === "error") {
-      const first = [0, 1, 2].find((n) => STEP_FIELDS[n].some((k) => Object.keys(state.fields).some((f) => f === k || f.startsWith(`${k}.`))));
-      if (first !== undefined) setStep(first);
-    }
-  }
   const seeded = useRef(false);
   const statusRef = useRef<HTMLDivElement>(null);
   const uid = useId();
@@ -99,6 +132,15 @@ export function EnquiryForm({
   useEffect(() => {
     // The success view replaces the form; "Send another" reloads for a fresh idempotency key.
     if (state.status === "success") list.clear();
+    if (state.status === "error") {
+      // Take the buyer to the first field with a problem; the banner at the top alone can be out of sight (e.g. the consent box).
+      const bad = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+      if (bad) {
+        bad.scrollIntoView({ block: "center", behavior: "smooth" });
+        bad.focus({ preventScroll: true });
+        return;
+      }
+    }
     if (state.status !== "idle") statusRef.current?.focus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
@@ -108,28 +150,11 @@ export function EnquiryForm({
   const aria = (id: string, k: string) => ({ id, name: k, defaultValue: values[k], "aria-invalid": !!err(k) || undefined, "aria-describedby": err(k) ? `${id}-error` : undefined });
   const update = (key: string, patch: Partial<Line>) => setLines((ls) => ls.map((l) => (l.key === key ? { ...l, ...patch } : l)));
 
-  const goNext = () => {
-    const fd = new FormData(formRef.current!);
-    const val = (k: string) => String(fd.get(k) ?? "").trim();
-    let msg = "";
-    if (step === 0) {
-      if (lines.some((l) => !l.productId && !l.productName.trim())) msg = "Choose a product, or describe your custom requirement, for every line.";
-    } else if (step === 1) {
-      if (!val("customerName") || !val("email") || !val("phone")) msg = "Please fill in your name, business email and phone.";
-    }
-    setStepError(msg);
-    if (!msg) setStep((n) => n + 1);
-  };
-  const goBack = () => {
-    setStepError("");
-    setStep((n) => n - 1);
-  };
-
   if (state.status === "success") {
     return (
-      <div ref={statusRef} tabIndex={-1} role="status" className="border border-success/30 bg-paper p-8 outline-none sm:p-12">
+      <div ref={statusRef} tabIndex={-1} role="status" className="rounded-[1.4rem] border border-success/30 bg-paper p-8 outline-none sm:p-12">
         <CheckCircle2 className="size-8 text-success" aria-hidden />
-        <h3 className="mt-5 font-display font-semibold text-title">Thank you, your enquiry has been received.</h3>
+        <h3 className="mt-5 font-display font-semibold text-title">Thank you, your request has been received.</h3>
         {state.enquiryNumber !== "—" && (
           <p className="mt-3 text-ink-soft">
             Your reference is <strong className="font-medium text-ink tabular-nums">{state.enquiryNumber}</strong>. Please quote it if you contact us. Our sales team will review your requirement and get back to you.
@@ -149,7 +174,14 @@ export function EnquiryForm({
   }
 
   return (
-    <form ref={formRef} key={state.status === "error" ? JSON.stringify(state.values) + state.message : "fresh"} action={formAction} noValidate className="overflow-hidden rounded-[1.4rem] border border-line bg-white shadow-[0_40px_80px_-50px_rgb(18_22_76/0.45)]" aria-describedby={state.status === "error" ? `${uid}-status` : undefined}>
+    <form
+      ref={formRef}
+      key={state.status === "error" ? JSON.stringify(state.values) + state.message : "fresh"}
+      action={formAction}
+      noValidate
+      className="overflow-hidden rounded-[1.4rem] border-2 border-ink/15 bg-white shadow-[0_30px_70px_-35px_rgb(18_22_76/0.55)]"
+      aria-describedby={state.status === "error" ? `${uid}-status` : undefined}
+    >
       <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
       {/* Honeypot: hidden from people and assistive tech. */}
       <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
@@ -158,75 +190,59 @@ export function EnquiryForm({
         </label>
       </div>
 
-      <div className="grid lg:grid-cols-[17rem_1fr]">
-        <aside className="hidden flex-col justify-between gap-10 border-r border-line bg-paper p-8 lg:flex">
-          <div>
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted">Wholesale enquiry</p>
-            <ol className="mt-8 space-y-6" aria-label="Enquiry steps">
-              {STEPS.map((label, n) => (
-                <li key={label} aria-current={n === step ? "step" : undefined}>
-                  <button type="button" disabled={n > step} onClick={() => (setStepError(""), setStep(n))} className="flex w-full items-start gap-4 text-left disabled:cursor-default">
-                    <span className={clsx("grid size-8 shrink-0 place-items-center rounded-full text-xs font-semibold transition-colors", n <= step ? "bg-ink text-white" : "border border-sand text-muted")}>
-                      {n < step ? <Check className="size-4" aria-hidden /> : n + 1}
-                    </span>
-                    <span>
-                      <span className={clsx("block text-[0.95rem] font-semibold", n > step && "text-muted")}>{label}</span>
-                      <span className="mt-0.5 block text-sm text-muted">{STEP_HINTS[n]}</span>
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ol>
-          </div>
-          <div className="space-y-3 border-t border-line pt-6 text-sm text-muted">
-            <p>
-              <span className="font-semibold tabular-nums text-ink">{lines.length}</span> {lines.length === 1 ? "product" : "products"} so far
-            </p>
-            <p>
-              Prefer to call?{" "}
-              <a href={BUSINESS.phone.href} className="font-medium text-ink underline underline-offset-4">
-                {BUSINESS.phone.display}
-              </a>
-            </p>
-          </div>
-        </aside>
-        <div className="min-w-0 space-y-7 p-6 sm:p-10">
       <div ref={statusRef} tabIndex={-1} id={`${uid}-status`} className="outline-none">
         {state.status === "error" && (
-          <p role="alert" className="border border-danger/30 bg-danger-soft px-4 py-3 text-sm text-danger">
+          <p role="alert" className="border-b border-danger/30 bg-danger-soft px-5 py-3 text-sm font-medium text-danger sm:px-9">
             {state.message}
           </p>
         )}
       </div>
 
-      <ol className="flex items-center gap-2 sm:gap-3 lg:hidden" aria-label="Enquiry steps">
-        {STEPS.map((label, n) => (
-          <li key={label} className="flex flex-1 items-center gap-2 sm:gap-3" aria-current={n === step ? "step" : undefined}>
-            <span className={clsx("grid size-7 shrink-0 place-items-center rounded-full text-xs font-semibold", n <= step ? "bg-indigo text-white" : "border border-line text-muted")}>
-              {n < step ? <Check className="size-3.5" aria-hidden /> : n + 1}
-            </span>
-            <span className={clsx("hidden text-sm sm:inline", n === step ? "font-medium text-ink" : "text-muted")}>{label}</span>
-            {n < STEPS.length - 1 && <span className={clsx("h-px flex-1", n < step ? "bg-indigo" : "bg-line")} aria-hidden />}
-          </li>
-        ))}
-      </ol>
-
-      <h3 className="font-display text-[clamp(1.4rem,1.1rem+1vw,1.9rem)] font-bold leading-tight tracking-tight">{STEP_TITLES[step]}</h3>
-
-      <fieldset className={clsx("space-y-5", step !== 0 && "hidden")}>
-        <legend className="sr-only">1 · What you need</legend>
-        {err("items") && <p className="text-sm text-danger">{err("items")}</p>}
-        <div className="flex items-baseline justify-between">
-          <p className="text-sm text-muted">
-            <span className="font-semibold tabular-nums text-ink">{lines.length}</span> {lines.length === 1 ? "product" : "products"} in this enquiry
-          </p>
-          {lines.length < 20 && (
-            <button type="button" onClick={() => setLines((ls) => [...ls, newLine()])} className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo transition-colors hover:text-indigo-deep">
-              <Plus className="size-4" aria-hidden /> Add product
-            </button>
-          )}
+      {/* 1 · Shop */}
+      <Section n={1} title="Your shop" subtitle="Tell us who you are. This unlocks the rest of the form." done={unlocked}>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field id={`${uid}-shop`} label="Shop name" required error={err("companyName") ?? (shopError || undefined)}>
+            <input {...aria(`${uid}-shop`, "companyName")} aria-invalid={!!(err("companyName") || shopError) || undefined} defaultValue={undefined} value={shopName} onChange={(e) => (setShopName(e.target.value), setShopError(""), setConfirmed(false))} autoComplete="organization" className="field field-soft" placeholder="e.g. Sri Murugan Textiles" />
+          </Field>
+          <Field id={`${uid}-gst`} label="GST number" required error={err("gstNumber") ?? (gstError || undefined)} hint="15 characters, e.g. 33ABCDE1234F1Z5">
+            <input {...aria(`${uid}-gst`, "gstNumber")} aria-invalid={!!(err("gstNumber") || gstError) || undefined} defaultValue={undefined} value={gst} onChange={(e) => (setGst(e.target.value.toUpperCase().replace(/s/g, "")), setGstError(""), setConfirmed(false))} maxLength={15} autoCapitalize="characters" autoComplete="off" className="field field-soft uppercase tracking-wide" placeholder="33ABCDE1234F1Z5" />
+          </Field>
         </div>
-        <div className="hidden grid-cols-[minmax(0,1.5fr)_5.5rem_minmax(0,1.2fr)_2rem] gap-x-3 border-b border-ink px-0 pb-2 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-muted md:grid" aria-hidden>
+        <div className="flex flex-wrap items-center gap-4 pt-1">
+          <button type="button" onClick={continueToForm} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-8 text-[0.95rem] font-semibold text-white transition-colors hover:bg-indigo-deep">
+            {unlocked ? "Details confirmed" : "Continue"} {unlocked ? <Check className="size-4" aria-hidden /> : <ArrowRight className="size-4" aria-hidden />}
+          </button>
+          {!unlocked && <p className="text-sm text-muted">Fill in both fields, then press Continue to open the rest of the form.</p>}
+        </div>
+      </Section>
+
+      {/* 2 · Contact */}
+      <Section n={2} sectionRef={contactRef} title="Contact details" subtitle="Where we send your price list and quotation." locked={!unlocked}>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field id={`${uid}-name`} label="Your name" required error={err("customerName")}>
+            <input {...aria(`${uid}-name`, "customerName")} autoComplete="name" className="field field-soft" />
+          </Field>
+          <Field id={`${uid}-phone`} label="Phone" required error={err("phone")} hint="With country code, e.g. +91 94430 22044">
+            <input {...aria(`${uid}-phone`, "phone")} type="tel" autoComplete="tel" className="field field-soft" />
+          </Field>
+          <Field id={`${uid}-email`} label="Email" required error={err("email")}>
+            <input {...aria(`${uid}-email`, "email")} type="email" autoComplete="email" className="field field-soft" />
+          </Field>
+          <Field id={`${uid}-country`} label="Country" error={err("country")}>
+            <input {...aria(`${uid}-country`, "country")} autoComplete="country-name" className="field field-soft" placeholder="India" />
+          </Field>
+          <div className="sm:col-span-2">
+            <Field id={`${uid}-address`} label="Shop address" error={err("address")} hint="Street, city and state, e.g. Erode, Tamil Nadu">
+              <input {...aria(`${uid}-address`, "address")} autoComplete="street-address" className="field field-soft" />
+            </Field>
+          </div>
+        </div>
+      </Section>
+
+      {/* 3 · Products */}
+      <Section n={3} title="Products you need" subtitle="Pick products and rough quantities, or describe something custom." locked={!unlocked}>
+        {err("items") && <p className="text-sm font-medium text-danger">{err("items")}</p>}
+        <div className="hidden grid-cols-[minmax(0,1.5fr)_5.5rem_minmax(0,1.2fr)_2rem] gap-x-3 border-b border-ink pb-2 text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-muted md:grid" aria-hidden>
           <span>Product</span>
           <span>Qty</span>
           <span>Sizes, colours, fabric</span>
@@ -298,49 +314,27 @@ export function EnquiryForm({
                 />
               )}
               {(err(`items.${i}.productName`) || err(`items.${i}.quantity`)) && (
-                <p className="col-span-full text-xs text-danger">{err(`items.${i}.productName`) ?? err(`items.${i}.quantity`)}</p>
+                <p className="col-span-full text-xs font-medium text-danger">{err(`items.${i}.productName`) ?? err(`items.${i}.quantity`)}</p>
               )}
             </li>
           ))}
         </ol>
-      </fieldset>
+        {lines.length < 20 && (
+          <button type="button" onClick={() => setLines((ls) => [...ls, newLine()])} className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo transition-colors hover:text-indigo-deep">
+            <Plus className="size-4" aria-hidden /> Add another product
+          </button>
+        )}
+      </Section>
 
-      <fieldset className={clsx("grid gap-5 sm:grid-cols-2", step !== 1 && "hidden")}>
-        <legend className="sr-only">2 · About you</legend>
-        <Field id={`${uid}-name`} label="Your name" required error={err("customerName")}>
-          <input {...aria(`${uid}-name`, "customerName")} autoComplete="name" className="field field-soft" />
-        </Field>
-        <Field id={`${uid}-company`} label="Company" error={err("companyName")}>
-          <input {...aria(`${uid}-company`, "companyName")} autoComplete="organization" className="field field-soft" />
-        </Field>
-        <Field id={`${uid}-phone`} label="Phone with country code" required error={err("phone")} hint="e.g. +91 94430 22044">
-          <input {...aria(`${uid}-phone`, "phone")} type="tel" autoComplete="tel" className="field field-soft" />
-        </Field>
-        <Field id={`${uid}-email`} label="Business email" required error={err("email")}>
-          <input {...aria(`${uid}-email`, "email")} type="email" autoComplete="email" className="field field-soft" />
-        </Field>
-        <div className="sm:col-span-2">
-          <Field id={`${uid}-address`} label="Address" error={err("address")} hint="Street, city and state, e.g. Erode, Tamil Nadu">
-            <input {...aria(`${uid}-address`, "address")} autoComplete="street-address" className="field field-soft" />
-          </Field>
-        </div>
-        <Field id={`${uid}-budget`} label="Estimated enquiry value (₹)" error={err("targetBudget")} hint="Approximate total value of this order, numbers only, e.g. 50000">
-          <input {...aria(`${uid}-budget`, "targetBudget")} inputMode="decimal" autoComplete="off" placeholder="50000" className="field field-soft" />
-        </Field>
-        <Field id={`${uid}-country`} label="Country / market" error={err("country")}>
-          <input {...aria(`${uid}-country`, "country")} autoComplete="country-name" className="field field-soft" placeholder="India" />
-        </Field>
-      </fieldset>
-
-      <fieldset className={clsx("space-y-5", step !== 2 && "hidden")}>
-        <legend className="sr-only">3 · Details</legend>
-        <Field id={`${uid}-msg`} label="Your requirement" required error={err("message")} hint="Delivery location, timelines, packing or branding needs, or anything else that helps us quote accurately.">
+      {/* 4 · Requirement */}
+      <Section n={4} title="Your requirement" subtitle="Anything that helps us quote accurately." locked={!unlocked}>
+        <Field id={`${uid}-msg`} label="Requirement" required error={err("message")} hint="Delivery location, timelines, packing or branding needs.">
           <textarea {...aria(`${uid}-msg`, "message")} rows={4} className="field field-soft" />
         </Field>
         <Field id={`${uid}-files`} label={`Reference files (up to ${ATTACHMENT_RULES.maxFiles}, 8 MB each)`} error={err("attachments")} hint="JPG, PNG, WebP or PDF. Files are stored privately.">
           <label
             htmlFor={`${uid}-files`}
-            className={clsx("flex cursor-pointer items-center gap-3 border border-dashed border-sand bg-paper px-4 py-4 text-sm hover:border-ink", err("attachments") && "border-danger")}
+            className={clsx("flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-sand bg-paper px-4 py-4 text-sm hover:border-ink", err("attachments") && "border-danger")}
           >
             <Paperclip className="size-4 text-muted" aria-hidden />
             <span className="truncate">{fileNames.length ? fileNames.join(", ") : "Choose files"}</span>
@@ -368,40 +362,31 @@ export function EnquiryForm({
             </span>
           </label>
           {err("consent") && (
-            <p id={`${uid}-consent-error`} className="mt-1.5 text-xs text-danger">
+            <p id={`${uid}-consent-error`} className="mt-1.5 text-xs font-medium text-danger">
               {err("consent")}
             </p>
           )}
         </div>
-      </fieldset>
+      </Section>
 
-      {stepError && (
-        <p role="alert" className="text-sm text-danger">
-          {stepError}
+      {/* Submit */}
+      <div className="flex flex-col gap-4 border-t-2 border-ink/10 bg-mist px-5 py-6 sm:flex-row sm:items-center sm:justify-between sm:px-9">
+        <p className="text-sm text-muted">
+          Prefer to call?{" "}
+          <a href={BUSINESS.phone.href} className="font-medium text-ink underline underline-offset-4">
+            {BUSINESS.phone.display}
+          </a>
         </p>
-      )}
-      <div className="flex items-center gap-3">
-        {step > 0 && (
-          <button type="button" onClick={goBack} className="inline-flex h-13 items-center gap-2 rounded-full border border-line px-6 text-[0.95rem] font-medium transition-colors hover:border-ink">
-            <ArrowLeft className="size-4" aria-hidden /> Back
-          </button>
-        )}
-        {step < STEPS.length - 1 ? (
-          <button type="button" onClick={goNext} className="inline-flex h-13 flex-1 items-center justify-center gap-2 rounded-full bg-indigo px-8 text-[0.95rem] font-semibold text-white transition-colors hover:bg-indigo-deep sm:flex-none">
-            Next <ArrowRight className="size-4" aria-hidden />
-          </button>
-        ) : (
-          <button
-            type="submit"
-            disabled={pending || !idempotencyKey}
-            className="inline-flex h-13 flex-1 items-center justify-center gap-2 rounded-full bg-indigo px-8 text-[0.95rem] font-semibold text-white transition-colors hover:bg-indigo-deep disabled:opacity-60 sm:flex-none"
-          >
-            {pending && <Loader2 className="size-4 animate-spin" aria-hidden />}
-            {pending ? "Sending…" : "Send enquiry"}
-          </button>
-        )}
-      </div>
-        </div>
+        <button
+          type="submit"
+          name="intent"
+          value="price_list"
+          disabled={pending || !idempotencyKey || !unlocked}
+          className="inline-flex h-13 items-center justify-center gap-2 rounded-full bg-indigo px-9 text-[0.95rem] font-semibold text-white transition-colors hover:bg-indigo-deep disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {pending && <Loader2 className="size-4 animate-spin" aria-hidden />}
+          {pending ? "Sending…" : "Request B2B Price List"}
+        </button>
       </div>
     </form>
   );

@@ -1,6 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
+import { getCustomer } from "@/lib/auth/customer";
 import { after } from "next/server";
 import { fieldErrors, parseEnquiryForm, type FieldErrors } from "@/lib/services/enquiry-form";
 import { submitEnquiry } from "@/lib/services/enquiries";
@@ -11,7 +12,7 @@ export type EnquiryFormState =
   | { status: "error"; message: string; fields: FieldErrors; values: Record<string, string> }
   | { status: "success"; enquiryNumber: string; warning?: string };
 
-const ECHO_FIELDS = ["customerName", "companyName", "email", "phone", "country", "address", "targetBudget", "message"] as const;
+const ECHO_FIELDS = ["customerName", "companyName", "gstNumber", "email", "phone", "country", "address", "targetBudget", "message"] as const;
 
 /** React resets uncontrolled fields after an action; echo text values back so nothing typed is lost. */
 function echo(fd: FormData) {
@@ -37,7 +38,8 @@ export async function submitEnquiryAction(_prev: EnquiryFormState, formData: For
   const clientId = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "unknown";
   const files = formData.getAll("attachments").filter((f): f is File => f instanceof File);
 
-  const result = await submitEnquiry(parsed.data, files, clientId);
+  const me = await getCustomer();
+  const result = await submitEnquiry(parsed.data, files, clientId, me?.id ?? null);
   if (!result.ok) {
     return { status: "error", message: result.message, fields: result.field ? { [result.field]: result.message } : {}, values: echo(formData) };
   }

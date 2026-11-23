@@ -6,7 +6,7 @@ import "./globals.css";
 // Archivo (italic, with its width axis) is the athletic voice for prices, badges and shopping headlines.
 const sans = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-heading", display: "swap" });
-const sport = Archivo({ subsets: ["latin"], style: ["normal", "italic"], axes: ["wdth"], variable: "--font-promo", display: "swap" });
+const sport = Archivo({ subsets: ["latin"], style: ["normal", "italic"], variable: "--font-promo", display: "swap" });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
