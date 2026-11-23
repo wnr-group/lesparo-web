@@ -2,7 +2,6 @@ import { BadgePercent, Building2, CheckCircle2, FileText, Headset, Mail, Phone, 
 import { LoopVideo } from "@/components/site/loop-video";
 import { ButtonLink } from "@/components/ui/button";
 import { BUSINESS } from "@/lib/business";
-import { asset } from "@/lib/assets";
 
 const BENEFITS = [
   { icon: BadgePercent, title: "Wholesale prices", text: "Request our B2B price list for retailers, showrooms and wholesalers." },
@@ -28,7 +27,7 @@ export function WholesaleLanding() {
       <section className="relative isolate overflow-hidden bg-indigo-deep text-white">
         {/* The film covers the whole hero. It plays only while on screen and has its own pause button. */}
         <div className="absolute inset-0">
-          <LoopVideo src={asset("/videos/textile-journey.mp4")} label="LESPARO's textile journey: Erode, since 1979" className="size-full" />
+          <LoopVideo src="/videos/textile-journey.mp4" label="LESPARO's textile journey: Erode, since 1979" className="size-full" />
         </div>
         {/* Keeps the text readable over any frame: strong on the left and on small screens, lighter on the right. */}
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-r from-indigo-deep/95 via-indigo-deep/75 to-indigo-deep/35 max-lg:from-indigo-deep/90 max-lg:to-indigo-deep/70" />

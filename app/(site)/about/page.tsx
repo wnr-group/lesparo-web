@@ -10,7 +10,6 @@ import { Magnetic, Tilt } from "@/components/site/pointer-fx";
 import { SplitWords } from "@/components/site/split-words";
 import { ButtonLink } from "@/components/ui/button";
 import { BUSINESS } from "@/lib/business";
-import { asset } from "@/lib/assets";
 import "./about.css";
 
 export const metadata: Metadata = {
@@ -34,33 +33,33 @@ const HISTORY = [
     year: "1979",
     title: "R. Yuvaraj, Erode",
     body: "Mr. Yuvaraj founds R. Yuvaraj in Erode, a city known for textiles. The business begins by supplying lungis, dhoties and mull cloth to Kerala.",
-    photo: { src: asset("/history/1979.jpg"), pos: "50% 55%" },
+    photo: { src: "/history/1979.jpg", pos: "50% 55%" },
     caption: "A weaver at a hand loom",
-    range: { src: asset("/history/today-lungi.jpg"), pos: "50% 50%", label: "Lungi", href: "/collections/lungi" },
+    range: { src: "/history/today-lungi.jpg", pos: "50% 50%", label: "Lungi", href: "/collections/lungi" },
   },
   {
     year: "1999",
     title: "The next generation",
     body: "His son, Y. Sathish, joins as a trainee after a business administration degree, and soon takes a leading role in the company’s growth and expansion.",
-    photo: { src: asset("/history/1999-loom.jpg"), pos: "50% 50%" },
+    photo: { src: "/history/1999-loom.jpg", pos: "50% 50%" },
     caption: "A handloom and its striped cloth",
-    range: { src: asset("/history/today-gents.jpg"), pos: "50% 50%", label: "Gents wear", href: "/collections/gents" },
+    range: { src: "/history/today-gents.jpg", pos: "50% 50%", label: "Gents wear", href: "/collections/gents" },
   },
   {
     year: "2001",
     title: "Y. Sathish & Co.",
     body: "After about two years in the family business, he starts Y. Sathish & Co.: churidar materials, Kerala special dhoties and Kerala sarees, sold to showrooms, chain stores and wholesalers in Kerala and Tamil Nadu.",
-    photo: { src: asset("/history/2001.jpg"), pos: "50% 50%" },
+    photo: { src: "/history/2001.jpg", pos: "50% 50%" },
     caption: "Rolls of cloth, ready for showrooms",
-    range: { src: asset("/history/today-kavi.jpg"), pos: "50% 50%", label: "Kavi dhothy", href: "/collections/kavi" },
+    range: { src: "/history/today-kavi.jpg", pos: "50% 50%", label: "Kavi dhothy", href: "/collections/kavi" },
   },
   {
     year: "2017",
     title: "Abija Exports and LESPARO",
     body: "After his own market survey, he launches Abija Exports, the unit behind LESPARO: knitted and woven unisex and kids’ casual wear. Shorts, 3/4th pants and track suits for leisure, sports and ethnic wear.",
-    photo: { src: asset("/history/2017.jpg"), pos: "50% 38%" },
+    photo: { src: "/history/2017.jpg", pos: "50% 38%" },
     caption: "Yarn cones on a mill rack",
-    range: { src: asset("/history/today-tracks.jpg"), pos: "50% 50%", label: "Gents tracks", href: "/collections/gents-tracks" },
+    range: { src: "/history/today-tracks.jpg", pos: "50% 50%", label: "Gents tracks", href: "/collections/gents-tracks" },
   },
 ];
 
@@ -69,9 +68,9 @@ const VISION = ["To be India’s most customer-centric company of leisure wear",
 
 /** The three ranges, each with a photograph from the studio shoot or the lifestyle artwork. */
 const RANGES = [
-  { name: "Gents", href: "/collections/gents", note: "Shorts, tracks, 3/4th and T-shirts for men.", src: asset("/collections/gents.jpg"), pos: "50% 28%" },
-  { name: "Kids", href: "/collections/kids", note: "Shorts, tracks and 3/4th for kids.", src: asset("/about/range-kids.jpg"), pos: "50% 50%" },
-  { name: "Fabric unstitched", href: "/collections/fabric-unstitched", note: "Lungi, kavi dhothy, towels and kerchiefs: the woven lines the family trade began with.", src: asset("/about/range-fabric.jpg"), pos: "50% 50%" },
+  { name: "Gents", href: "/collections/gents", note: "Shorts, tracks, 3/4th and T-shirts for men.", src: "/collections/gents.jpg", pos: "50% 28%" },
+  { name: "Kids", href: "/collections/kids", note: "Shorts, tracks and 3/4th for kids.", src: "/about/range-kids.jpg", pos: "50% 50%" },
+  { name: "Fabric unstitched", href: "/collections/fabric-unstitched", note: "Lungi, kavi dhothy, towels and kerchiefs: the woven lines the family trade began with.", src: "/about/range-fabric.jpg", pos: "50% 50%" },
 ];
 
 /** The quality policy in four short lines; the full wording is one click away, unchanged. */
@@ -118,11 +117,11 @@ export default function AboutPage() {
       </section>
 
       {/* The brand film: a loom, a tailor, a runner at a temple, a family, and the line "40 Years in Every Thread". */}
-      <BrandFilm open src={asset("/videos/brand-film.mp4")} title="LESPARO: 40 years in every thread" />
+      <BrandFilm open src="/videos/brand-film.mp4" title="LESPARO: 40 years in every thread" />
 
       {/* ========================================================== vision */}
       <section aria-labelledby="vision-heading" className="relative isolate overflow-clip bg-[#1c1d1a] py-16 text-white lg:py-24">
-        <Image src={asset("/collections/banner-kids.jpg")} alt="" fill sizes="100vw" className="scrub-parallax -z-10 object-cover opacity-45" style={{ objectPosition: "70% 40%" }} />
+        <Image src="/collections/banner-kids.jpg" alt="" fill sizes="100vw" className="scrub-parallax -z-10 object-cover opacity-45" style={{ objectPosition: "70% 40%" }} />
         <span aria-hidden className="absolute inset-0 -z-[5] bg-gradient-to-r from-black/85 via-black/55 to-black/25" />
         <div className="mx-auto max-w-page px-4 sm:px-6 lg:px-10">
           <p data-reveal="up" className="eyebrow !text-white/60">
@@ -200,7 +199,7 @@ export default function AboutPage() {
         <div className="mx-auto grid max-w-page gap-12 px-4 sm:px-6 lg:grid-cols-12 lg:items-center lg:gap-16 lg:px-10">
           <div data-reveal="clip" className="lg:col-span-6">
             <div className="relative aspect-[4/3] overflow-hidden bg-night lg:aspect-[5/4]">
-              <Image src={asset("/about/range-fabric.jpg")} alt="Woven LESPARO fabric" fill unoptimized sizes="(min-width:1024px) 50vw, 100vw" className="object-cover" />
+              <Image src="/about/range-fabric.jpg" alt="Woven LESPARO fabric" fill unoptimized sizes="(min-width:1024px) 50vw, 100vw" className="object-cover" />
             </div>
           </div>
           <div className="lg:col-span-6">
@@ -238,8 +237,8 @@ export default function AboutPage() {
           <div className="lg:col-span-6">
             {/* The registered device mark, unaltered, on a plate that tilts a few degrees toward the pointer. */}
             <Tilt className="relative grid aspect-[4/3] place-items-center overflow-clip bg-white ring-1 ring-line" max={4}>
-              <Image src={asset("/lesparo-bird.png")} alt="" aria-hidden width={700} height={700} className="pointer-events-none absolute -right-10 top-1/2 h-[130%] w-auto -translate-y-1/2 opacity-[0.06]" />
-              <Image src={asset("/lesparo-logo-v2.png")} alt="The LESPARO registered device mark" width={900} height={484} sizes="(min-width:1024px) 40vw, 80vw" className="relative w-[70%] max-w-md" />
+              <Image src="/lesparo-bird.png" alt="" aria-hidden width={700} height={700} className="pointer-events-none absolute -right-10 top-1/2 h-[130%] w-auto -translate-y-1/2 opacity-[0.06]" />
+              <Image src="/lesparo-logo-v2.png" alt="The LESPARO registered device mark" width={900} height={484} sizes="(min-width:1024px) 40vw, 80vw" className="relative w-[70%] max-w-md" />
             </Tilt>
           </div>
           <div className="lg:col-span-6">

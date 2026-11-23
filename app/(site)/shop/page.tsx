@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -6,7 +8,6 @@ import { CatalogueBrowser, CatalogueSkeleton } from "@/components/site/catalogue
 import { getCategoryTree } from "@/lib/catalogue/queries";
 import { SplitWords } from "@/components/site/split-words";
 import { CollectionBanner } from "@/components/site/collection-banner";
-import { asset } from "@/lib/assets";
 
 export const metadata: Metadata = {
   title: "Shop all products",
@@ -14,8 +15,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/shop" },
 };
 
-/** The shop promo film, uploaded to the site-assets bucket as videos/shop-banner.mp4. */
-const shopVideo = () => asset("/videos/shop-banner.mp4");
+/** The shop promo film, if one has been added at public/videos/shop-banner.mp4. Without it the banner keeps its photograph. */
+const shopVideo = () => (existsSync(join(process.cwd(), "public", "videos", "shop-banner.mp4")) ? "/videos/shop-banner.mp4" : undefined);
 
 /** Garments, Fabric Unstitched ... with their sub-categories indented beneath. */
 async function ShopCatalogue({ searchParams }: { searchParams: PageProps<"/shop">["searchParams"] }) {

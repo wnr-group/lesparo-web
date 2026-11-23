@@ -4,7 +4,6 @@ import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
 import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { asset } from "@/lib/assets";
 
 type Cta = { label: string; href: string };
 /** A full-bleed campaign banner: the photograph under a dark fade, white headline, yellow button. */
@@ -19,29 +18,29 @@ const BRAND = "Abija Exports · Erode, Tamil Nadu";
 // Banner photographs (public/hero-bg): a wide image (the 2200:1228 shape) and a 9:16 phone crop of each. `pos` is the focal point as percentages.
 // Slides 1 to 4 are the campaign banners. Slides 5 to 8 are category banners generated for LESPARO, each linking to its collection page.
 const PHOTOS: PhotoSlide[] = [
-  { kind: "photo", id: "lifestyle", a: "Everyday Wear.", b: "Made to Move.", text: "Soft cotton knits for men, women and kids.", cta: { label: "Shop the look", href: "/shop" }, img: asset("/hero-bg/banner-lifestyle.webp"), imgM: asset("/hero-bg/banner-lifestyle-mobile.webp"), pos: [50, 55], alt: "A young woman and man laughing together on old stone steps, wearing LESPARO tees and track pants", bg: NAVY },
-  { kind: "photo", id: "sprint", a: "Move Better.", b: "Live Brighter.", text: "Plain, rib and jogger track pants that keep up.", cta: { label: "Shop track pants", href: "/collections/gents-tracks" }, img: asset("/hero-bg/banner-sprint.webp"), imgM: asset("/hero-bg/banner-sprint-mobile.webp"), pos: [55, 28], alt: "A runner mid-stride on a track in a mustard LESPARO tee and navy track pants", bg: NAVY },
-  { kind: "photo", id: "minimal", a: "Style in", b: "Every Stitch.", text: "Everyday and training tees you will live in.", cta: { label: "Shop T-shirts", href: "/shop" }, img: asset("/hero-bg/banner-minimal.webp"), imgM: asset("/hero-bg/banner-minimal-mobile.webp"), pos: [55, 42], alt: "A woman seated in front of colourful arches, wearing a mauve LESPARO tee", bg: NAVY },
-  { kind: "photo", id: "kids", a: "Little Ones.", b: "Big Energy.", text: "Tees, tracks and shorts for kids.", cta: { label: "Shop kids", href: "/collections/kids" }, img: asset("/hero-bg/banner-kids.webp"), imgM: asset("/hero-bg/banner-kids-mobile.webp"), pos: [72, 55], alt: "Two children jumping in a park at sunset in navy and yellow LESPARO outfits", bg: NAVY },
+  { kind: "photo", id: "lifestyle", a: "Everyday Wear.", b: "Made to Move.", text: "Soft cotton knits for men, women and kids.", cta: { label: "Shop the look", href: "/shop" }, img: "/hero-bg/banner-lifestyle.webp", imgM: "/hero-bg/banner-lifestyle-mobile.webp", pos: [50, 55], alt: "A young woman and man laughing together on old stone steps, wearing LESPARO tees and track pants", bg: NAVY },
+  { kind: "photo", id: "sprint", a: "Move Better.", b: "Live Brighter.", text: "Plain, rib and jogger track pants that keep up.", cta: { label: "Shop track pants", href: "/collections/gents-tracks" }, img: "/hero-bg/banner-sprint.webp", imgM: "/hero-bg/banner-sprint-mobile.webp", pos: [55, 28], alt: "A runner mid-stride on a track in a mustard LESPARO tee and navy track pants", bg: NAVY },
+  { kind: "photo", id: "minimal", a: "Style in", b: "Every Stitch.", text: "Everyday and training tees you will live in.", cta: { label: "Shop T-shirts", href: "/shop" }, img: "/hero-bg/banner-minimal.webp", imgM: "/hero-bg/banner-minimal-mobile.webp", pos: [55, 42], alt: "A woman seated in front of colourful arches, wearing a mauve LESPARO tee", bg: NAVY },
+  { kind: "photo", id: "kids", a: "Little Ones.", b: "Big Energy.", text: "Tees, tracks and shorts for kids.", cta: { label: "Shop kids", href: "/collections/kids" }, img: "/hero-bg/banner-kids.webp", imgM: "/hero-bg/banner-kids-mobile.webp", pos: [72, 55], alt: "Two children jumping in a park at sunset in navy and yellow LESPARO outfits", bg: NAVY },
 
-  { kind: "photo", id: "cat-boys", eyebrow: "Boys Collection", a: "Game On.", b: "All Day.", text: "T-shirts, tracks, shorts and 3/4ths for boys.", cta: { label: "Shop Boys", href: "/collections/boys" }, img: asset("/hero-bg/banner-category-boys.webp"), imgM: asset("/hero-bg/banner-category-boys-mobile.webp"), pos: [50, 50], alt: "Two boys standing on a rooftop at sunset, one holding a cricket bat, in LESPARO tees and track pants", bg: NAVY },
-  { kind: "photo", id: "cat-women", eyebrow: "Women Collection", a: "Easy Days.", b: "Effortless Style.", text: "T-shirts, tracks and 3/4ths for women.", cta: { label: "Shop Women", href: "/collections/women" }, img: asset("/hero-bg/banner-category-women.webp"), imgM: asset("/hero-bg/banner-category-women-mobile.webp"), pos: [50, 50], alt: "A woman seated on a window seat in a bright loft, wearing a lavender LESPARO tee and grey track pants", bg: NAVY },
-  { kind: "photo", id: "cat-hoodies", eyebrow: "Hoodies Collection", a: "Layer Up.", b: "Stay Cool.", text: "Hoodies for cooler days.", cta: { label: "Shop Hoodies", href: "/collections/hoodies" }, img: asset("/hero-bg/banner-category-hoodies.webp"), imgM: asset("/hero-bg/banner-category-hoodies-mobile.webp"), pos: [50, 50], alt: "A man in a slate-blue LESPARO zip hoodie standing on a city overpass", bg: NAVY },
-  { kind: "photo", id: "cat-new-styles", eyebrow: "New Styles", a: "Just In.", b: "Fresh Looks.", text: "The newest styles from LESPARO.", cta: { label: "Shop New Styles", href: "/collections/new-styles" }, img: asset("/hero-bg/banner-category-new-styles.webp"), imgM: asset("/hero-bg/banner-category-new-styles-mobile.webp"), pos: [50, 50], alt: "A man in a cream LESPARO tee and black trousers posing against pastel colour blocks and arches", bg: NAVY },
+  { kind: "photo", id: "cat-boys", eyebrow: "Boys Collection", a: "Game On.", b: "All Day.", text: "T-shirts, tracks, shorts and 3/4ths for boys.", cta: { label: "Shop Boys", href: "/collections/boys" }, img: "/hero-bg/banner-category-boys.webp", imgM: "/hero-bg/banner-category-boys-mobile.webp", pos: [50, 50], alt: "Two boys standing on a rooftop at sunset, one holding a cricket bat, in LESPARO tees and track pants", bg: NAVY },
+  { kind: "photo", id: "cat-women", eyebrow: "Women Collection", a: "Easy Days.", b: "Effortless Style.", text: "T-shirts, tracks and 3/4ths for women.", cta: { label: "Shop Women", href: "/collections/women" }, img: "/hero-bg/banner-category-women.webp", imgM: "/hero-bg/banner-category-women-mobile.webp", pos: [50, 50], alt: "A woman seated on a window seat in a bright loft, wearing a lavender LESPARO tee and grey track pants", bg: NAVY },
+  { kind: "photo", id: "cat-hoodies", eyebrow: "Hoodies Collection", a: "Layer Up.", b: "Stay Cool.", text: "Hoodies for cooler days.", cta: { label: "Shop Hoodies", href: "/collections/hoodies" }, img: "/hero-bg/banner-category-hoodies.webp", imgM: "/hero-bg/banner-category-hoodies-mobile.webp", pos: [50, 50], alt: "A man in a slate-blue LESPARO zip hoodie standing on a city overpass", bg: NAVY },
+  { kind: "photo", id: "cat-new-styles", eyebrow: "New Styles", a: "Just In.", b: "Fresh Looks.", text: "The newest styles from LESPARO.", cta: { label: "Shop New Styles", href: "/collections/new-styles" }, img: "/hero-bg/banner-category-new-styles.webp", imgM: "/hero-bg/banner-category-new-styles-mobile.webp", pos: [50, 50], alt: "A man in a cream LESPARO tee and black trousers posing against pastel colour blocks and arches", bg: NAVY },
 ];
 
 // The pastel cut-out campaign slides. They carry the same messages as the first photo banners, so they are off by default.
 // Set to true to play them after the photo banners.
 const SHOW_CUTOUT_CAMPAIGNS = false;
 const CAMPAIGNS: Campaign[] = [
-  { kind: "campaign", id: "lifestyle", a: "Everyday Wear.", b: "Made to Move.", text: "Discover thoughtfully crafted apparel for everyday comfort and style.", cta: { label: "Shop Collection", href: "/shop" }, img: asset("/hero/banner-gents.webp"), alt: "Model in a LESPARO polo and relaxed trousers", bg: "linear-gradient(115deg,#cfe3fb 0%,#eef3fb 45%,#fbe6d8 100%)", shape: "lifestyle" },
-  { kind: "campaign", id: "energy", a: "Move Better.", b: "Live Brighter.", text: "Premium casualwear for every generation.", cta: { label: "Shop Collection", href: "/collections/gents-tracks" }, img: asset("/hero/banner-move.webp"), alt: "Model in a LESPARO tee and cargo track pants", bg: "linear-gradient(115deg,#b9d4f6 0%,#dbe8fa 60%,#eaf2fc 100%)", shape: "energy" },
-  { kind: "campaign", id: "minimal", a: "Style in", b: "Every Stitch.", text: "Knitted & woven fabrics from Erode.", cta: { label: "Shop Collection", href: "/shop" }, img: asset("/hero/banner-beige.webp"), alt: "Model in a LESPARO tee and cargo pants", bg: "linear-gradient(115deg,#f8f2ea 0%,#efe9f6 55%,#e6ecfa 100%)", shape: "minimal" },
+  { kind: "campaign", id: "lifestyle", a: "Everyday Wear.", b: "Made to Move.", text: "Discover thoughtfully crafted apparel for everyday comfort and style.", cta: { label: "Shop Collection", href: "/shop" }, img: "/hero/banner-gents.webp", alt: "Model in a LESPARO polo and relaxed trousers", bg: "linear-gradient(115deg,#cfe3fb 0%,#eef3fb 45%,#fbe6d8 100%)", shape: "lifestyle" },
+  { kind: "campaign", id: "energy", a: "Move Better.", b: "Live Brighter.", text: "Premium casualwear for every generation.", cta: { label: "Shop Collection", href: "/collections/gents-tracks" }, img: "/hero/banner-move.webp", alt: "Model in a LESPARO tee and cargo track pants", bg: "linear-gradient(115deg,#b9d4f6 0%,#dbe8fa 60%,#eaf2fc 100%)", shape: "energy" },
+  { kind: "campaign", id: "minimal", a: "Style in", b: "Every Stitch.", text: "Knitted & woven fabrics from Erode.", cta: { label: "Shop Collection", href: "/shop" }, img: "/hero/banner-beige.webp", alt: "Model in a LESPARO tee and cargo pants", bg: "linear-gradient(115deg,#f8f2ea 0%,#efe9f6 55%,#e6ecfa 100%)", shape: "minimal" },
 ];
 const THUMBS = [
-  { src: asset("/looks/c5.jpg"), label: "T-shirts", href: "/shop" },
-  { src: asset("/looks/c1.jpg"), label: "Track pants", href: "/collections/gents-tracks" },
-  { src: asset("/looks/c4.jpg"), label: "Cargo wear", href: "/collections/gents-tracks" },
+  { src: "/looks/c5.jpg", label: "T-shirts", href: "/shop" },
+  { src: "/looks/c1.jpg", label: "Track pants", href: "/collections/gents-tracks" },
+  { src: "/looks/c4.jpg", label: "Cargo wear", href: "/collections/gents-tracks" },
 ];
 const MS = 4000;
 const SUN = "#ffd23f";

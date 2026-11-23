@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { BUSINESS, formattedAddress } from "@/lib/business";
 import { getCategoryTree } from "@/lib/catalogue/queries";
-import { asset } from "@/lib/assets";
 
 export async function Footer() {
   const tree = await getCategoryTree();
@@ -29,8 +28,8 @@ export async function Footer() {
       <div className="mx-auto grid max-w-page gap-12 px-4 py-16 sm:px-6 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:px-10">
         <div>
           <div className="inline-flex items-center gap-5 rounded-2xl bg-white p-4">
-            <Image src={asset("/lesparo-logo-bird.png")} alt="" width={270} height={350} className="aspect-[270/350] h-16 w-auto" />
-            <Image src={asset("/lesparo-wordmark.png")} alt="LESPARO" width={700} height={205} className="aspect-[700/205] h-10 w-auto" />
+            <Image src="/lesparo-logo-bird.png" alt="" width={270} height={350} className="aspect-[270/350] h-16 w-auto" />
+            <Image src="/lesparo-wordmark.png" alt="LESPARO" width={700} height={205} className="aspect-[700/205] h-10 w-auto" />
           </div>
           <p className="mt-6 max-w-xs font-display text-3xl font-bold tracking-tight text-white">{BUSINESS.tagline}</p>
           <address className="mt-6 text-sm not-italic leading-relaxed">

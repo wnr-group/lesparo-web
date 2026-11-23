@@ -1,34 +1,33 @@
 import Image from "next/image";
 import { BannerVideo } from "@/components/site/banner-video";
 import type { ReactNode } from "react";
-import { asset } from "@/lib/assets";
 
 /** Studio photographs from the LESPARO shoot, in public/collections. `pos` keeps the subject in frame when the portrait is cropped wide. */
 const PHOTOS: Record<string, { src: string; pos: string }> = {
-  garments: { src: asset("/collections/garments.jpg"), pos: "50% 30%" },
-  gents: { src: asset("/collections/gents.jpg"), pos: "50% 28%" },
-  kids: { src: asset("/collections/kids.jpg"), pos: "50% 25%" },
-  tracks: { src: asset("/collections/tracks.jpg"), pos: "50% 82%" },
-  shorts: { src: asset("/collections/shorts.jpg"), pos: "50% 60%" },
-  "three-quarter": { src: asset("/collections/three-quarter.jpg"), pos: "50% 55%" },
-  fabric: { src: asset("/collections/fabric.jpg"), pos: "50% 35%" },
-  lungi: { src: asset("/collections/lungi.jpg"), pos: "50% 35%" },
-  kavi: { src: asset("/collections/kavi.jpg"), pos: "50% 40%" },
-  towels: { src: asset("/collections/towels.jpg"), pos: "50% 35%" },
-  kerchief: { src: asset("/collections/kerchief.jpg"), pos: "50% 30%" },
-  range: { src: asset("/collections/range.jpg"), pos: "50% 35%" },
-  about: { src: asset("/collections/about-banner-b.jpg"), pos: "50% 6%" },
-  wholesale: { src: asset("/collections/wholesale-banner.jpg"), pos: "50% 8%" },
-  contact: { src: asset("/collections/contact-banner.jpg"), pos: "50% 18%" },
+  garments: { src: "/collections/garments.jpg", pos: "50% 30%" },
+  gents: { src: "/collections/gents.jpg", pos: "50% 28%" },
+  kids: { src: "/collections/kids.jpg", pos: "50% 25%" },
+  tracks: { src: "/collections/tracks.jpg", pos: "50% 82%" },
+  shorts: { src: "/collections/shorts.jpg", pos: "50% 60%" },
+  "three-quarter": { src: "/collections/three-quarter.jpg", pos: "50% 55%" },
+  fabric: { src: "/collections/fabric.jpg", pos: "50% 35%" },
+  lungi: { src: "/collections/lungi.jpg", pos: "50% 35%" },
+  kavi: { src: "/collections/kavi.jpg", pos: "50% 40%" },
+  towels: { src: "/collections/towels.jpg", pos: "50% 35%" },
+  kerchief: { src: "/collections/kerchief.jpg", pos: "50% 30%" },
+  range: { src: "/collections/range.jpg", pos: "50% 35%" },
+  about: { src: "/collections/about-banner-b.jpg", pos: "50% 6%" },
+  wholesale: { src: "/collections/wholesale-banner.jpg", pos: "50% 8%" },
+  contact: { src: "/collections/contact-banner.jpg", pos: "50% 18%" },
 };
 
 /** Lifestyle banner artwork for the kids and fabric collections (public/collections/banner-*.jpg). The dark left side of each is left clear for the title. */
 const COVERS: { match: string; src: string; pos: string }[] = [
-  { match: "kerchief", src: asset("/collections/banner-kerchief.jpg"), pos: "64% 40%" },
-  { match: "towel", src: asset("/collections/banner-towels.jpg"), pos: "75% 50%" },
-  { match: "kavi", src: asset("/collections/banner-kavi.jpg"), pos: "64% 50%" },
-  { match: "lungi", src: asset("/collections/banner-lungi.jpg"), pos: "64% 40%" },
-  { match: "kids", src: asset("/collections/banner-kids.jpg"), pos: "72% 40%" },
+  { match: "kerchief", src: "/collections/banner-kerchief.jpg", pos: "64% 40%" },
+  { match: "towel", src: "/collections/banner-towels.jpg", pos: "75% 50%" },
+  { match: "kavi", src: "/collections/banner-kavi.jpg", pos: "64% 50%" },
+  { match: "lungi", src: "/collections/banner-lungi.jpg", pos: "64% 40%" },
+  { match: "kids", src: "/collections/banner-kids.jpg", pos: "72% 40%" },
 ];
 const coverFor = (slug?: string) => (slug ? COVERS.find((c) => slug.includes(c.match)) : undefined);
 

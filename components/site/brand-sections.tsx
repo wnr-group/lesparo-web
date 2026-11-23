@@ -5,7 +5,6 @@ import { CountUp } from "@/components/site/count-up";
 import { Magnetic } from "@/components/site/pointer-fx";
 import { SplitWords } from "@/components/site/split-words";
 import { BUSINESS } from "@/lib/business";
-import { asset } from "@/lib/assets";
 
 /** The brand line, large, on a light panel beside a studio photograph. */
 export function BrandStatement() {
@@ -33,7 +32,7 @@ export function BrandStatement() {
           </Magnetic>
         </div>
         <div className="group relative min-h-80 overflow-clip lg:min-h-0">
-          <Image src={asset("/looks/training.jpg")} alt="" fill sizes="(min-width:1024px) 38vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: "50% 30%" }} />
+          <Image src="/looks/training.jpg" alt="" fill sizes="(min-width:1024px) 38vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: "50% 30%" }} />
         </div>
       </div>
     </section>
@@ -51,7 +50,7 @@ export function BrandStory() {
     <section aria-labelledby="brand-story" className="py-16 lg:py-24">
       <div className="mx-auto grid max-w-page items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20 lg:px-10">
         <div data-reveal="clip" className="group relative aspect-[4/5] lg:sticky lg:top-32 lg:self-start overflow-clip rounded-[1.6rem] bg-night">
-          <Image src={asset("/collections/range.jpg")} alt="A LESPARO polo in brown knit, worn in the studio" fill sizes="(min-width:1024px) 42vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: "50% 30%" }} />
+          <Image src="/collections/range.jpg" alt="A LESPARO polo in brown knit, worn in the studio" fill sizes="(min-width:1024px) 42vw, 100vw" className="scrub-parallax hz object-cover" style={{ objectPosition: "50% 30%" }} />
         </div>
         <div>
           <p data-reveal="up" className="eyebrow">

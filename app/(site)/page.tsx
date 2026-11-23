@@ -10,7 +10,6 @@ import { ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/ui/primitives";
 import { BUSINESS } from "@/lib/business";
 import { getCategoryBySlug, getCategoryTree, getHomepageContent, listProducts } from "@/lib/catalogue/queries";
-import { asset } from "@/lib/assets";
 
 const STEPS = [
   ["Browse", "Add products to your enquiry list as you explore the catalogue."],
@@ -58,13 +57,13 @@ export default async function HomePage() {
       )}
 
       {/* ------------------------------------------------------- campaign film: Move Freely */}
-      <BrandFilm open src={asset("/videos/active-life.mp4")} title="LESPARO: Move freely" />
+      <BrandFilm open src="/videos/active-life.mp4" title="LESPARO: Move freely" />
 
       <BrandStatement />
       <BrandStory />
 
       {/* ------------------------------------------------------------ lookbook film */}
-      <BrandFilm src={asset("/lesparo-video-1.mp4")} title="The LESPARO lookbook" />
+      <BrandFilm src="/lesparo-video-1.mp4" title="The LESPARO lookbook" />
 
       <DetailPanels />
 
@@ -107,7 +106,7 @@ export default async function HomePage() {
               {/* One calm panel: the range standing together. */}
               <div data-reveal="clip" className="relative min-h-[26rem] overflow-hidden rounded-[2rem] bg-night lg:col-span-5 lg:min-h-[34rem]">
                 <p className="absolute left-6 top-6 z-10 rounded-full bg-white px-4 py-2 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-indigo shadow-sm">Abija Exports · Erode</p>
-                <Image src={asset("/collections/kavi.jpg")} alt="A LESPARO polo in brown knit" fill sizes="(min-width:1024px) 40vw, 100vw" className="object-cover" style={{ objectPosition: "50% 30%" }} />
+                <Image src="/collections/kavi.jpg" alt="A LESPARO polo in brown knit" fill sizes="(min-width:1024px) 40vw, 100vw" className="object-cover" style={{ objectPosition: "50% 30%" }} />
               </div>
             </div>
           </Container>

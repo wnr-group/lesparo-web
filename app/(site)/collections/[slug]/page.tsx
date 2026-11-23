@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -6,7 +8,6 @@ import { CatalogueBrowser, CatalogueSkeleton } from "@/components/site/catalogue
 import { SplitWords } from "@/components/site/split-words";
 import { CollectionBanner, hasPhoto } from "@/components/site/collection-banner";
 import { getCategories, getCategoryBySlug, listProducts } from "@/lib/catalogue/queries";
-import { asset } from "@/lib/assets";
 
 export async function generateStaticParams() {
   return (await getCategories()).map((c) => ({ slug: c.slug }));
@@ -27,10 +28,10 @@ export async function generateMetadata(props: PageProps<"/collections/[slug]">):
 /** The stretch of the film that plays: 0:00 to 0:06:12 (6 seconds and 12 frames at the file's 24 fps, which is 6.5 s), then it loops. */
 const GENTS_CLIP: [number, number] = [0, 6 + 12 / 24];
 
-/** Collections with a promo film in the site-assets bucket (videos/<slug>_video.mp4). Add a slug here after uploading its film. */
-const FILMS = new Set(["gents"]);
+/** A promo film for a collection, if public/videos/<slug>_video.mp4 exists (gents_video.mp4 for Gents). */
 function filmFor(slug: string) {
-  return FILMS.has(slug) ? asset(`/videos/${slug}_video.mp4`) : undefined;
+  const name = `${slug}_video.mp4`;
+  return existsSync(join(process.cwd(), "public", "videos", name)) ? `/videos/${name}` : undefined;
 }
 
 async function CollectionHeader({ params }: { params: Promise<{ slug: string }> }) {
